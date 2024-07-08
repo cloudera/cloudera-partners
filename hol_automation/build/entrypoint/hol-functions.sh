@@ -485,7 +485,7 @@ cdp_destroy_status=$?
 destroy_hol_infra () {
    destroy_cdp
    cdp_destroy_status=$?
-   if [ "$provision_keycloak" == "yes"]; then
+   if [ "$provision_keycloak" == "yes" ]; then
       destroy_keycloak
       keycloak_destroy_status=$?
    fi

@@ -13,7 +13,7 @@ case $USER_ACTION in
           key_pair_file
           setup_aws_and_cdp_profile
           aws_prereq
-          if [ "$provision_keycloak" == "yes"]; then
+          if [ "$provision_keycloak" == "yes" ]; then
             setup_keycloak_ec2 $keycloak_sg_name
             if [ $? -ne 0 ]; then
                echo "Keycloak Server Provisioning Failed. Rolling Back The Changes."
@@ -44,7 +44,7 @@ Please Try Again. Exiting....."
              echo
            fi
            update_cdp_user_group
-           if [ "$provision_keycloak" == "yes"]; then
+           if [ "$provision_keycloak" == "yes" ]; then
             cdp_idp_setup_user
            fi
            enable_data_services
@@ -54,7 +54,7 @@ Please Try Again. Exiting....."
    destroy)
           validating_variables
           setup_aws_and_cdp_profile
-          if [ "$provision_keycloak" == "yes"]; then
+          if [ "$provision_keycloak" == "yes" ]; then
             cdp_idp_user_teardown
           fi
           disable_data_services
