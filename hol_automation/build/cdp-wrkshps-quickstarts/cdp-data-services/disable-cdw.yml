@@ -26,10 +26,18 @@
       ansible.builtin.command: |
         cdp dw delete-data-visualization --cluster-id "{{ dwcluster.get('clusters', [{}])[0].get('id') }}" --data-visualization-id "{{ item }}"
       loop: "{{ datavizs.stdout | from_json | json_query('dataVisualizations[].id') }}"
-      until: datavizs.get('cluster', [{}])[0].get('status') == "Deleting"
-      retries: 50
-      delay: 30
+      register: delete_output
       ignore_errors: true
+
+    - name: Check if data visualization clusters still exist
+      ansible.builtin.command: |
+        cdp dw list-data-visualizations --cluster-id "{{ dwcluster.get('clusters', [{}])[0].get('id') }}"
+      register: check_output
+      until: check_output.stdout | from_json | json_query('dataVisualizations') | length == 0
+      retries: 50
+      delay: 10
+      ignore_errors: true
+
 
     - name: Debug dwcluster and dbcatalogstatus
       debug:
