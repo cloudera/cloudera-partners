@@ -382,7 +382,7 @@ cdp_prereq() {
       echo "************************************************************************************************************************************************************"
       exit 1
    else
-      echo -e "Check CDP SAML Identity Providers (IdP) Count ..... Passed\n"
+      echo -e "Check CDP SAML Identity Providers (IdP) Count ..... Passed"
    fi
 }
 #-------------------------------------------------------------------------------------------------#
@@ -632,6 +632,8 @@ cdp_idp_setup_user() {
    echo "Numbers Of Users Created: $number_of_workshop_users" >>"/userconfig/$workshop_name.txt"
    echo "Sample Usernames: User1: $sample_keycloak_user1, User2: $sample_keycloak_user2" >>"/userconfig/$workshop_name.txt"
    echo "Default Password for HOL Users: $workshop_user_default_password " >>"/userconfig/$workshop_name.txt"
+   echo "UserAssignment App Admin URL: http://$KEYCLOAK_SERVER_IP:5000/admin" >>"/userconfig/$workshop_name.txt"
+   echo "UserAssignment App Participant URL: http://$KEYCLOAK_SERVER_IP:5000/participant" >>"/userconfig/$workshop_name.txt"
    echo "===============================================================" >>"/userconfig/$workshop_name.txt"
 }
 #--------------------------------------------------------------------------------------------------#
@@ -667,7 +669,7 @@ count_elements() {
 #--------------------------------------------------------------------------------------------------#
 deploy_cdw() {
    echo -e "\n               ==========================Deploying CDW======================================"
-   echo -e "\n Configuring subnet values.. \nInitial values:"
+   echo -e "\nConfiguring subnet values.. \nInitial values:"
    echo "ENV_PUBLIC_SUBNETS: $ENV_PUBLIC_SUBNETS"
    echo "ENV_PRIVATE_SUBNETS: $ENV_PRIVATE_SUBNETS"
 
@@ -693,7 +695,8 @@ deploy_cdw() {
    env_lb_public_subnet=$ENV_PUBLIC_SUBNETS \
    env_wrkr_private_subnet=$ENV_PRIVATE_SUBNETS \
    workshop_name=$workshop_name \
-   Size=$size_of_virtual_warehouse \
+   vw_size=$size_of_virtual_warehouse \
+   cdvc_size=viz-default \
    number_vw_to_create=$number_vw_to_create"
 }
 #--------------------------------------------------------------------------------------------------#
@@ -707,6 +710,14 @@ disable_cdw() {
 deploy_cde() {
    echo "               ==========================Deploying CDE======================================"
    number_vc_to_create=$((($number_of_workshop_users / 10) + ($number_of_workshop_users % 10 > 0)))
+   DEFAULT_CDE_INSTANCE_TYPE="m5.2xlarge"
+   if [ -z "${CDE_INSTANCE_TYPE+x}" ] || [ -z "$CDE_INSTANCE_TYPE" ]; then
+       cde_instance_type=$DEFAULT_CDE_INSTANCE_TYPE
+   else
+       cde_instance_type=$CDE_INSTANCE_TYPE
+   fi
+   cde_min_instances=10
+   cde_max_instances=40
    ansible-playbook $DS_CONFIG_DIR/enable-cde.yml --extra-vars \
       "cdp_env_name=$workshop_name-cdp-env \
    workshop_name=$workshop_name \
@@ -730,7 +741,12 @@ deploy_cml() {
    #number_vws_to_create=$(( ($number_of_workshop_users / 10) + ($number_of_workshop_users % 10 > 0) ))
    ansible-playbook $DS_CONFIG_DIR/enable-cml.yml --extra-vars \
       "cdp_env_name=$workshop_name-cdp-env \
-   workshop_name=$workshop_name"
+   workshop_name=$workshop_name \
+   enable_gpu=true \
+   minimum_instances=1 \
+   maximum_instances=10 \
+   minimum_gpu_instances=0 \
+   maximum_gpu_instances=10"
    #number_vws_to_create=$number_vws_to_create"
 }
 #--------------------------------------------------------------------------------------------------#

@@ -8,13 +8,27 @@
     minimum_instances: 1
     maximum_instances: 10
     gpu_instance_type: "g4dn.xlarge"
+    minimum_gpu_instances: 0
+    maximum_gpu_instances: 10
     root_volume_size: 256
-    enable_gpu: true
+    enable_gpu: false
+
   tasks:
     - name: Check and print variable status
       debug:
-        msg: "cdp_env_name: {{ cdp_env_name }}, workshop_name: {{ workshop_name }}, workspace_name: {{ workshop_name }}-cml-ws"
-
+        msg: |
+          cdp_env_name: {{ cdp_env_name }},
+          workshop_name: {{ workshop_name }},
+          workspace_name: {{ workshop_name }}-cml-ws,
+          ws_instance_type: {{ ws_instance_type }},
+          minimum_instances: {{ minimum_instances }},
+          maximum_instances: {{ maximum_instances }},
+          gpu_instance_type: {{ gpu_instance_type }},
+          minimum_gpu_instances: {{ minimum_gpu_instances }},
+          maximum_gpu_instances: {{ maximum_gpu_instances }},
+          root_volume_size: {{ root_volume_size }},
+          enable_gpu: {{ enable_gpu }}
+        
     - name: List CML Workspaces for existence check
       ansible.builtin.shell: >
         cdp ml list-workspaces | jq -r '.workspaces[].instanceName'
@@ -29,55 +43,62 @@
         msg: "Workspace {{ workshop_name }}-cml-ws already exists in environment {{ cdp_env_name }}."
       when: workspace_exists
 
-    - name: Provision CML Workspace with GPU support if it does not exist
-      ansible.builtin.command: >
-        cdp ml create-workspace \
-        --environment-name "{{ cdp_env_name }}" \
-        --workspace-name "{{ workshop_name }}-cml-ws" \
-        --use-public-load-balancer \
-        --enable-model-metrics \
-        --no-disable-tls \
-        --enable-monitoring \
-        --static-subdomain "{{ workshop_name[0:11] }}-cml" \
-        --provision-k8s-request {{
+    - name: Generate JSON for provision-k8s-request
+      set_fact:
+        provision_k8s_request: >
           {
-            "environmentName": cdp_env_name,
+            "environmentName": "{{ cdp_env_name }}",
             "instanceGroups": [
               {
                 "name": "default_settings",
                 "instanceType": "{{ ws_instance_type }}",
-                "rootVolume": {"size": "{{ root_volume_size }}"},
+                "rootVolume": {"size": {{ root_volume_size | int }}},
                 "autoscaling": {
-                  "minInstances": "{{ minimum_instances }}",
-                  "maxInstances": "{{ maximum_instances }}",
+                  "minInstances": {{ minimum_instances | int }},
+                  "maxInstances": {{ maximum_instances | int }},
                   "enabled": true
                 }
               },
               {
                 "name": "cpu_settings",
                 "instanceType": "{{ ws_instance_type }}",
-                "rootVolume": {"size": "{{ root_volume_size }}"},
+                "rootVolume": {"size": {{ root_volume_size | int }}},
                 "autoscaling": {
-                  "minInstances": "{{ minimum_instances }}",
-                  "maxInstances": "{{ maximum_instances }}",
+                  "minInstances": {{ minimum_instances | int }},
+                  "maxInstances": {{ maximum_instances | int }},
                   "enabled": true
                 }
               }
-              {%- if enable_gpu %}
+              {% if enable_gpu %}
               , {
                 "name": "gpu_settings",
                 "instanceType": "{{ gpu_instance_type }}",
-                "rootVolume": {"size": "{{ root_volume_size }}"},
+                "rootVolume": {"size": {{ root_volume_size | int }}},
                 "autoscaling": {
-                  "minInstances": 0,
-                  "maxInstances": 1,
+                  "minInstances": {{ minimum_gpu_instances | int }},
+                  "maxInstances": {{ maximum_gpu_instances | int }},
                   "enabled": true
                 }
               }
-              {%- endif %}
+              {% endif %}
             ]
           }
-        | to_json }}
+
+    - name: Debug generated JSON
+      debug:
+        msg: "Provision K8S request JSON: {{ provision_k8s_request | to_json }}"
+
+    - name: Provision CML Workspace with GPU support if it does not exist
+      ansible.builtin.command: >
+        cdp ml create-workspace
+        --environment-name "{{ cdp_env_name }}"
+        --workspace-name "{{ workshop_name }}-cml-ws"
+        --use-public-load-balancer
+        --enable-model-metrics
+        --no-disable-tls
+        --enable-monitoring
+        --static-subdomain "{{ workshop_name[0:11] }}-cml"
+        --provision-k8s-request '{{ provision_k8s_request | to_json }}'
       register: ml_provision_workspace
       when: not workspace_exists
 
