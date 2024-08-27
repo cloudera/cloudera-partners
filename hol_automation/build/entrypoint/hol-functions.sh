@@ -205,11 +205,17 @@ validating_variables() {
          ENABLE_DATA_SERVICES)
             enable_data_services=$value
             ;;
-         SIZE_OF_VIRTUAL_WAREHOUSE)
-            size_of_virtual_warehouse=$value
+         CDW_VRTL_WAREHOUSE_SIZE)
+            cdw_vrtl_warehouse_size=$value
+            ;;
+         CDW_DATAVIZ_SIZE)
+            cdw_dataviz_size=$value
             ;;
          CDE_INSTANCE_TYPE)
             cde_instance_type=$value
+            ;;
+         CDE_INITIAL_INSTANCES)
+            cde_initial_instances=$value
             ;;
          CDE_MIN_INSTANCES)
             cde_min_instances=$value
@@ -219,6 +225,27 @@ validating_variables() {
             ;;
          CDE_SPARK_VERSION)
             cde_spark_version=$value
+            ;;
+         CML_WS_INSTANCE_TYPE)
+            cml_ws_instance_type=$value
+            ;;
+         CML_MIN_INSTANCES)
+            cml_min_instances=$value
+            ;;
+         CML_MAX_INSTANCES)
+            cml_max_instances=$value
+            ;;
+         CML_ENABLE_GPU)
+            cml_enable_gpu=$value
+            ;;
+         CML_GPU_INSTANCE_TYPE)
+            cml_gpu_instance_type=$value
+            ;;
+         CML_MIN_GPU_INSTANCES)
+            cml_min_gpu_instances=$value
+            ;;
+         CML_MAX_GPU_INSTANCES)
+            cml_max_gpu_instances=$value
             ;;
             # Can Add more cases if required.
          esac
@@ -690,15 +717,14 @@ deploy_cdw() {
    echo "ENV_PRIVATE_SUBNETS: $ENV_PRIVATE_SUBNETS"
 
    number_vw_to_create=$((($number_of_workshop_users / 10) + ($number_of_workshop_users % 10 > 0)))
-   DEFAULT_CDW_VW_SIZE="xsmall"
-   size_of_virtual_warehouse=$DEFAULT_CDW_VW_SIZE
+
    ansible-playbook $DS_CONFIG_DIR/enable-cdw.yml --extra-vars \
       "cdp_env_name=$workshop_name-cdp-env \
    env_lb_public_subnet=$ENV_PUBLIC_SUBNETS \
    env_wrkr_private_subnet=$ENV_PRIVATE_SUBNETS \
    workshop_name=$workshop_name \
-   vw_size=$size_of_virtual_warehouse \
-   cdvc_size=viz-default \
+   vw_size=$cdw_vrtl_warehouse_size \
+   cdvc_size=$cdw_dataviz_size \
    number_vw_to_create=$number_vw_to_create"
 }
 #--------------------------------------------------------------------------------------------------#
@@ -714,19 +740,19 @@ deploy_cde() {
    number_vc_to_create=$((($number_of_workshop_users / 10) + ($number_of_workshop_users % 10 > 0)))
    DEFAULT_CDE_INSTANCE_TYPE="m5.2xlarge"
    if [ -z "${CDE_INSTANCE_TYPE+x}" ] || [ -z "$CDE_INSTANCE_TYPE" ]; then
-       cde_instance_type=$DEFAULT_CDE_INSTANCE_TYPE
+      cde_instance_type=$DEFAULT_CDE_INSTANCE_TYPE
    else
-       cde_instance_type=$CDE_INSTANCE_TYPE
+      cde_instance_type=$CDE_INSTANCE_TYPE
    fi
-   cde_min_instances=10
-   cde_max_instances=40
+
    ansible-playbook $DS_CONFIG_DIR/enable-cde.yml --extra-vars \
       "cdp_env_name=$workshop_name-cdp-env \
    workshop_name=$workshop_name \
    instance_type=$cde_instance_type \
+   initial_instances=$cde_initial_instances \
    minimum_instances=$cde_min_instances \
    maximum_instances=$cde_max_instances \
-   spark_version=$cde_spark_version \	
+   spark_version=$cde_spark_version \
    number_vc_to_create=$number_vc_to_create"
 
 }
@@ -744,11 +770,14 @@ deploy_cml() {
    ansible-playbook $DS_CONFIG_DIR/enable-cml.yml --extra-vars \
       "cdp_env_name=$workshop_name-cdp-env \
    workshop_name=$workshop_name \
-   enable_gpu=true \
-   minimum_instances=1 \
-   maximum_instances=10 \
-   minimum_gpu_instances=0 \
-   maximum_gpu_instances=10"
+   ws_instance_type=$cml_ws_instance_type \
+   minimum_instances=$cml_min_instances \
+   maximum_instances=$cml_max_instances \
+   root_volume_size=256 \
+   enable_gpu=$cml_enable_gpu \
+   gpu_instance_type=$cml_gpu_instance_type \
+   minimum_gpu_instances=$cml_min_gpu_instances \
+   maximum_gpu_instances=$cml_max_gpu_instances"
    #number_vws_to_create=$number_vws_to_create"
 }
 #--------------------------------------------------------------------------------------------------#
@@ -852,16 +881,82 @@ enable_data_services() {
       set_resource_roles $workshop_name-aw-cdp-user-group $workshop_name-cdp-env "${resource_roles[@]}"
 
       if [[ "$service" == "cdw" ]]; then
+         echo -e "\n               ==========================Initializing Parameter Values for CDW======================================"
+         # Default Values
+         DEFAULT_CDW_VRTL_WAREHOUSE_SIZE="xsmall"
+         DEFAULT_CDW_DATAVIZ_SIZE="viz-default"
+
+         # CDW (Cloudera Data Warehouse) Variables
+         cdw_vrtl_warehouse_size="${cdw_vrtl_warehouse_size:-$DEFAULT_CDW_VRTL_WAREHOUSE_SIZE}"
+         cdw_dataviz_size="${cdw_dataviz_size:-$DEFAULT_CDW_DATAVIZ_SIZE}"
+
+         # Print Assigned Values for CDW
+         echo "CDW (Cloudera Data Warehouse) Variables:"
+         echo "  Virtual Warehouse Size: $cdw_vrtl_warehouse_size"
+         echo "  DataViz Size: $cdw_dataviz_size"
+
          deploy_cdw
          resource_roles=("DWAdmin" "DWUser")
          set_resource_roles $workshop_name-aw-cdp-user-group $workshop_name-cdp-env "${resource_roles[@]}"
 
       elif [[ "$service" == "cde" ]]; then
+         echo -e "\n               ==========================Initializing Parameter Values for CDE======================================"
+         # Default Values
+         DEFAULT_CDE_INSTANCE_TYPE="m5.2xlarge"
+         DEFAULT_CDE_INITIAL_INSTANCES=10
+         DEFAULT_CDE_MIN_INSTANCES=10
+         DEFAULT_CDE_MAX_INSTANCES=40
+         DEFAULT_CDE_SPARK_VERSION="SPARK3"
+
+         # CDE (Cloudera Data Engineering) Variables
+         cde_instance_type="${cde_instance_type:-$DEFAULT_CDE_INSTANCE_TYPE}"
+         cde_initial_instances="${cde_initial_instances:-$DEFAULT_CDE_INITIAL_INSTANCES}"
+         cde_min_instances="${cde_min_instances:-$DEFAULT_CDE_MIN_INSTANCES}"
+         cde_max_instances="${cde_max_instances:-$DEFAULT_CDE_MAX_INSTANCES}"
+         cde_spark_version="${cde_spark_version:-$DEFAULT_CDE_SPARK_VERSION}"
+
+         # Print Assigned Values for CDE
+         echo "CDE (Cloudera Data Engineering) Variables:"
+         echo "  Instance Type: $cde_instance_type"
+         echo "  Initial Instances: $cde_initial_instances"
+         echo "  Min Instances: $cde_min_instances"
+         echo "  Max Instances: $cde_max_instances"
+         echo "  Spark Version: $cde_spark_version"
+
          deploy_cde
          resource_roles=("DEUser")
          set_resource_roles $workshop_name-aw-cdp-user-group $workshop_name-cdp-env "${resource_roles[@]}"
 
       elif [[ "$service" == "cml" ]]; then
+         echo -e "\n               ==========================Initializing Parameter Values for CML======================================"
+         # Default Values
+         DEFAULT_CML_WS_INSTANCE_TYPE="m5.2xlarge"
+         DEFAULT_CML_MIN_INSTANCES=1
+         DEFAULT_CML_MAX_INSTANCES=10
+         DEFAULT_CML_ENABLE_GPU="false"
+         DEFAULT_CML_GPU_INSTANCE_TYPE="g4dn.xlarge"
+         DEFAULT_CML_MIN_GPU_INSTANCES=0
+         DEFAULT_CML_MAX_GPU_INSTANCES=10
+
+         # CML (Cloudera Machine Learning) Variables
+         cml_ws_instance_type="${cml_ws_instance_type:-$DEFAULT_CML_WS_INSTANCE_TYPE}"
+         cml_min_instances="${cml_min_instances:-$DEFAULT_CML_MIN_INSTANCES}"
+         cml_max_instances="${cml_max_instances:-$DEFAULT_CML_MAX_INSTANCES}"
+         cml_enable_gpu="${cml_enable_gpu:-$DEFAULT_CML_ENABLE_GPU}"
+         cml_gpu_instance_type="${cml_gpu_instance_type:-$DEFAULT_CML_GPU_INSTANCE_TYPE}"
+         cml_min_gpu_instances="${cml_min_gpu_instances:-$DEFAULT_CML_MIN_GPU_INSTANCES}"
+         cml_max_gpu_instances="${cml_max_gpu_instances:-$DEFAULT_CML_MAX_GPU_INSTANCES}"
+
+         # Print Assigned Values for CML
+         echo "CML (Cloudera Machine Learning) Variables:"
+         echo "  WS Instance Type: $cml_ws_instance_type"
+         echo "  Min Instances: $cml_min_instances"
+         echo "  Max Instances: $cml_max_instances"
+         echo "  Enable GPU: $cml_enable_gpu"
+         echo "  GPU Instance Type: $cml_gpu_instance_type"
+         echo "  Min GPU Instances: $cml_min_gpu_instances"
+         echo "  Max GPU Instances: $cml_max_gpu_instances"
+
          deploy_cml
          resource_roles=("MLUser")
          set_resource_roles $workshop_name-aw-cdp-user-group $workshop_name-cdp-env "${resource_roles[@]}"
