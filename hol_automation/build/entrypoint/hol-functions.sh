@@ -690,6 +690,8 @@ deploy_cdw() {
    echo "ENV_PRIVATE_SUBNETS: $ENV_PRIVATE_SUBNETS"
 
    number_vw_to_create=$((($number_of_workshop_users / 10) + ($number_of_workshop_users % 10 > 0)))
+   DEFAULT_CDW_VW_SIZE="xsmall"
+   size_of_virtual_warehouse=$DEFAULT_CDW_VW_SIZE
    ansible-playbook $DS_CONFIG_DIR/enable-cdw.yml --extra-vars \
       "cdp_env_name=$workshop_name-cdp-env \
    env_lb_public_subnet=$ENV_PUBLIC_SUBNETS \

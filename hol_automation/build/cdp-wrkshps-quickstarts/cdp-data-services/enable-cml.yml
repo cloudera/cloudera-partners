@@ -114,7 +114,7 @@
       until: >
         ml_ws_status.stdout is defined and
         (ml_ws_status.rc == 0 and (ml_ws_status.stdout in [
-          "", "modify:finished", "modify:failed", "installation:finished", "installation:failed",
+          "", "modify:finished", "modify:failed", "installation:finished", "installation:failed", "resume:finished",
           "provision:finished", "provision:failed", "deprovision:finished", "deprovision:failed"
         ]))
       retries: 50

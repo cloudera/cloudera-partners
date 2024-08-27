@@ -1,47 +1,64 @@
 ---
-- name: disable cde data service
+- name: Disable CDE Data Service
   hosts: localhost
   connection: local
   gather_facts: yes
   tasks:
-    - name: list cde virtual clusters
+    - name: List CDE virtual clusters
       cloudera.cloud.de_virtual_cluster_info:
         cluster_name: "{{ workshop_name }}-cde"
         environment: "{{ workshop_name }}-cdp-env"
       register: virtualclusters
 
-    - name: extract the virtual clusters id
+    - name: Extract the virtual clusters id
       ansible.builtin.set_fact:
         vc_ids: "{{ virtualclusters['vcs'] | community.general.json_query(query_string) | default([]) }}"
       vars:
         query_string: "[].{vcId:vcId,clusterId:clusterId}"
 
-    - name: print vc_ids
+    - name: Print VC IDs
       debug:
         msg: "{{ vc_ids }}"
 
-    - name: delete cde virtual clusters
+    - name: Delete CDE virtual clusters
       ansible.builtin.command: >
         cdp de delete-vc \
         --cluster-id "{{ item.clusterId }}" \
-        --vc-id "{{ item.vcId}}"
+        --vc-id "{{ item.vcId }}"
       loop: "{{ vc_ids }}"
+      register: delete_vc
+      until: delete_vc.rc == 0
+      retries: 10
+      delay: 30
+      ignore_errors: true
 
-    - name: deactivate cde service
+    - name: Deactivate CDE service
       cloudera.cloud.de:
         name: "{{ workshop_name }}-cde"
         env: "{{ workshop_name }}-cdp-env"
         state: absent
+        wait: False
+      register: deactivation
+      ignore_errors: true
 
-    - name: check status of cde service
+    - name: Print Deactivation Result
+      debug:
+        msg: "Deactivation Result: {{ deactivation }}"
+
+    - name: Check status of CDE service until completely deleted
       cloudera.cloud.de_info:
         name: "{{ workshop_name }}-cde"
         env: "{{ workshop_name }}-cdp-env"
       register: serstatus
-      until: serstatus['services'] | length == 0
+      until: serstatus['services'] | length == 0 or serstatus['services'][0]['status'] in ["Deleting", "Error", "Failed"]
       retries: 50
       delay: 30
 
-    - name: print
+    - name: Print status of CDE service
       debug:
-        msg: "{{ serstatus }}"
+        msg: "CDE Service status: {{ serstatus }}"
+
+    - name: Fail task if CDE service deletion failed
+      fail:
+        msg: "CDE Service Deletion Failed."
+      when: serstatus['services'] | length > 0 and serstatus['services'][0]['status'] in ["Error", "Failed"]
