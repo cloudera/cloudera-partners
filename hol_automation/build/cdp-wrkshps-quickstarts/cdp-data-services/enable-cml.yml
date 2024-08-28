@@ -128,9 +128,9 @@
     - name: Print success message on successful workspace creation
       debug:
         msg: "Successfully provisioned workspace {{ workshop_name }}-cml-ws in environment {{ cdp_env_name }}."
-      when: ml_ws_status.stdout is defined and ml_ws_status.stdout in ["installation:finished", "modify:finished"]
+      when: ml_ws_status.stdout is defined and ml_ws_status.stdout in ["installation:finished", "modify:finished", "provision:finished"]
 
     - name: Fail task on Workspace Creation Failed
       fail:
         msg: "Workspace Provisioning Got Failed."
-      when: ml_ws_status.stdout is defined and ml_ws_status.stdout not in ["installation:finished", "modify:finished"]
+      when: ml_ws_status.stdout is defined and ml_ws_status.stdout not in ["installation:finished", "modify:finished", "provision:finished"]
