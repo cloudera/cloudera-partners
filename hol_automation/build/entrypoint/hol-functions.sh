@@ -225,7 +225,7 @@ validating_variables() {
             cde_max_instances=$value
             ;;
          CDE_SPARK_VERSION)
-            cde_spark_version=$(echo $value | tr '[:upper:]' '[:lower:]')
+            cde_spark_version=$value
             ;;
          CML_WS_INSTANCE_TYPE)
             cml_ws_instance_type=$(echo $value | tr '[:upper:]' '[:lower:]')
