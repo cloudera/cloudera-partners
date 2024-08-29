@@ -156,6 +156,11 @@ Please note that the image built using the above method will be platform-depende
 
 11. Deployment of Number of CDW Warehouses is determined dynamically, based on number of workshop users.
 
+12. Optional Deployment of GPU instances with CML workspaces
+
+13. Optionally override the various default configuration values for data services e.g. instance_type, instance_size, Spark version etc. If use don't pass any override values, default values will be used.
+
+14. Deployment of CDV instance and Data Catalog with CDW data service.
 
 ---
 

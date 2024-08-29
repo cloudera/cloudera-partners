@@ -188,46 +188,61 @@ values of the parameters.
 **NO** If KeyCloak provisioning is not required.
 |KEYCLOAK_SERVER_NAME
 |Name for Keycloak EC2 Instance
-|No quotes
+|No quotes, preffered lowercase
+
 |KEYCLOAK_ADMIN_PASSWORD
 |Admin User Password for Keycloak
 |No quotes
+
 |KEYCLOAK_SECURITY_GROUP_NAME
 |Name of security group for keycloak EC2 instance
-|No quotes
+|No quotes, preffered lowercase
+
 |AWS_ACCESS_KEY_ID
 |Generated in AWS section of Step 1
 |No quotes
+
 |AWS_SECRET_ACCESS_KEY
 |Generated in AWS section of Step 1
 |No quotes
+
 |AWS_REGION
 |Region in which resources will be deployed
-|No quotes
+|No quotes, only lowercase with numbers
+
 |AWS_KEY_PAIR
 |Generated in Step 2
 |Only base name without .pem extension.
+
 |CDP_ACCESS_KEY_ID
 |Generated in CDP section of Step 1
 |No quotes
+
 |CDP_PRIVATE_KEY
 |Generated in CDP section of Step 1
 |No quotes
+
+|CDP_DEPLOYMENT_TYPE
+|Public, Private Or Semi-Private
+|No quotes and only in lower case
+
+Only from the provided values
 |WORKSHOP_NAME
 |Name for the workshop. Will used to create resources.
-|No quotes and underscore and should be between 5-18 characters
+|No quotes and underscore and should be between 5-18 characters, preffered lowercase (with integers)
+
 |NUMBER_OF_WORKSHOP_USERS
 |Number of users required for the workshop
 |No quotes, only integer
+
 |WORKSHOP_USER_PREFIX
 |Prefix for creating workshop users in Keycloak
-|No quotes, only string
+|No quotes, only string, preffered lowercase (with integers)
+
 |WORKSHOP_USER_DEFAULT_PASSWORD
 |Default password for participants
 |No quotes
-|CDP_DEPLOYMENT_TYPE
-|Public, Private Or Semi-Private
-|No quotes and in lower case
+
 |LOCAL_MACHINE_IP
 |Public IPV4 address of local machine
 |No quotes and don't remove /32
@@ -235,18 +250,17 @@ values of the parameters.
 |A comma separated list of Data services to enable.
 |**[NONE]** If no data services required.
 
-
 **[CDW]** If only one of them is required.
-
 
 **[CDW,CDE]** If any two of them are required.
 
-
 **[CDW,CDE,CML]** If all three are required.
+
+Only from the provided values
 |===
 ---
 [NOTE]
-**Below are the optional parameters that should only be changed if customization is needed. If you intend to proceed with the default configuration of the data services, do not modify the values. If you need to make changes, please refer to the table below for detailed instructions on providing the correct values.**
+**Below are the optional parameters that should only be changed if any customization is needed. If you intend to proceed with the default configuration values for the data services, do not modify and/or uncomment the values. If you need to make changes, please refer to the table below for detailed instructions on providing the correct values. To override the default values for optional parameters for any of data services, uncomment/add the parameter Key and Provide/update the values corresponding to them, if and when required.**
 
 === Optional parameters for CDW
 
@@ -256,11 +270,16 @@ values of the parameters.
 |Description
 |Remarks
 
-|SIZE_OF_VIRTUAL_WAREHOUSE
+|CDW_VRTL_WAREHOUSE_SIZE
 |Possible values: **xsmall**, **small**, **medium**, **large**
-|Default value is **xsmall**. If you want to override, replace the value with one of the given possible values. 
+|Default value is **xsmall**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the given possible values. 
 
-No quotes, only string
+No quotes, only string, only lowercase (with integers)
+|CDW_DATAVIZ_SIZE
+|Possible values: **viz-default**, **viz-low**, **viz-medium**, **viz-large**
+|Default value is **viz-default**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the given possible values. 
+
+No quotes, only string, only lowercase (with integers)
 |===
 
 === Optional parameters for CDE
@@ -271,27 +290,85 @@ No quotes, only string
 |Description
 |Remarks
 
+|CDE_SPARK_VERSION
+|Possible values: **SPARK2, SPARK2_4, SPARK3, SPARK3_0, SPARK3_1, SPARK3_2, SPARK3_3, SPARK3_5**
+|Default value is **SPARK3**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the given possible values.
+
+No quotes, Only from the provided values
 |CDE_INSTANCE_TYPE
 |Possible values: **m5.2xlarge, r5.4xlarge** etc.
-|Default value is **m5.2xlarge**. If you want to override, replace the value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
+|Default value is **m5.2xlarge**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
 
-No quotes, only string
+No quotes, only string, only lowercase (with integers)
+|CDE_INITIAL_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
+
+No quotes, only integer
 |CDE_MIN_INSTANCES
 |Possible values: **0** to **100**.
-|Default value is **10**. If you want to override, replace the value with any number between the given possible range.
+|Default value is **10**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
 
 No quotes, only integer
 |CDE_MAX_INSTANCES
 |Possible values: **0** to **100**.
-|Default value is **40**. If you want to override, replace the value with any number between the given possible range.
+|Default value is **40**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
 
 No quotes, only integer
-|CDE_SPARK_VERSION
-|Possible values: **SPARK2, SPARK2_4, SPARK3, SPARK3_0, SPARK3_1, SPARK3_2, SPARK3_3, SPARK3_5**
-|Default value is **SPARK3**. If you want to override, replace the value with one of the given possible values.
-
-No quotes, only string
 |===
+
+
+=== Optional parameters for CML
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|CML_WS_INSTANCE_TYPE
+|Possible values: **m5.2xlarge, r5.4xlarge** etc.
+|Default value is **m5.2xlarge**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
+
+No quotes, only string, only lowercase (with integers)
+|CML_MIN_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CML_MAX_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **40**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CML_ENABLE_GPU
+|Possible values: **TRUE, FALSE**
+|Default value is **FALSE**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the given possible values.
+
+No quotes, Only from the provided values
+|CML_GPU_INSTANCE_TYPE
+|Possible values: *g4dn.xlarge, p3.2xlarge* etc.
+|Default value is **g4dn.xlarge**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation.
+
+No quotes, only string, only lowercase (with integers)
+|CML_MIN_GPU_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CML_MAX_GPU_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **40**. If you want to override, add or uncomment the corresponding entry in config file and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|===
+
+
+[NOTE]
+ The availability of GPU instances is specific to AWS region and Quotas available to an AWS account and may vary for different accounts and region used for deployement. Please provide the correct/suitable values only, after referring to the official AWS and CDP public documentations.
+
+[NOTE]
+ Please refer to the official AWS and CDP public documentations, for checking the correct and suitable values for AWS regions and Instance Types.
 
 ==== D):
 Place the **AWS_KEY_PAIR.pem** file downloaded in **Step 2** inside userconfig folder created in previous step.
