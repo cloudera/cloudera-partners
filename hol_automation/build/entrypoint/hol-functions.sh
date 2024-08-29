@@ -134,7 +134,7 @@ validating_variables() {
             provision_keycloak=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          KEYCLOAK_SERVER_NAME)
-            ec2_instance_name=$value
+            ec2_instance_name=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          KEYCLOAK_ADMIN_PASSWORD)
             keycloak__admin_password=$value
@@ -146,7 +146,7 @@ validating_variables() {
             aws_secret_access_key=$value
             ;;
          AWS_REGION)
-            aws_region=$value
+            aws_region=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          WORKSHOP_NAME)
             case $value in
@@ -178,7 +178,7 @@ validating_variables() {
             cdp_private_key=$value
             ;;
          AWS_KEY_PAIR)
-            aws_key_pair=$value
+            aws_key_pair=$(echo $value | tr '[:upper:]' '[:lower:]')
             #echo "Found KeyPair File: $aws_key_pair.pem"
             ;;
          CDP_DEPLOYMENT_TYPE)
@@ -201,19 +201,19 @@ validating_variables() {
             local_ip=$value
             ;;
          KEYCLOAK_SECURITY_GROUP_NAME)
-            keycloak_sg_name=$value
+            keycloak_sg_name=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          ENABLE_DATA_SERVICES)
             enable_data_services=$value
             ;;
          CDW_VRTL_WAREHOUSE_SIZE)
-            cdw_vrtl_warehouse_size=$value
+            cdw_vrtl_warehouse_size=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CDW_DATAVIZ_SIZE)
-            cdw_dataviz_size=$value
+            cdw_dataviz_size=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CDE_INSTANCE_TYPE)
-            cde_instance_type=$value
+            cde_instance_type=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CDE_INITIAL_INSTANCES)
             cde_initial_instances=$value
@@ -225,10 +225,10 @@ validating_variables() {
             cde_max_instances=$value
             ;;
          CDE_SPARK_VERSION)
-            cde_spark_version=$value
+            cde_spark_version=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CML_WS_INSTANCE_TYPE)
-            cml_ws_instance_type=$value
+            cml_ws_instance_type=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CML_MIN_INSTANCES)
             cml_min_instances=$value
@@ -237,10 +237,10 @@ validating_variables() {
             cml_max_instances=$value
             ;;
          CML_ENABLE_GPU)
-            cml_enable_gpu=$value
+            cml_enable_gpu=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CML_GPU_INSTANCE_TYPE)
-            cml_gpu_instance_type=$value
+            cml_gpu_instance_type=$(echo $value | tr '[:upper:]' '[:lower:]')
             ;;
          CML_MIN_GPU_INSTANCES)
             cml_min_gpu_instances=$value
