@@ -107,7 +107,7 @@ pipeline {
                     writeFile file: env.PEM_FILE_PATH, text: params.PEM_FILE_CONTENT
                     // Set file permissions to 664
                     sh "chmod 664 ${env.PEM_FILE_PATH}"
-                    sh "ls -l ${CONFIG_DIR} #&& cat ${env.PEM_FILE_PATH}"
+                    sh "ls -l ${CONFIG_DIR}"
                 }
             }
         }
@@ -161,7 +161,7 @@ CML_GPU_INSTANCE_TYPE:${params.CML_GPU_INSTANCE_TYPE}
 CML_MIN_GPU_INSTANCES:${params.CML_MIN_GPU_INSTANCES}
 CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
 """
-                    sh "pwd && ls -l ${CONFIG_DIR} #&& cat ${env.CONFIG_FILE}"
+                    sh "pwd && ls -l ${CONFIG_DIR}"
                 }
             }
         }
@@ -203,10 +203,7 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
             steps {
                 sh 'echo "Stage :: Run Docker Container"'
                 script {
-                    #sh "cat ${env.CONFIG_DIR}/configfile"
-                    sh "docker run --name hol-provisioner-${BUILD_NUMBER} -i -v ${env.CONFIG_DIR}:/userconfig -v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp -v ${REPO_DIR}:/repo ${env.DOCKER_IMAGE} ${params.ACTION}"
-                    sh "sudo chown -R jenkins:jenkins ${env.CONFIG_DIR}/"
-                    sh "cat ${env.CONFIG_DIR}/${params.WORKSHOP_NAME}.txt"
+                    sh "docker run --name hol-provisioner-${BUILD_NUMBER} -i -v ${env.CONFIG_DIR}:/userconfig -v ${REPO_DIR}:/repo ${env.DOCKER_IMAGE} ${params.ACTION}"
                 }
             }
         }
@@ -215,7 +212,8 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
     post {
         success {
             sh 'echo "SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
-            archiveArtifacts artifacts: "userconfig/${params.WORKSHOP_NAME}.txt, userconfig/configfile", allowEmptyArchive: true
+            sh "cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && cp ${params.WORKSHOP_NAME}.txt configfile ${WORKSPACE}/"
+            archiveArtifacts artifacts: "${params.WORKSHOP_NAME}.txt, configfile", allowEmptyArchive: true
         }
         failure {
             sh 'echo "FAILURE: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
