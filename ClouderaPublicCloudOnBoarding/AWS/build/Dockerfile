@@ -9,32 +9,19 @@ RUN mkdir -p /opt/cdp-public-cloud-automation
 # Setting Up Environment Variable.
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV HOME_DIR="/opt/cdp-public-cloud-automation"
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Installing Required Packages.
 RUN apt-get update && \
-    apt-get install -y jq wget git make unzip gcc build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev openssl libssl-dev libreadline-dev bzip2 libffi-dev curl libbz2-dev libdb-dev liblzma-dev libsqlite3-dev uuid-dev && \
+    apt-get install -y jq wget git make unzip gcc build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev openssl libssl-dev libreadline-dev bzip2 libffi-dev curl libbz2-dev libdb-dev liblzma-dev libsqlite3-dev uuid-dev python3-pip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget https://www.python.org/ftp/python/3.10.9/Python-3.10.9.tgz && \
-    tar -xvf Python-3.10.9.tgz && \
-    cd Python-3.10.9 && \
-    ./configure --enable-optimizations && \
-    make altinstall && \
-    cp /usr/local/bin/python3.10 /usr/bin/ && \
-    rm -f /usr/bin/python && \
-    ln -s /usr/bin/python3.10 /usr/bin/python && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py && \
-    rm /Python-3.10.9.tgz && \
-    rm get-pip.py && \
-    rm -rf Python-3.10.9
-
-RUN pip install --upgrade pip && \
-    pip install setuptools_rust ansible-core==2.12.10 jmespath==1.0.1 awscli && \
-    pip install git+https://github.com/cloudera-labs/cdpy@main#egg=cdpy && \
-    #pip install git+https://github.com/cloudera-labs/cdpy@devel#egg=cdpy && \
-    pip uninstall -y cdpcli-beta && pip install cdpcli && \
+RUN pip3 install --upgrade pip && \
+    pip3 install setuptools_rust ansible-core==2.15.10 jmespath==1.0.1 awscli && \
+    pip3 install git+https://github.com/cloudera-labs/cdpy@main#egg=cdpy && \
+    #pip3 install git+https://github.com/cloudera-labs/cdpy@devel#egg=cdpy && \
+    pip3 uninstall -y cdpcli-beta && pip3 install cdpcli && \
     ansible-galaxy collection install community.general -vv && \
     ansible-galaxy collection install git+https://github.com/cloudera-labs/cloudera.cloud.git,main
     #ansible-galaxy collection install git+https://github.com/cloudera-labs/cloudera.cloud.git,devel
