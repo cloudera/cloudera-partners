@@ -211,11 +211,14 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
 
     post {
         success {
-            sh 'echo "SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
+            sh "echo 'SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})'"
             script {
                 if (params.ACTION == 'provision') {
-                    sh "cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && cp ${params.WORKSHOP_NAME}.txt configfile ${WORKSPACE}/"
-                    archiveArtifacts artifacts: "${params.WORKSHOP_NAME}.txt, configfile", allowEmptyArchive: true
+                    sh """
+                        cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && \
+                        cp ${params.WORKSHOP_NAME.toLowerCase()}.txt configfile ${WORKSPACE}/
+                    """
+                    archiveArtifacts artifacts: "${params.WORKSHOP_NAME.toLowerCase()}.txt,configfile", allowEmptyArchive: true
                 }
             }
         }
