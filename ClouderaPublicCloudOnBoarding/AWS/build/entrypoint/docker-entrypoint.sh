@@ -10,12 +10,18 @@ USER_ACTION=$1
 case $USER_ACTION in
     provision)
         validating_variables
-        key_pair_file
-        setup_aws_and_cdp_profile
+        if [[ -n "$aws_key_pair" ]]; then
+           key_pair_file
+        else
+           echo "No AWS Key Pair provided. Skipping SSH key file check."
+        fi
+        #setup_aws_and_cdp_profile
         aws_prereq
         cdp_prereq
+        check_key_pair
         if [ "$provision_keycloak" == "yes" ]; then
-            setup_keycloak_ec2 $keycloak_sg_name
+            # setup_keycloak_ec2 $keycloak_sg_name
+            setup_keycloak_ec2
             if [ $? -ne 0 ]; then
                 echo "Keycloak Server Provisioning Failed. Rolling Back The Changes."
                 destroy_keycloak
@@ -54,7 +60,7 @@ case $USER_ACTION in
     ;;
     destroy)
         validating_variables
-        setup_aws_and_cdp_profile
+        #setup_aws_and_cdp_profile
         if [ "$provision_keycloak" == "yes" ]; then
             cdp_idp_user_teardown
         fi

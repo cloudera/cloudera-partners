@@ -1,5 +1,5 @@
-variable instance_name {
-  description = "Name Of the EC2 instance"
+variable workshop_name {
+  description = "name_prefix Of the EC2 instance"
   type = string
   default = "keycloak-server"
 }
@@ -7,7 +7,7 @@ variable instance_name {
 variable "aws_region" {
   description = "AWS Region In which Resources Will Be Deployed"
   type = string
-  default = "ap-south-1"  
+  default = "ap-southeast-1"  
 }
 
 variable "instance_type" {
@@ -19,7 +19,7 @@ variable "instance_type" {
 variable "instance_keypair" {
   description = "SSH KeyPair For EC2 Instance"
   type = string
-  default = "puneetjoshipsedaily"  
+  default = "aktpsedaily"  
 }
 
 variable "kc_security_group" {

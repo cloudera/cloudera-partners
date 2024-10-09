@@ -22,7 +22,7 @@ resource "aws_instance" "keycloak-server" {
   key_name = "${var.instance_keypair}"
   vpc_security_group_ids = [ aws_security_group.vpc-ssh-web.id ]
   tags = {
-    "Name" = var.instance_name
+    "Name" = "${var.workshop_name}-keyc"
   }
   provisioner "file" {
     source      = "cloudera-newco-wshps.png"
@@ -31,7 +31,7 @@ resource "aws_instance" "keycloak-server" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = "${file("/userconfig/${var.instance_keypair}.pem")}"
+      private_key = "${file("/userconfig/.${var.workshop_name}/${var.instance_keypair}.pem")}"
       host        = "${self.public_dns}"
     }
   }
@@ -42,7 +42,7 @@ resource "aws_instance" "keycloak-server" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = "${file("/userconfig/${var.instance_keypair}.pem")}"
+      private_key = "${file("/userconfig/.${var.workshop_name}/${var.instance_keypair}.pem")}"
       host        = "${self.public_dns}"
     }
   }

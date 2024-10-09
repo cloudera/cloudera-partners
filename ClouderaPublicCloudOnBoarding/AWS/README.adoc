@@ -56,9 +56,9 @@ All the above tools are integrated with each other and packaged as a Docker Cont
 The ready to use container takes care of all the dependencies of required tools & does not require user to install or configure any of the above listed tools. 
 For using this user should have:
 
-1. Docker.
-2. Programatic Access(CDP_ACCESS_KEY_ID & CDP_PRIVATE_KEY) of CDP Tenant
-3. Programatic Access(AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY) of the AWS account with Administrator or Power User Role
+1. *Docker* and *AWSCLI V2* installed on your Laptop.
+2. *Programatic Access*(CDP_ACCESS_KEY_ID & CDP_PRIVATE_KEY) of *CDP Tenant*
+3. *Programatic Access*(AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY) *OR* *SSO details* of the *AWS account* with Administrator or Power User Role *OR* *Role Assignment* to EC2 deployer machine *via sts:assumeRole* method 
 
 == How to install docker on your local machine
 
@@ -83,32 +83,155 @@ image::build/images/gen_access_key.png[access_key, 460, 150]
 
 * Copy the values of Access Key ID and Private Key separately and keep it in a note. Or download the keys by pressing the Blue Button.
 
-image::build/images/gen_access_key_1.png[access_key1, 600, 400]
+image::build/images/gen_access_key_1.png[access_key1, 360, 240]
 
-==== AWS
-1. Open the IAM console at https://console.aws.amazon.com/iam/.
+* On your Laptop, Login to cdp cli as below (if not already).
 
-2. On the navigation menu, choose Users.
-
-3. Choose your IAM user name (not the check box).
-
-4. Open the Security credentials tab, and then choose Create access key.
-
-5. To see the new access key, choose Show. Your credentials resemble the following:
 [.shell]
 ----
-Access key ID: AKIAIOSFODNN7EXAMPLE
+ksahu@Kuldeeps-MacBook-Air build % cdp configure
+CDP Access Key ID [None]: CDPEXAMPLEACCESSKEY
+CDP Private Key [None]: myPSEcdpPrivateKEy/Sample123456xyz
+CDP Region [None]: <Enter>
+CDP Endpoint URL (blank for public cloud) [None]: <Enter>
+ksahu@Kuldeeps-MacBook-Air build % 
 
-Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
+# Verify using below command, if CDP CLI is configured correctly:
+ksahu@Kuldeeps-MacBook-Air build % cdp iam get-user
 ----
 
-To download the key pair, choose Download .csv file. Store the .csv file with keys in a secure location.
+==== AWS
+
+There are three ways you can authenticate with AWS Account:
+
+a) Normal Way: *Using AWS ACCESS_KEY_ID and SECRET_ACCESS_KEY*
+
+. Open the IAM console at https://console.aws.amazon.com/iam/.
+. On the navigation menu, choose Users.
+. Choose your IAM user name (not the check box).
+. Open the Security credentials tab, and then choose Create access key.
+. To see the new access key, choose Show. Your credentials resemble the following:
+
+ Access key ID: SAMPLEODNN7EXAMPLE
+ Secret access key: examplesecret123/PSESECRETENG/myPSERfiCYEXAMPLEKEY
+
+ To download the above key pair, choose Download .csv file. Store the .csv file with keys in a secure location.
+
+. Configure the AWS credentials on your Laptop.
+
+[.shell]
+----
+ksahu@Kuldeeps-MacBook-Air build % aws configure
+AWS Access Key ID [****************WXYZ]: <Enter_ACCESS_KEY_ID>
+AWS Secret Access Key [****************abcd]: <Enter_SECRET_ACCESS_KEY>
+Default region name [None]: <Enter>
+Default output format [None]: <Enter>
+ksahu@Kuldeeps-MacBook-Air build % 
+----
+
+b) *Using Single Sign On (SSO)* for AWS, If your organization supports this method:
+[.shell]
+----
+ksahu@Kuldeeps-MacBook-Air build % aws configure sso
+SSO session name (Recommended): my-sso
+SSO start URL [None]: https://cloudera.awsapps.com/start
+SSO region [None]: us-east-1
+
+Attempting to automatically open the SSO authorization page in your default browser.
+
+If the browser does not open or you wish to use a different device to authorize this request, open the following URL:
+https://device.sso.us-east-1.amazonaws.com/
+
+Then enter the code:
+DPVH-GCXS
+
+There are 3 AWS accounts available to you.
+Using the account ID 01234567890
+The only role available to you is: cldr_poweruser
+Using the role name "cldr_poweruser"
+CLI default client Region [None]: <Enter>
+CLI default output format [None]: <Enter>
+CLI profile name [cldr_poweruser-01234567890]: default
+
+# Run below command to verify
+ksahu@Kuldeeps-MacBook-Air build % aws s3 ls
+----
+
+=======
+c) *Using Role Assignment to EC2 instance* i.e. Deployer Machine, from where you run the Docker container to deploy the HoL Infra *(via sts:assumeRole)*.
+
+*Steps*
+
+*Sign in to the AWS Management Console*
+
+    1. Go to the AWS Management Console: https://aws.amazon.com/console/
+    2. Enter your credentials to sign in.
+
+*Navigate to IAM*
+
+    1. In the AWS Management Console, search for **IAM** in the search bar.
+    2. Click on **IAM** to open the Identity and Access Management dashboard.
+
+*Create a New Role*
+
+    1. In the left navigation pane, click on **Roles**.
+    2. Click on the **Create role** button.
+
+*Choose Trusted Entity*
+
+    1. Select **AWS service** as the trusted entity.
+    2. Under **Use case for other AWS services**, choose **EC2**.
+    3. Click on **Next: Permissions**.
+
+*Attach Policies*
+
+    1. In the policy search box, type **AdministratorAccess**.
+    2. Check the box next to **AdministratorAccess** to attach the policy.
+    3. Click on **Next: Tags**.
+
+*Add Tags (Optional)*
+
+    1. (Optional) You can add tags to help identify the role.
+    2. Click on **Next: Review**.
+
+*Review and Create Role*
+
+    1. Enter a **Role name** (e.g., `CDPAWSAdminRole`).
+    2. Review the details and click on **Create role**.
+
+*Navigate to EC2*
+
+    1. In the AWS Management Console, search for **EC2** in the search bar.
+    2. Click on **EC2** to open the EC2 dashboard.
+
+*Select Your EC2 Instance*
+
+    1. In the left navigation pane, click on **Instances**.
+    2. Select the EC2 instance to which you want to assign the role.
+
+*Attach the IAM Role*
+
+    1. With the instance selected, click on the **Actions** dropdown menu.
+    2. Navigate to **Security** > **Modify IAM Role**.
+    3. In the **IAM role** dropdown, select the role you just created (e.g., `EC2AdminRole`).
+    4. Click on **Update IAM role** to apply the changes.
+
+*Verify Role Assignment*
+
+    1. With the instance still selected, check the **Description** tab at the bottom.
+    2. Under **IAM role**, confirm that your role (e.g., `EC2AdminRole`) is listed.
+
+To verify role assignment, use the following command:
+
+[.shell]
+----
+aws sts assume-role --role-arn arn:aws:iam::123456789012:role/YourRoleName --role-session-name MySession
+----
 
 ---
 
 === Step 2: AWS SSH Key Pair
-1. Open the Amazon EC2 console at https://console.aws.amazon.com/ec2/.
+1. Open the Amazon EC2 console at https://console.aws.amazon.com/ec2/ and navigate to the same region, where you want to deploy the CDP-PC HoL Infra.
 
 2. In the navigation pane, under Network & Security, choose Key Pairs.
 
@@ -186,24 +309,9 @@ values of the parameters.
 **YES** If KeyCloak provisioning is required.
 
 **NO** If KeyCloak provisioning is not required.
-|KEYCLOAK_SERVER_NAME
-|Name for Keycloak EC2 Instance
-|No quotes, preffered lowercase
 
 |KEYCLOAK_ADMIN_PASSWORD
 |Admin User Password for Keycloak
-|No quotes
-
-|KEYCLOAK_SECURITY_GROUP_NAME
-|Name of security group for keycloak EC2 instance
-|No quotes, preffered lowercase
-
-|AWS_ACCESS_KEY_ID
-|Generated in AWS section of Step 1
-|No quotes
-
-|AWS_SECRET_ACCESS_KEY
-|Generated in AWS section of Step 1
 |No quotes
 
 |AWS_REGION
@@ -213,14 +321,6 @@ values of the parameters.
 |AWS_KEY_PAIR
 |Generated in Step 2
 |Only base name without .pem extension.
-
-|CDP_ACCESS_KEY_ID
-|Generated in CDP section of Step 1
-|No quotes
-
-|CDP_PRIVATE_KEY
-|Generated in CDP section of Step 1
-|No quotes
 
 |CDP_DEPLOYMENT_TYPE
 |Public, Private Or Semi-Private
@@ -393,6 +493,7 @@ Once the configfile is created as outlined in Step 4 . The provisioning of infra
 ----
 docker run -it \
 -v ~/userconfig:/userconfig \
+-v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
 clouderapartners/cdp-public-cloud-hol-provisioner:latest \
 provision
 
@@ -428,9 +529,19 @@ If the execution of docker container for provisioning fails (due to timeout or a
 ---
 
 === The Outcome
-==== Keycloak:
+==== Keycloak Server:
+[%header,cols="1,1"]
+|===
+|Type
+|Name
+
+|KeyCloak Server EC2 Instance
+|<WORKSHOP_NAME>-keyc; e.g: accn-workshp-keyc
+
+|===
+
 The successful execution of Step 5 will generate a .txt file in 'userconfig' folder on your local machine. The name of the file will be <VALUE_OF_WORKSHOP_NAME>.txt
-e.g : If in the configfile the value of WORKSHOP_NAME is **accn-wrkshp** the out put file will be **accn-wrkshp.txt**
+e.g : If in the configfile the value of WORKSHOP_NAME is **accn-wrkshp** the output file will be **accn-wrkshp.txt**
 
 This file contains details about the provisioned Keycloak Server and the SSO URL which will be used for participants for login. It will look similar like below
 
@@ -556,6 +667,7 @@ After succesful delivery of your HOL/Workshop the complete stack can be destroye
 ----
 docker run -it \
 -v ~/userconfig:/userconfig \
+-v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
 clouderapartners/cdp-public-cloud-hol-provisioner:latest \
 destroy
 
