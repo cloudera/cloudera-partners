@@ -1,7 +1,6 @@
 PROVISION_KEYCLOAK:<VALUE>
 KEYCLOAK_ADMIN_PASSWORD:<VALUE>
 AWS_REGION:<VALUE>
-AWS_KEY_PAIR:<VALUE>
 CDP_DEPLOYMENT_TYPE:<VALUE>
 WORKSHOP_NAME:<VALUE>
 NUMBER_OF_WORKSHOP_USERS:<VALUE>
@@ -11,6 +10,14 @@ LOCAL_MACHINE_IP:<VALUE>/32
 ENABLE_DATA_SERVICES:[Comma Separated list of data services to be enabled. NONE if not required]
 
 #==================Optional Parameters===============#
+
+#AWS_KEY_PAIR:demo-keypair
+
+##Optional parameters for CDP Quota
+#CDP_SAML_PROVIDER_LIMIT:10
+#CDP_USER_LIMIT:1000
+#CDP_GROUP_LIMIT:50
+
 ## CDW
 #CDW_VRTL_WAREHOUSE_SIZE:xsmall
 #CDW_DATAVIZ_SIZE:viz-default
