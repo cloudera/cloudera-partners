@@ -4,16 +4,14 @@ pipeline {
     parameters {
         choice(name: 'ACTION', choices: ['provision', 'destroy'], description: 'Choose whether to provision or destroy the stack')
         choice(name: 'PROVISION_KEYCLOAK', choices: ['YES', 'NO'], description: 'Provision Keycloak Instance (YES/NO)')
-        string(name: 'KEYCLOAK_SERVER_NAME', defaultValue: 'accn-workshop-kc', description: 'Name for Keycloak EC2 Instance')
+        
         string(name: 'KEYCLOAK_ADMIN_PASSWORD', defaultValue: 'admin', description: 'Admin User Password for Keycloak')
-        string(name: 'KEYCLOAK_SECURITY_GROUP_NAME', defaultValue: 'accn-workshop-kc-sg', description: 'Keycloak Security Group Name')
-        string(name: 'AWS_ACCESS_KEY_ID', defaultValue: 'AWSEXAMPLEACCESSKEY', description: 'AWS Access Key ID')
-        string(name: 'AWS_SECRET_ACCESS_KEY', defaultValue: 'awsEXAMPLEsecretKEY123456/abcxyz123', description: 'AWS Secret Access Key')
+        
+        
         string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region')
-        string(name: 'AWS_KEY_PAIR', defaultValue: 'accn-workshop-ssh-kp', description: 'AWS Key Pair (base name without .pem)')
+        
         text(name: 'PEM_FILE_CONTENT', defaultValue: '---PRIVATE KEY---', description: 'Content of the .pem file to be created')
-        string(name: 'CDP_ACCESS_KEY_ID', defaultValue: 'CDPEXAMPLEACCESSKEY', description: 'CDP Access Key ID')
-        string(name: 'CDP_PRIVATE_KEY', defaultValue: 'cdpEXAMPLEsecretKEY123456/abcxyz123', description: 'CDP Private Key')
+        
         string(name: 'CDP_DEPLOYMENT_TYPE', defaultValue: 'public', description: 'CDP Deployment Type (public/private/semi-private)')
         string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'Local Machine IP (don’t remove /32)')
         string(name: 'WORKSHOP_NAME', defaultValue: 'accn-workshop', description: 'Workshop Name')
@@ -127,15 +125,8 @@ pipeline {
                     
                     // Create or overwrite the config file
                     writeFile file: env.CONFIG_FILE, text: """PROVISION_KEYCLOAK:${params.PROVISION_KEYCLOAK}
-KEYCLOAK_SERVER_NAME:${params.KEYCLOAK_SERVER_NAME}
 KEYCLOAK_ADMIN_PASSWORD:${params.KEYCLOAK_ADMIN_PASSWORD}
-KEYCLOAK_SECURITY_GROUP_NAME:${params.KEYCLOAK_SECURITY_GROUP_NAME}
-AWS_ACCESS_KEY_ID:${params.AWS_ACCESS_KEY_ID}
-AWS_SECRET_ACCESS_KEY:${params.AWS_SECRET_ACCESS_KEY}
 AWS_REGION:${params.AWS_REGION}
-AWS_KEY_PAIR:${params.AWS_KEY_PAIR}
-CDP_ACCESS_KEY_ID:${params.CDP_ACCESS_KEY_ID}
-CDP_PRIVATE_KEY:${params.CDP_PRIVATE_KEY}
 CDP_DEPLOYMENT_TYPE:${params.CDP_DEPLOYMENT_TYPE}
 LOCAL_MACHINE_IP:${params.LOCAL_MACHINE_IP}
 WORKSHOP_NAME:${params.WORKSHOP_NAME}
@@ -203,7 +194,7 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
             steps {
                 sh 'echo "Stage :: Run Docker Container"'
                 script {
-                    sh "docker run --name hol-provisioner-${BUILD_NUMBER} -i -v ${env.CONFIG_DIR}:/userconfig -v ${REPO_DIR}:/repo ${env.DOCKER_IMAGE} ${params.ACTION}"
+                    sh "docker run --name hol-provisioner-${BUILD_NUMBER} -i -v ${env.CONFIG_DIR}:/userconfig -v ${REPO_DIR}:/repo -v ~/.cdp/:/root/.cdp ${env.DOCKER_IMAGE} ${params.ACTION}"
                 }
             }
         }
