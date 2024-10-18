@@ -4,14 +4,8 @@ pipeline {
     parameters {
         choice(name: 'ACTION', choices: ['provision', 'destroy'], description: 'Choose whether to provision or destroy the stack')
         choice(name: 'PROVISION_KEYCLOAK', choices: ['YES', 'NO'], description: 'Provision Keycloak Instance (YES/NO)')
-        
         string(name: 'KEYCLOAK_ADMIN_PASSWORD', defaultValue: 'admin', description: 'Admin User Password for Keycloak')
-        
-        
         string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region')
-        
-        text(name: 'PEM_FILE_CONTENT', defaultValue: '---PRIVATE KEY---', description: 'Content of the .pem file to be created')
-        
         string(name: 'CDP_DEPLOYMENT_TYPE', defaultValue: 'public', description: 'CDP Deployment Type (public/private/semi-private)')
         string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'Local Machine IP (don’t remove /32)')
         string(name: 'WORKSHOP_NAME', defaultValue: 'accn-workshop', description: 'Workshop Name')
@@ -57,7 +51,6 @@ pipeline {
         HOL_AUTO_EXEC_DIR = "/home/holautosa/HOL_AUTO_EXEC_DIR"
         CONFIG_DIR = "${HOL_AUTO_EXEC_DIR}/userconfig"
         CONFIG_FILE = "${CONFIG_DIR}/configfile"
-        PEM_FILE_PATH = "${CONFIG_DIR}/${params.AWS_KEY_PAIR}.pem"
         REPO_URL = "https://github.com/cloudera/cloudera-partners.git"
         BRANCH_NAME = "hol-automation"
         REPO_DIR = "${HOL_AUTO_EXEC_DIR}/hol-automation"
@@ -96,20 +89,6 @@ pipeline {
             }
         }
 
-        stage('Create PEM File') {
-            steps {
-                sh 'echo "Stage :: Create PEM File"'
-                script {
-                    sh "pwd && ls -l ${CONFIG_DIR}"
-                    // Write the PEM file content
-                    writeFile file: env.PEM_FILE_PATH, text: params.PEM_FILE_CONTENT
-                    // Set file permissions to 664
-                    sh "chmod 664 ${env.PEM_FILE_PATH}"
-                    sh "ls -l ${CONFIG_DIR}"
-                }
-            }
-        }
-
         stage('Create Config File') {
             steps {
                 sh 'echo "Stage :: Create Config File"'
@@ -134,7 +113,6 @@ NUMBER_OF_WORKSHOP_USERS:${params.NUMBER_OF_WORKSHOP_USERS}
 WORKSHOP_USER_PREFIX:${params.WORKSHOP_USER_PREFIX}
 WORKSHOP_USER_DEFAULT_PASSWORD:${params.WORKSHOP_USER_DEFAULT_PASSWORD}
 ENABLE_DATA_SERVICES:${formattedServices}
-
 CDW_VRTL_WAREHOUSE_SIZE:${params.CDW_VRTL_WAREHOUSE_SIZE}
 CDW_DATAVIZ_SIZE:${params.CDW_DATAVIZ_SIZE}
 
