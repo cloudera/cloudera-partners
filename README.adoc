@@ -1,1 +1,17 @@
-Cloudera Repository For Partners
+# Cloudera Repository For Partners
+
+*AlphavantageE2ELabs*
+       
+       Description : An end to end lab that covers a wide variety of Data Services
+
+*ClouderaPublicCloudOnBoarding*
+       
+       Description : Automation for on-boarding CDP on public cloud(AWS, Azure and GCP)
+
+*PartnerHandbook*
+      
+       Description : Everything that a partner would need to excel with Cloudera can be found here
+
+*Workshops*
+      
+       Description : Hands-on lab for all our Data Services
