@@ -182,7 +182,7 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
                     // Check the container logs for failure strings
                     sh "docker logs hol-provisioner-${BUILD_NUMBER} > ${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log"
                     def logOutput = readFile("${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log")
-        
+                
                     // Initialize a list to hold error messages
                     def errorMessages = []
         
@@ -210,78 +210,14 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
                     if (!errorMessages.isEmpty()) {
                         currentBuild.result = 'FAILURE'
                         
-                        // Join error messages with a newline for the email content
-                        def errorLog = errorMessages.join('\n')
+                        // Save error messages in build variable for use in post section
+                        currentBuild.description = errorMessages.join('\n')
         
                         // Send an email with the error logs
-                        emailext(
-                            to: "${env.BUILD_USER_EMAIL}",
-                            subject: "❌ Jenkins Build Failure: ${currentBuild.fullDisplayName}",
-                            body: """
-                                <html>
-                                    <head>
-                                        <style>
-                                            body { font-family: Arial, sans-serif; color: #333333; }
-                                            h3 { color: #E53935; font-size: 18px; }
-                                            .container { border: 1px solid #e0e0e0; padding: 16px; border-radius: 8px; background-color: #f9f9f9; }
-                                            .content { padding: 8px 16px; }
-                                            .table-container { margin-top: 16px; }
-                                            table { width: 100%; border-collapse: collapse; }
-                                            th, td { padding: 12px; text-align: left; border: 1px solid #dddddd; }
-                                            th { background-color: #f2f2f2; font-weight: bold; }
-                                            td { color: #E53935; }
-                                            .build-info { font-size: 14px; color: #555555; }
-                                            .footer { margin-top: 16px; font-size: 12px; color: #777777; }
-                                        </style>
-                                    </head>
-                                    <body>
-                                        <div class="container">
-                                            <h3>❌ Jenkins Build Failure Notification</h3>
-                                            <p class="content">The build encountered errors. Below are the details:</p>
-                                            
-                                            <div class="table-container">
-                                                <table>
-                                                    <tr>
-                                                        <th>Job</th>
-                                                        <td>${env.JOB_NAME}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Build Number</th>
-                                                        <td>${env.BUILD_NUMBER}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Build URL</th>
-                                                        <td><a href="${env.BUILD_URL}" style="color: #1565C0; text-decoration: none;">View Build Logs</a></td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                            
-                                            <div class="table-container">
-                                                <table>
-                                                    <tr>
-                                                        <th>Error Description</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>${errorLog.replace('\n', '<br>')}</td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                            
-                                            <div class="footer">
-                                                <p>Triggered by: ${env.BUILD_USER}</p>
-                                                <p>For more details, please check the attached logfile or <a href="${env.BUILD_URL}" style="color: #1565C0;">Jenkins build logs</a>.</p>
-                                            </div>
-                                        </div>
-                                    </body>
-                                </html>
-                            """,
-                            mimeType: 'text/html',
-                            attachmentsPattern: "hol-provisioner-${BUILD_NUMBER}.log",
-                            from: 'jenkins@example.com'
-                        )
-      
-                        error(errorLog) // Join error messages with a newline for the build failure
-                       
+                        
+
+                         // Mark the build as failed with the error messages
+                        
                     }
                 }
             }
@@ -289,6 +225,78 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
     }
 
     post {
+        failure {
+            script {
+                def errorLog = currentBuild.description ?: "Unknown error occurred."
+                emailext(
+                    to: "${env.BUILD_USER_EMAIL}",
+                    subject: "❌ Jenkins Build Failure: ${currentBuild.fullDisplayName}",
+                    body: """
+                        <html>
+                            <head>
+                                <style>
+                                    body { font-family: Arial, sans-serif; color: #333333; }
+                                    h3 { color: #E53935; font-size: 18px; }
+                                    .container { border: 1px solid #e0e0e0; padding: 16px; border-radius: 8px; background-color: #f9f9f9; }
+                                    .content { padding: 8px 16px; }
+                                    .table-container { margin-top: 16px; }
+                                    table { width: 100%; border-collapse: collapse; }
+                                    th, td { padding: 12px; text-align: left; border: 1px solid #dddddd; }
+                                    th { background-color: #f2f2f2; font-weight: bold; }
+                                    td { color: #E53935; }
+                                    .build-info { font-size: 14px; color: #555555; }
+                                    .footer { margin-top: 16px; font-size: 12px; color: #777777; }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h3>❌ Jenkins Build Failure Notification</h3>
+                                    <p class="content">The build encountered errors. Below are the details:</p>
+                                    
+                                    <div class="table-container">
+                                        <table>
+                                            <tr>
+                                                <th>Job</th>
+                                                <td>${env.JOB_NAME}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Build Number</th>
+                                                <td>${env.BUILD_NUMBER}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Build URL</th>
+                                                <td><a href="${env.BUILD_URL}" style="color: #1565C0; text-decoration: none;">View Build Logs</a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="table-container">
+                                        <table>
+                                            <tr>
+                                                <th>Error Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td>${errorLog.replace('\n', '<br>')}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="footer">
+                                        <p>Triggered by: ${env.BUILD_USER}</p>
+                                        <p>For more details, please check the attached logfile or <a href="${env.BUILD_URL}" style="color: #1565C0;">Jenkins build logs</a>.</p>
+                                    </div>
+                                </div>
+                            </body>
+                        </html>
+                    """,
+                    mimeType: 'text/html',
+                    attachmentsPattern: "hol-provisioner-${BUILD_NUMBER}.log",
+                    from: 'jenkins@example.com'
+                )
+                
+            }
+        }
+                    
         success {
             sh "echo 'SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})'"
             script {
@@ -373,15 +381,9 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
 
             }
         }
-        failure {
-            sh 'echo "FAILURE: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
-        }
         cleanup {
             sh "rm -f ${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log"
             sh 'echo "CLEANUP: Docker : "; docker rm -f hol-provisioner-${BUILD_NUMBER} || true'           
-        }
-        always {
-            sh 'echo "ALWAYS: Done"'
         }
     }
 }
