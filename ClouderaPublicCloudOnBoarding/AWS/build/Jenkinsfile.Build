@@ -7,7 +7,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-cloudera-partners'
         DOCKERFILE_DIR = 'ClouderaPublicCloudOnBoarding/AWS/build'
         BUILDER_NAME = 'mybuilder'
-        BUILD_BRANCH = 'hol-automation'
+        BUILD_BRANCH = 'hotfix/2.1.0'
         RECIPIENTS = 'ksahu@cloudera.com,aktiwari@cloudera.com'
     }
 
