@@ -35,7 +35,7 @@ pipeline {
                               userRemoteConfigs: [[url: 'https://github.com/cloudera/cloudera-partners.git']],
                               branches: [[name: "refs/heads/${BUILD_BRANCH}"]]
                     ])
-                    echo "Checkout complete. Branch 'hol-automation' checked out."
+                    echo "Checkout complete. Branch '${BUILD_BRANCH}' checked out."
                 }
             }
         }
