@@ -84,13 +84,13 @@ pipeline {
                         // Build the image with primary tag
                         dir("${env.DOCKERFILE_DIR}") {
                             sh 'echo "Building multi-platform Docker image with primary tag..."'
-                            sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} --push ."
+                            sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} --push ."
                         }
 
                         // Push the image with secondary tag
                         echo "Pushing multi-platform Docker image with secondary tag..."
                         dir("${env.DOCKERFILE_DIR}") {
-                            sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} --push ."
+                            sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} --push ."
                         }
                     } else {
                         echo "Regular build and push."
@@ -98,7 +98,7 @@ pipeline {
                         // Build the Docker image with both primary and secondary tags
                         dir("${env.DOCKERFILE_DIR}") {
                             sh 'echo "Building Docker image with primary and secondary tags..."'
-                            sh "docker build  --build-arg TF_QUICKSTART_VERSION=${TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} ."
+                            sh "docker build  --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} ."
                         }
 
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-cloudera-partners', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
