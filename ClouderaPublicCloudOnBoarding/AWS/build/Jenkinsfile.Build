@@ -32,7 +32,7 @@ pipeline {
                     echo "Stage :: Checkout"
                     checkout([$class: 'GitSCM',
                               userRemoteConfigs: [[url: 'https://github.com/cloudera/cloudera-partners.git']],
-                              branches: [[name: 'refs/heads/hol-automation']]
+                              branches: [[name: 'refs/heads/hotfix/2.1.0']]
                     ])
                     echo "Checkout complete. Branch 'hol-automation' checked out."
                 }
