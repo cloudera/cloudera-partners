@@ -16,7 +16,7 @@ pipeline {
         choice(name: 'DELETE_WORKDIR', choices: ['false', 'true'], description: 'Delete the Work directory at the end of the job.')
         booleanParam(name: 'REFRESH_JENKINSFILE', defaultValue: false, description: 'Reload changes from Jenkinsfile and exit.')
         booleanParam(name: 'MULTI_PLATFORM_BUILD', defaultValue: true, description: 'Check to enable multi-platform build and push.')
-        string(name: 'TF_QS_VER', defaultValue: 'main', description: 'CDP-TF-QUICKSTART tag version to use for building Docker image')
+        string(name: 'TF_QS_VER', defaultValue: 'main', description: 'CDP-TF-QUICKSTART tag version (e.g. v0.8.5 or main) to use for building Docker image')
     }
 
     options {
