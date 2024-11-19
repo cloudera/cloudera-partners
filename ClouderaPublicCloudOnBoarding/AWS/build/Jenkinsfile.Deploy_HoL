@@ -222,6 +222,49 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
                 }
             }
         }
+        stage('Assign admin roles to builduser') {
+            steps {
+                echo 'Assigning Resorce roles'
+                script{
+                    sh '''
+                    CDP_WORKLOAD_USERNAME=$BUILD_USER_ID
+                    echo "CDP_WORKLOAD_USERNAME: $CDP_WORKLOAD_USERNAME"
+                    # Set your environment name
+                    CDP_ENV_NAME="$(echo "$WORKSHOP_NAME" | tr '[:upper:]' '[:lower:]')-cdp-env"
+                    echo "CDP_ENV_NAME: $CDP_ENV_NAME"
+                    # Get User CRN
+                    export CDP_USER_CRN=$(cdp iam list-users --max-items 10000 | jq --arg CDP_WORKLOAD_USERNAME "$CDP_WORKLOAD_USERNAME" \'.users[] | select(.workloadUsername==$CDP_WORKLOAD_USERNAME).userId\'| tr -d \'"\')
+                    
+                    # Get Environment CRN
+                    export CDP_ENV_CRN=$(cdp environments describe-environment --environment-name ${CDP_ENV_NAME} | jq -r .environment.crn)
+                    
+                    export RESOURCE_ROLES=(EnvironmentAdmin Owner)
+                    
+                    # Function: Get Resource Roles CRN
+                    get_crn_resource_role () {
+                       CDP_RESOURCE_ROLE_NAME=$1
+                       CDP_RESOURCE_ROLE_CRN=$(cdp iam list-resource-roles |jq --arg CDP_RESOURCE_ROLE_NAME "$CDP_RESOURCE_ROLE_NAME" \'.resourceRoles[] | select(.crn | endswith(":" + $CDP_RESOURCE_ROLE_NAME))| .crn\')
+                       echo $CDP_RESOURCE_ROLE_CRN | tr -d \'"\'
+                    }
+                    
+                    # Set Resource Roles
+                    for role_name in "${RESOURCE_ROLES[@]}"; do \\
+                    cdp iam assign-user-resource-role \\
+                    --user ${CDP_USER_CRN} \\
+                    --resource-role-crn $(get_crn_resource_role ${role_name}) \\
+                    --resource-crn ${CDP_ENV_CRN} || true; \\
+                    done
+                    
+                    # Synchronize users
+                    cdp environments sync-all-users \
+                    --environment-name $CDP_ENV_NAME
+                    
+                    # Synchronize IDBroker Mappings
+                    cdp environments sync-id-broker-mappings \
+                    --environment-name $CDP_ENV_NAME'''
+                }
+            }
+        }
     }
 
     post {
