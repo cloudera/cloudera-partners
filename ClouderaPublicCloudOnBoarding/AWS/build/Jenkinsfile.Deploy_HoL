@@ -223,6 +223,9 @@ CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
             }
         }
         stage('Assign admin roles to builduser') {
+            when {
+            expression { params.action == 'provision' }
+            }
             steps {
                 echo 'Assigning Resorce roles'
                 script{
