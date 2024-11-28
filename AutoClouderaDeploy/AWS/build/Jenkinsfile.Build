@@ -7,15 +7,15 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-cloudera-partners'
         DOCKERFILE_DIR = 'ClouderaPublicCloudOnBoarding/AWS/build'
         BUILDER_NAME = 'mybuilder'
-        BUILD_BRANCH = 'hotfix/2.1.0'
+        BUILD_BRANCH = 'main'
         RECIPIENTS = 'ksahu@cloudera.com,aktiwari@cloudera.com'
     }
 
     parameters {
-        string(name: 'PRIMARY_TAG', defaultValue: 'test-latest', description: 'Primary tag for the Docker image')
+        string(name: 'PRIMARY_TAG', defaultValue: 'testmain', description: 'Primary tag for the Docker image')
         choice(name: 'DELETE_WORKDIR', choices: ['false', 'true'], description: 'Delete the Work directory at the end of the job.')
         booleanParam(name: 'REFRESH_JENKINSFILE', defaultValue: false, description: 'Reload changes from Jenkinsfile and exit.')
-        booleanParam(name: 'MULTI_PLATFORM_BUILD', defaultValue: true, description: 'Check to enable multi-platform build and push.')
+        booleanParam(name: 'MULTI_PLATFORM_BUILD', defaultValue: false, description: 'Check to enable multi-platform build and push.')
         string(name: 'TF_QS_VER', defaultValue: 'main', description: 'CDP-TF-QUICKSTART tag version (e.g. v0.8.5 or main) to use for building Docker image')
     }
 
@@ -77,7 +77,7 @@ pipeline {
                     def primaryTag = params.PRIMARY_TAG
                     def buildNumber = env.BUILD_NUMBER
                     def buildDate = new Date().format('yyyyMMdd')
-                    def secondaryTag = "${buildDate}-${buildNumber}"
+                    //def secondaryTag = "${buildDate}-${buildNumber}"
 
                     if (params.MULTI_PLATFORM_BUILD) {
                         echo "Multi-platform build enabled."
@@ -89,17 +89,17 @@ pipeline {
                         }
 
                         // Push the image with secondary tag
-                        echo "Pushing multi-platform Docker image with secondary tag..."
+                        /*echo "Pushing multi-platform Docker image with secondary tag..."
                         dir("${env.DOCKERFILE_DIR}") {
                             sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} --push ."
-                        }
+                        }*/
                     } else {
                         echo "Regular build and push."
 
                         // Build the Docker image with both primary and secondary tags
                         dir("${env.DOCKERFILE_DIR}") {
                             sh 'echo "Building Docker image with primary and secondary tags..."'
-                            sh "docker build  --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} ."
+                            sh "docker build  --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} ."
                         }
 
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-cloudera-partners', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
