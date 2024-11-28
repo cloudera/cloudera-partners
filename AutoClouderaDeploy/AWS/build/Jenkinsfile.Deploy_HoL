@@ -47,8 +47,7 @@ pipeline {
 
     environment {
         LANG = "C.UTF-8"
-        IMAGE_TAG = "params.IMAGE_TAG"
-        DOCKER_IMAGE = "clouderapartners/cdp-public-cloud-hol-provisioner:${IMAGE_TAG}"
+        DOCKER_IMAGE = "clouderapartners/cdp-public-cloud-hol-provisioner:${params.IMAGE_TAG}"
         HOL_AUTO_EXEC_DIR = "/home/holautosa/HOL_AUTO_EXEC_DIR"
         CONFIG_DIR = "${HOL_AUTO_EXEC_DIR}/userconfig"
         CONFIG_FILE = "${CONFIG_DIR}/configfile"
