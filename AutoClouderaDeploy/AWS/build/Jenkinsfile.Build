@@ -7,7 +7,6 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-cloudera-partners'
         DOCKERFILE_DIR = 'ClouderaPublicCloudOnBoarding/AWS/build'
         BUILDER_NAME = 'mybuilder'
-        BUILD_BRANCH = 'main'
         RECIPIENTS = 'ksahu@cloudera.com,aktiwari@cloudera.com'
     }
 
@@ -17,6 +16,7 @@ pipeline {
         booleanParam(name: 'REFRESH_JENKINSFILE', defaultValue: false, description: 'Reload changes from Jenkinsfile and exit.')
         booleanParam(name: 'MULTI_PLATFORM_BUILD', defaultValue: false, description: 'Check to enable multi-platform build and push.')
         string(name: 'TF_QS_VER', defaultValue: 'main', description: 'CDP-TF-QUICKSTART tag version (e.g. v0.8.5 or main) to use for building Docker image')
+        string(name: 'BUILD_BRANCH', defaultValue: 'main', description: 'Primary tag for the Docker image')        
     }
 
     options {
@@ -30,12 +30,12 @@ pipeline {
             steps {
                 script {
                     echo "Stage :: Checkout"
-                    echo "Checking out ${BUILD_BRANCH} Branch."
+                    echo "Checking out ${params.BUILD_BRANCH} Branch."
                     checkout([$class: 'GitSCM',
                               userRemoteConfigs: [[url: 'https://github.com/cloudera/cloudera-partners.git']],
-                              branches: [[name: "refs/heads/${BUILD_BRANCH}"]]
+                              branches: [[name: "refs/heads/${params.BUILD_BRANCH}"]]
                     ])
-                    echo "Checkout complete. Branch '${BUILD_BRANCH}' checked out."
+                    echo "Checkout complete. Branch '${params.BUILD_BRANCH}' checked out."
                 }
             }
         }
