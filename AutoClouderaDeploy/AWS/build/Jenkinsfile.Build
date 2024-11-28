@@ -106,8 +106,7 @@ pipeline {
                             sh 'echo "Logging in to Docker registry..."'
                             sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                             sh 'echo "Pushing Docker image with primary and secondary tags..."'
-                            sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag}"
-                            sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag}"
+                            sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag}"                      
                         }
                     }
                 }
