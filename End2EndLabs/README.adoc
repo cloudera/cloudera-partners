@@ -1,0 +1,16 @@
+= EndToEndLabs
+
+== Overview
+The `EndToEndLabs` folder provides comprehensive, real-world examples of how to integrate multiple Cloudera Data Services into unified workflows. These labs simulate real-world scenarios, showcasing data ingestion, transformation, analysis, and visualization.
+
+This folder currently contains one workshop **Alphavantage**.
+
+== Alphavantage Workshop
+
+=== Description
+The Alphavantage workshop is an end-to-end data pipeline that demonstrates how to leverage Cloudera Data Platform (CDP) services to analyze financial market data. Using the Alphavantage API as a data source, this workshop walks you through the process of:
+
+* Data ingestion and streaming with Cloudera Data Flow (CDF).
+* Processing the data with Cloudera Data Engineering (CDE).
+* Storing and querying the data using Cloudera Data Warehouse (CDW).
+

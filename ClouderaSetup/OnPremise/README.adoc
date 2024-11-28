@@ -1,0 +1,14 @@
+= Cloudera Private Cloud Onboarding (OnPremise)
+
+This folder provides automation scripts and configurations for deploying Cloudera Data Platform on on-premise platforms: `VMware`, `RedHat Openshift`. The automation enables efficient and repeatable provisioning of CDP environments tailored to your needs.
+
+== Repository Structure
+The repository is structured by on-premise platforms, with each platform having its own folder containing relevant automation resources.
+
+== Usage Instructions
+1. Click on below link to Navigate to the folder for your chosen on-premise platform.
+* link:./VMware/[**`VMware`**] [Not available yet]
+* link:./Openshift/[**`Openshift`**] [Not available yet]
+
+2. Follow the `README` file in that folder for detailed steps on configuring and running the automation.
+3. Ensure all prerequisites are met before initiating deployment.

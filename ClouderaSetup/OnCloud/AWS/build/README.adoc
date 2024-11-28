@@ -1,5 +1,4 @@
-
-= CDP Public Cloud: Hands-On Labs Infrastructure Provisioner
+= AutoClouderaDeploy (Hands On Labs Infrastructure Provisioner)
 :toc:
 
 Author: **Kuldeep Sahu**
@@ -26,45 +25,44 @@ Hands-on Labs play a crucial role in showcasing the capabilities of Cloudera Dat
 
 Infrastructure components are important and play a vital role in achieving the goal of Hands-on Labs and in providing a better experience to the participants.
 
-**Hands-On Labs Infrastructure Provisioner** is a container-based solution that takes care of provisioning the required infrastructure components with minimal manual effort. By executing a single command, it creates a **disposable** on-demand stack consisting of:
+**AutoClouderaDeploy** is a container-based solution that takes care of provisioning the required infrastructure components with minimal manual effort. By executing a single command, it creates a **disposable** on-demand stack consisting of:
 
-1. CDP Environment
+1. Cloudera Environment
 2. Datalake
-3. Data Service (Currently CDW & CDE)
-4. Keycloak Server
-5. Users 
+3. Data Service (Currently CML, CDW & CDE)
+4. `Keycloak` Server
+5. Users
 
 
 == Technology Stack
-**Hands-On Labs Infrastructure Provisioner** employs a robust toolchain consisting of:
+**AutoClouderaDeploy** employs a robust toolchain consisting of:
 
-1.  Ansible
-2.  Terraform
-3.  Cloudera.cloud
-4.  CDP-tf-quickstarts
-5.  CDPY
-6.  CDP CLI
-7.  AWS CLI
-8.  Shell Scripting
+1. `Ansible`
+2. `Terraform`
+3. `Cloudera.cloud`
+4. `CDP-tf-quickstarts`
+5. `CDPY`
+6. `CDP CLI`
+7. `AWS CLI`
+8. `Shell Scripting`
 
-All the above tools are integrated with each other and packaged as a Docker Container for use.
-
----
-== How to Install Docker on Your Local Machine
-Follow the page below for installing Docker on your machine:
-
-https://docs.docker.com/engine/install/
+All the above tools are integrated with each other and packaged as a `Docker` Container for use.
 
 ---
+== How to Install `Docker` on Your Local Machine
+Follow mentioned link for link:https://docs.docker.com/engine/install/[**installing Docker**] on your machine.
 
-== How To Create Docker Image for HoL-Automation
 
-=== Step 1: Clone the Code and CD into the hol_automation/build Directory
+---
+
+== How To Create `Docker` Image for **AutoClouderaDeploy**
+
+=== Step 1: Clone the Code and CD into the build Directory
 
 [.shell]
 ----
 
-cd hol_automation/build
+cd ClouderaSetup/OnCloud/AWS/build/
 
 ----
 
@@ -90,26 +88,26 @@ docker images
 ---
 
 === Step 3: Log in to Docker Hub
-The Docker image is available at Docker Hub. Once Docker is installed and ready to use, pull the **cdp-public-cloud-hol-provisioner:latest** image by executing the command below:
+The Docker image is available at Docker Hub. Once `Docker` is installed and ready to use, pull the **cdp-public-cloud-hol-provisioner:latest** image by executing the command below:
 
 [.shell]
 ----
 
-ksahu@Kuldeeps-MacBook-Air build % docker login             
+ksahu@Kuldeeps-MacBook-Air build % docker login
 Log in with your Docker ID or email address to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com/ to create one.
 You can log in with your password or a Personal Access Token (PAT). Using a limited-scope PAT grants better security and is required for organizations using SSO. Learn more at https://docs.docker.com/go/access-tokens/
 
 Username: clouderapartners
-Password: 
+Password:
 Login Succeeded
-ksahu@Kuldeeps-MacBook-Air build % 
+ksahu@Kuldeeps-MacBook-Air build %
 
 ----
 
 ---
 
 === Step 4: Tag and Push the Docker Image
-The Docker image will be available at Docker Hub. Once Docker is installed and you are logged in to Docker Hub, push the **cdp-public-cloud-hol-provisioner:latest** image by executing the commands below:
+The Docker image will be available at Docker Hub. Once `Docker` is installed and you are logged in to Docker Hub, push the **cdp-public-cloud-hol-provisioner:latest** image by executing the commands below:
 
 [.shell]
 ----
@@ -119,20 +117,20 @@ docker push clouderapartners/cdp-public-cloud-hol-provisioner:latest
 
 ----
 
---- 
-Please note that the image built using the above method will be platform-dependent and may not work if you try to run the container on a different platform than the one it was originally built on. To build a platform-agnostic image, kindly refer to the link: 
+---
+Please note that the image built using the above method will be platform-dependent and may not work if you try to run the container on a different platform than the one it was originally built on. To build a platform-agnostic image, kindly refer to the link:
 
 link:https://docs.docker.com/build/building/multi-platform/[**Link to Official Documentation**]
 
 ---
 
-== Major Features Implemented in the CDP **Hands-On Labs (HoL) Infrastructure Provisioner** Automation for AWS:
+== Major Features Implemented in the CDP **AutoClouderaeploy** provisioner Automation for AWS:
 
 1.  Ubuntu Linux-based base image.
 
-2.  Optional provisioning of Keycloak Server for providing external user access to the Lab Environment with the help of SSO.
+2.  Optional provisioning of `Keycloak` Server for providing external user access to the Lab Environment with the help of SSO.
 
-3.  When Keycloak Server is provisioned using this automation, the workshop owner can create the required number of workshop users with Keycloak (SSO) based access to the workshop environment (depending on the type of workshop e.g. CML, CDW, or CDE).
+3.  When `Keycloak` Server is provisioned using this automation, the workshop owner can create the required number of workshop users with Keycloak (SSO) based access to the workshop environment (depending on the type of workshop e.g. CML, CDW, or CDE).
 
 4.  Provisioned Keycloak users are added in the backend to IAM Groups in the CDP Tenant with the least required access roles.
 
@@ -140,7 +138,7 @@ link:https://docs.docker.com/build/building/multi-platform/[**Link to Official D
 
 6.  Externalize (parameterization from config file) the Keycloak Admin Password (for improved security control).
 
-7.  Added below validation prerequisite checks for AWS and CDP infrastructures:
+7.  Added below validation prerequisite checks for `AWS` and `CDP` infrastructures:
     -  Input config file is present.
     -  Required input parameter keys are present in the config file with non-empty values.
     -  Enough quotas for VPC, ElasticIP, and S3 bucket creation are available on AWS.
@@ -160,14 +158,14 @@ link:https://docs.docker.com/build/building/multi-platform/[**Link to Official D
 
 14. Deployment of CDV instance and Data Catalog with CDW data service.
 
-15. Decoupled Authentication Mechanism and provide multiple ways for authentication with AWS:
+15. Decoupled Authentication Mechanism and provide multiple ways for authentication with `AWS`:
 
  a) ACCESS_KEY_ID and SECRET_ACCESS_KEY
 
  b) AWS SSO Mechanism via Octa/SAML
- 
- c) Role Assignment to EC2 instance i.e. Deployer Machine. (via sts:assumeRole)
 
+ c) Role Assignment to EC2 instance i.e. Deployer Machine. (via sts:assumeRole)
+ 
 ---
 
 
@@ -176,6 +174,4 @@ link:https://docs.docker.com/build/building/multi-platform/[**Link to Official D
 For more information on how to use this HoL provisioner Docker image, see the main README file:
 
 link:../README.adoc[**Link to Usage Documentation**]
-
----
 

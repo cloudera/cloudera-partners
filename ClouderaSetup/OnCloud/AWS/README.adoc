@@ -1,4 +1,4 @@
-= CDP Public Cloud: Hands On Labs Infrastructure Provisioner
+= Cloudera OnCloud: AutoClouderaDeploy Provisioner
 :toc:
 
 Author: **Kuldeep Sahu**
@@ -20,7 +20,7 @@ Hands-on Labs play a crucial role in showcasing the capabilities of Cloudera Dat
 
 Infrastructure components are important and play a vital role in achieving the goal of Hands-on Labs and to give a better experience to the participants.
 
-**Hands On Labs Infrastructure Provisioner** is a container based solution which takes care of provisioning the required infrastructure components without much manual efforts. By executing a single command it creates a **disposable** on-demand stack consists of:
+**AutoClouderaDeploy** provisioner is a container based solution which takes care of provisioning the required infrastructure components without much manual efforts. By executing a single command it creates a **disposable** on-demand stack consists of:
 
 1. CDP Environment
 2. Datalake
@@ -32,7 +32,7 @@ Infrastructure components are important and play a vital role in achieving the g
 image::build/images/Components.png[Components,600,400]
 
 == Technology Stack
-**Hands On Labs Infrastructure Provisioner** employs a robust toolchain consisting of:
+**AutoClouderaDeploy** employs a robust toolchain consisting of:
 
 1. `Ansible`
 2. `Terraform`

@@ -1,4 +1,4 @@
-= PARTNER HANDBOOK
+= PARTNER RESOURCES
 mmehra@cloudera.com
 v1.0, May 31, 2024:
 :toc:
