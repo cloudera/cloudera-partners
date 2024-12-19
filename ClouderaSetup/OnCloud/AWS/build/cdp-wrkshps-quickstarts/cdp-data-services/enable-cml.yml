@@ -1,0 +1,136 @@
+---
+- name: Enable CML data service
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars:
+    ws_instance_type: "m5.2xlarge"
+    minimum_instances: 1
+    maximum_instances: 10
+    gpu_instance_type: "g4dn.xlarge"
+    minimum_gpu_instances: 0
+    maximum_gpu_instances: 10
+    root_volume_size: 256
+    enable_gpu: false
+
+  tasks:
+    - name: Check and print variable status
+      debug:
+        msg: |
+          cdp_env_name: {{ cdp_env_name }},
+          workshop_name: {{ workshop_name }},
+          workspace_name: {{ workshop_name }}-cml-ws,
+          ws_instance_type: {{ ws_instance_type }},
+          minimum_instances: {{ minimum_instances }},
+          maximum_instances: {{ maximum_instances }},
+          gpu_instance_type: {{ gpu_instance_type }},
+          minimum_gpu_instances: {{ minimum_gpu_instances }},
+          maximum_gpu_instances: {{ maximum_gpu_instances }},
+          root_volume_size: {{ root_volume_size }},
+          enable_gpu: {{ enable_gpu }}
+        
+    - name: List CML Workspaces for existence check
+      ansible.builtin.shell: >
+        cdp ml list-workspaces | jq -r '.workspaces[].instanceName'
+      register: ml_list_workspaces
+
+    - name: Set workspace exists flag
+      set_fact:
+        workspace_exists: "{{ ml_list_workspaces.rc == 0 and (workshop_name + '-cml-ws' in ml_list_workspaces.stdout_lines) }}"
+
+    - name: Skip provisioning if workspace already exists
+      debug:
+        msg: "Workspace {{ workshop_name }}-cml-ws already exists in environment {{ cdp_env_name }}."
+      when: workspace_exists
+
+    - name: Generate JSON for provision-k8s-request
+      set_fact:
+        provision_k8s_request: >
+          {
+            "environmentName": "{{ cdp_env_name }}",
+            "instanceGroups": [
+              {
+                "name": "default_settings",
+                "instanceType": "{{ ws_instance_type }}",
+                "rootVolume": {"size": {{ root_volume_size | int }}},
+                "autoscaling": {
+                  "minInstances": {{ minimum_instances | int }},
+                  "maxInstances": {{ maximum_instances | int }},
+                  "enabled": true
+                }
+              },
+              {
+                "name": "cpu_settings",
+                "instanceType": "{{ ws_instance_type }}",
+                "rootVolume": {"size": {{ root_volume_size | int }}},
+                "autoscaling": {
+                  "minInstances": {{ minimum_instances | int }},
+                  "maxInstances": {{ maximum_instances | int }},
+                  "enabled": true
+                }
+              }
+              {% if enable_gpu %}
+              , {
+                "name": "gpu_settings",
+                "instanceType": "{{ gpu_instance_type }}",
+                "rootVolume": {"size": {{ root_volume_size | int }}},
+                "autoscaling": {
+                  "minInstances": {{ minimum_gpu_instances | int }},
+                  "maxInstances": {{ maximum_gpu_instances | int }},
+                  "enabled": true
+                }
+              }
+              {% endif %}
+            ]
+          }
+
+    - name: Debug generated JSON
+      debug:
+        msg: "Provision K8S request JSON: {{ provision_k8s_request | to_json }}"
+
+    - name: Provision CML Workspace with GPU support if it does not exist
+      ansible.builtin.command: >
+        cdp ml create-workspace
+        --environment-name "{{ cdp_env_name }}"
+        --workspace-name "{{ workshop_name }}-cml-ws"
+        --use-public-load-balancer
+        --enable-model-metrics
+        --no-disable-tls
+        --enable-monitoring
+        --static-subdomain "{{ workshop_name[0:11] }}-cml"
+        --provision-k8s-request '{{ provision_k8s_request | to_json }}'
+      register: ml_provision_workspace
+      when: not workspace_exists
+
+    - name: Pause for 150 seconds after provisioning workspace
+      pause:
+        seconds: 150
+      when: not workspace_exists
+
+    - name: Getting CML Workspace Status until Provisioning Completes
+      ansible.builtin.shell: >
+        cdp ml list-workspaces | jq -r '.workspaces[] | select(.instanceName == "{{ workshop_name }}-cml-ws")  | .instanceStatus'
+      register: ml_ws_status
+      until: >
+        ml_ws_status.stdout is defined and
+        (ml_ws_status.rc == 0 and (ml_ws_status.stdout in [
+          "", "modify:finished", "modify:failed", "installation:finished", "installation:failed", "resume:finished",
+          "provision:finished", "provision:failed", "deprovision:finished", "deprovision:failed"
+        ]))
+      retries: 50
+      delay: 120
+
+    - name: Print ML Workspace Status
+      debug:
+        msg: "ML Workspace Status is {{ ml_ws_status.stdout }}. If workspace does not already exist and there are no errors in the execution, usually it takes around ~60 minutes to provision."
+      when: ml_ws_status.stdout is defined
+
+    - name: Print success message on successful workspace creation
+      debug:
+        msg: "Successfully provisioned workspace {{ workshop_name }}-cml-ws in environment {{ cdp_env_name }}."
+      when: ml_ws_status.stdout is defined and ml_ws_status.stdout in ["installation:finished", "modify:finished", "provision:finished"]
+
+    - name: Fail task on Workspace Creation Failed
+      fail:
+        msg: "Workspace Provisioning Got Failed."
+      when: ml_ws_status.stdout is defined and ml_ws_status.stdout not in ["installation:finished", "modify:finished", "provision:finished"]

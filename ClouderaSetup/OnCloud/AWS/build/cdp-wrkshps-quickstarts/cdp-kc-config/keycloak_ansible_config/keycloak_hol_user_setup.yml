@@ -1,0 +1,77 @@
+---
+- name: HOL User Setup
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Print variables
+      debug:
+        msg:
+          - "hol_session_name: {{ hol_session_name }}"
+          - "number_user_to_create: {{ number_user_to_create }}"
+          - "username_prefix: {{ username_prefix }}"
+          - "default_user_password: {{ default_user_password }}"
+          - "==================="
+          - "hol_keycloak_realm: {{ hol_keycloak_realm }}"
+          - "keycloak__domain: {{ keycloak__domain }}"
+          - "keycloak__admin_username: {{ keycloak__admin_username }}"
+
+    ############# Initialization of Keycloak Variables #############
+    - name: Set variables for ease-of-use
+      ansible.builtin.set_fact:
+        workshop_group: "{{ hol_session_name | lower }}"
+        workshop_realm: "{{ hol_keycloak_realm | lower }}"
+        username_prefix_lower: "{{ username_prefix | lower }}"
+
+    ############# Keycloak Group for HOL #############
+    - name: Set variables for HOL Groups
+      ansible.builtin.set_fact:
+        __hol_group_details:
+          - group_name: "{{ workshop_group }}"
+            realm_name: "{{ workshop_realm }}"
+
+    # Create group
+    - name: Create Keycloak groups
+      ansible.builtin.include_role:
+        name: keycloak_data
+        tasks_from: setup_groups
+      vars:
+        keycloak__groups_to_create: "{{ __hol_group_details }}"
+
+    ############# Keycloak Users for HOL #############
+
+    - name: Generate User list for HOL
+      ansible.builtin.set_fact:
+        __hol_user_details: "{{ (__hol_user_details | default([])) + [__user] }}"
+      vars:
+        __user:
+          userName: "{{ username_prefix_lower }}{{ item }}"
+          firstName: "User-{{ username_prefix_lower }}{{ item }}"
+          lastName: "{{ username_prefix_lower }}{{ item }}"
+          email: "{{ username_prefix_lower }}{{ item }}@clouderaexample.com"
+          realm_name: "{{ workshop_realm }}"
+          groups:
+            - "{{ workshop_group }}"
+          password: "{{ default_user_password }}"
+      with_sequence: start=1 end="{{ number_user_to_create }}" format=%02d
+
+    - name: Create sequence
+      debug:
+        var: __hol_user_details
+
+    # Create users
+    - name: Create Keycloak users (in loop)
+      ansible.builtin.include_role:
+        name: keycloak_data
+        tasks_from: setup_user
+      vars:
+        keycloak__user_temporary_password: "{{ reset_password_on_first_login | default(True) }}"
+        keycloak__user_to_create:
+          realm_name: "{{ item.realm_name }}"
+          username: "{{ item.userName }}"
+          firstName: "{{ item.firstName }}"
+          lastName: "{{ item.lastName }}"
+          email: "{{ item.email }}"
+          groups: "{{ item.groups }}"
+          password: "{{ item.password }}"
+      loop: "{{ __hol_user_details }}"

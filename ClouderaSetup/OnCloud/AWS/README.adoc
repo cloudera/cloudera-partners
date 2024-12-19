@@ -1,0 +1,764 @@
+= Cloudera OnCloud: AutoClouderaDeploy Provisioner
+:toc:
+
+Author: **Kuldeep Sahu**
+
+Email: **ksahu@cloudera.com**
+
+Author: **Avanish Tiwari**
+
+Email: **aktiwari@cloudera.com**
+
+
+---
+
+
+== Overview
+
+Hands-on Labs play a crucial role in showcasing the capabilities of Cloudera Data Platform Public Cloud form factor to partners and customers. They offer a practical and immersive learning experience that goes beyond mere overview. Hands-on Labs facilitate participant engagement and allow them to explore and interact with different PaaS offerings of Cloudera Data Platform.
+
+
+Infrastructure components are important and play a vital role in achieving the goal of Hands-on Labs and to give a better experience to the participants.
+
+**AutoClouderaDeploy** provisioner is a container based solution which takes care of provisioning the required infrastructure components without much manual efforts. By executing a single command it creates a **disposable** on-demand stack consists of:
+
+1. CDP Environment
+2. Datalake
+3. Data Service (Currently CDW, CDE & CML)
+4. `Keycloak` Server
+5. Users 
+
+
+image::build/images/Components.png[Components,600,400]
+
+== Technology Stack
+**AutoClouderaDeploy** employs a robust toolchain consisting of:
+
+1. `Ansible`
+2. `Terraform`
+3. `Cloudera.cloud`
+4. `CDP-tf-quickstarts`
+5. `CDPY`
+6. `CDP CLI`
+7. `AWS CLI`
+8. `Shell Scripting`
+
+All the above tools are integrated with each other and packaged as a `Docker` Container for use.
+
+== Prerequisites
+The ready to use container takes care of all the dependencies of required tools & does not require user to install or configure any of the above listed tools. 
+For using this user should have:
+
+1. `Docker` and `AWSCLI V2` installed on your Laptop.
+2. *Programatic Access*(CDP_ACCESS_KEY_ID & CDP_PRIVATE_KEY) of *CDP Tenant*
+3. *Programatic Access*(AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY) *OR* *SSO details* of the *AWS account* with Administrator or Power User Role *OR* *Role Assignment* to EC2 deployer machine *via sts:assumeRole* method 
+
+=== How to install `Docker` on your local machine
+
+Follow mentioned link for link:https://docs.docker.com/engine/install/[**installing Docker**] on your machine.
+
+
+=== Generate Keys
+
+==== CDP
+* On the CDP Portal, click at the left bottom corner and click on Profile as shown below. 
+
+image::build/images/profile.png[profile, 120, 120]
+
+image::build/images/profile_1.png[profile1, 370, 193]
+
+* Click on Generate Access Key as shown below.
+
+image::build/images/gen_access_key.png[access_key, 460, 150]
+
+* Copy the values of Access Key ID and Private Key separately and keep it in a note. Or download the keys by pressing the Blue Button.
+
+image::build/images/gen_access_key_1.png[access_key1, 360, 240]
+
+* On your Laptop, Login to `cdp cli` as below (if not already).
+
+[.shell]
+----
+ksahu@Kuldeeps-MacBook-Air build % cdp configure
+CDP Access Key ID [None]: CDPEXAMPLEACCESSKEY
+CDP Private Key [None]: myPSEcdpPrivateKEy/Sample123456xyz
+CDP Region [us-west-1]: <Enter_OR_Provide_Override_Value>
+CDP Endpoint URL (blank for public cloud) [None]: <Enter>
+ksahu@Kuldeeps-MacBook-Air build % 
+
+# Verify using below command, if `cdp cli` is configured correctly:
+ksahu@Kuldeeps-MacBook-Air build % cdp iam get-user
+----
+
+==== AWS
+
+There are three ways you can authenticate with AWS Account:
+
+a) Normal Way: *Using AWS ACCESS_KEY_ID and SECRET_ACCESS_KEY*
+
+. Open the IAM console at https://console.aws.amazon.com/iam/.
+. On the navigation menu, click on Users
+. Click on your IAM user name
+. Open the Security credentials tab, and then click on `Create access key`.
+. To see the new access key, click on Show. Your credentials resemble the following:
+
+ Access key ID: SAMPLEODNN7EXAMPLE
+ Secret access key: examplesecret123/PSESECRETENG/myPSERfiCYEXAMPLEKEY
+
+ To download the above key pair, choose Download .csv file. Store the .csv file with keys in a secure location.
+
+. Configure the AWS credentials on your Laptop.
+
+[.shell]
+----
+ksahu@Kuldeeps-MacBook-Air build % aws configure
+AWS Access Key ID [****************WXYZ]: <Enter_ACCESS_KEY_ID>
+AWS Secret Access Key [****************abcd]: <Enter_SECRET_ACCESS_KEY>
+Default region name [None]: <Enter>
+Default output format [None]: <Enter>
+ksahu@Kuldeeps-MacBook-Air build % 
+----
+
+b) *Using Single Sign On (SSO)* for AWS, If your organization supports this method:
+[.shell]
+----
+ksahu@Kuldeeps-MacBook-Air build % aws configure sso
+SSO session name (Recommended): my-sso
+SSO start URL [None]: https://cloudera.awsapps.com/start                 #Enter your org's SSO url.
+SSO region [None]: us-east-1                #AWS region where your org's SSO server is deployed on AWS.
+
+Attempting to automatically open the SSO authorization page in your default browser.
+
+If the browser does not open or you wish to use a different device to authorize this request, open the following URL:
+https://device.sso.us-east-1.amazonaws.com/
+
+Then enter the code:
+DPVH-GCXS
+
+There are 3 AWS accounts available to you.
+Using the account ID 01234567890
+The only role available to you is: cldr_poweruser
+Using the role name "cldr_poweruser"
+CLI default client Region [None]: <Enter>
+CLI default output format [None]: <Enter>
+CLI profile name [cldr_poweruser-01234567890]: default
+
+# Run below command to verify
+ksahu@Kuldeeps-MacBook-Air build % aws s3 ls
+----
+
+
+c) *Using Role Assignment to EC2 instance* i.e. Deployer Machine, from where you run the `Docker` container to deploy the HoL Infra *(via sts:assumeRole)*.
+
+*Steps*
+
+===== 1) Sign in to the AWS Management Console
+
+    . Go to the AWS Management Console: https://aws.amazon.com/console/
+    . Enter your credentials to sign in.
+
+===== 2) Navigate to IAM
+
+    1. In the AWS Management Console, search for **IAM** in the search bar.
+    2. Click on **IAM** to open the Identity and Access Management dashboard.
+
+===== 3) Create a New Role
+
+    1. In the left navigation pane, click on **Roles**.
+    2. Click on the **Create role** button.
+
+===== 4) Choose Trusted Entity
+
+    1. Select **AWS service** as the trusted entity.
+    2. Under **Use case for other AWS services**, choose **EC2**.
+    3. Click on **Next: Permissions**.
+
+===== 5) Attach Policies
+
+    1. In the policy search box, type **AdministratorAccess**.
+    2. Check the box next to **AdministratorAccess** to attach the policy.
+    3. Click on **Next: Tags**.
+
+===== 6) Add Tags (Optional)
+
+    1. (Optional) You can add tags to help identify the role.
+    2. Click on **Next: Review**.
+
+===== 7) Review and Create Role
+
+    1. Enter a **Role name** (e.g., `CDPAWSAdminRole`).
+    2. Review the details and click on **Create role**.
+
+===== 8) Navigate to EC2
+
+    1. In the AWS Management Console, search for **EC2** in the search bar.
+    2. Click on **EC2** to open the EC2 dashboard.
+
+===== 9) Select Your EC2 Instance
+
+    1. In the left navigation pane, click on **Instances**.
+    2. Select the EC2 instance to which you want to assign the role.
+
+===== 10) Attach the IAM Role
+
+    1. With the instance selected, click on the **Actions** dropdown menu.
+    2. Navigate to **Security** > **Modify IAM Role**.
+    3. In the **IAM role** dropdown, select the role you just created (e.g., `EC2AdminRole`).
+    4. Click on **Update IAM role** to apply the changes.
+
+===== 11) Verify Role Assignment
+
+    1. With the instance still selected, check the **Description** tab at the bottom.
+    2. Under **IAM role**, confirm that your role (e.g., `EC2AdminRole`) is listed.
+
+To verify role assignment, use the following command:
+
+[.shell]
+----
+aws iam list-attached-role-policies --role-name EC2AdminRole
+----
+
+---
+////
+=== Step 2: AWS SSH Key Pair
+1. Open the Amazon EC2 console at https://console.aws.amazon.com/ec2/ and navigate to the same region, where you want to deploy the CDP-PC HoL Infra.
+
+2. In the navigation pane, under Network & Security, choose Key Pairs.
+
+3. Choose Create key pair.
+
+4. For Name, enter a descriptive name for the key pair. It can’t include leading or trailing spaces.
+
+5. For Key pair type, choose RSA.
+
+6. For Private key file format, choose the pem format.
+
+7. To add a tag to the public key, choose Add tag, and enter the key and value for the tag. Repeat for each tag.
+
+8. Choose Create key pair.
+
+The private key file is automatically downloaded by your browser. The base file name is the name that you specified as the name of your key pair, and the file name extension is determined by the file format that you chose. Save the private key file in a safe place.
+
+---
+////
+
+== How To Use
+
+image::build/images/HowToUse.png[HowToUse,600,400]
+
+=== Step 1: Get the Docker Image
+The Docker image is available at Docker Hub. Once the `Docker` is installed and ready to use, pull the **cdp-public-cloud-hol-provisioner:latest** image by executing below command.
+
+
+[.shell]
+----
+docker pull clouderapartners/cdp-public-cloud-hol-provisioner:latest
+
+----
+
+---
+
+=== Step 2: Define Configuration Values For Stack
+This `Docker` based provisioner requires values of mandatory parameters to provision the infrastructure. It reads the values of these parameters from a configuration file hosted on your local machine. This section walks you through all the steps which are required to create a configuration file. This is the most **important** part so please dont skip any
+step of this section.
+
+==== A): 
+Create a folder inside your user home directory on your local machine by name **userconfig**. This folder will store all the configuration file and output generated in further steps.
+
+**Mac/Linux Users:**
+
+[.shell]
+----
+mkdir -p ~/userconfig
+
+----
+**Windows Users:**
+
+[.shell]
+----
+md C:\Users\<username>\userconfig
+
+----
+
+==== B): 
+
+Download the  **configuration/configfile** and place it inside the above created directory. Make sure you don't add any file extension to it. (.txt,.doc).
+
+==== C): 
+Start editing the `configfile` with the help of editor of your choice. **Don't add any quotes(single or double) in values and no 'new line' after the last entry in the file.** Refer to below table for defining
+values of the parameters.
+
+[NOTE]
+ Make Sure, you are providing a unique name for the variables i.e. WORKSHOP_USER_PREFIX, WORKSHOP_NAME etc. else there are chances to break in-between of execution of automation, in case there is already a resource present on account, with the same names.
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|PROVISION_KEYCLOAK
+|Provision Keycloak Instance or Skip
+|No quotes 
+
+**YES** If KeyCloak provisioning is required.
+
+**NO** If KeyCloak provisioning is not required.
+
+|KEYCLOAK_ADMIN_PASSWORD
+|Admin User Password for Keycloak
+|No quotes
+
+|AWS_REGION
+|Region in which resources will be deployed
+|No quotes, only lowercase with numbers
+
+|CDP_DEPLOYMENT_TYPE
+|Public, Private Or Semi-Private
+|No quotes and only in lower case
+
+Only from the provided values
+|WORKSHOP_NAME
+|Name for the workshop. Will used to create resources.
+|No quotes and underscore and should be between 5-18 characters, preffered lowercase (with integers)
+
+|NUMBER_OF_WORKSHOP_USERS
+|Number of users required for the workshop
+|No quotes, only integer
+
+|WORKSHOP_USER_PREFIX
+|Prefix for creating workshop users in Keycloak
+|No quotes, only string, preffered lowercase (with integers)
+
+|WORKSHOP_USER_DEFAULT_PASSWORD
+|Default password for participants
+|No quotes
+
+|LOCAL_MACHINE_IP
+|Public IPV4 address of local machine
+|No quotes and don't remove /32
+|ENABLE_DATA_SERVICES
+|A comma separated list of Data services to enable.
+|**[NONE]** If no data services required.
+
+**[CDW]** If only one of them is required.
+
+**[CDW,CDE]** If any two of them are required.
+
+**[CDW,CDE,CML]** If all three are required.
+
+Only from the provided values
+|===
+---
+[NOTE]
+**Below are the optional parameters that should only be changed if any customization is needed. If you intend to proceed with the default configuration values for the data services, do not modify and/or uncomment the values. If you need to make changes, please refer to the table below for detailed instructions on providing the correct values. To override the default values for optional parameters for any of data services, uncomment the parameter Key and provide/update the values corresponding to them, if and when required.**
+
+
+==== Optional Parameters
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|AWS_KEY_PAIR
+|If you want to utilize an already existing keypair, uncomment the corresponding entry in `configfile` and override the value with the keypair name. If AWS_KEY_PAIR is not defined, the automation will create a new keypair.
+|Only base name without .pem extension.
+|===
+
+==== Optional parameters for CDP Quota
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|CDP_SAML_PROVIDER_LIMIT
+|Default value is **10**. 
+|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value.
+
+No quotes, only integer
+|CDP_USER_LIMIT
+|Default value is **1000**. 
+|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value.
+
+No quotes, only integer
+|CDP_GROUP_LIMIT
+|Default value is **50**.
+|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value.
+
+No quotes, only integer
+|===
+
+==== Optional parameters for CDW
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|CDW_VRTL_WAREHOUSE_SIZE
+|Possible values: **xsmall**, **small**, **medium**, **large**
+|Default value is **xsmall**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values. 
+
+No quotes, only string, only lowercase (with integers)
+|CDW_DATAVIZ_SIZE
+|Possible values: **viz-default**, **viz-low**, **viz-medium**, **viz-large**
+|Default value is **viz-default**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values. 
+
+No quotes, only string, only lowercase (with integers)
+|===
+
+==== Optional parameters for CDE
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|CDE_SPARK_VERSION
+|Possible values: **SPARK2, SPARK2_4, SPARK3, SPARK3_0, SPARK3_1, SPARK3_2, SPARK3_3, SPARK3_5**
+|Default value is **SPARK3**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
+
+No quotes, Only from the provided values
+|CDE_INSTANCE_TYPE
+|Possible values: **m5.2xlarge, r5.4xlarge** etc.
+|Default value is **m5.2xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
+
+No quotes, only string, only lowercase (with integers)
+|CDE_INITIAL_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CDE_MIN_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CDE_MAX_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **40**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|===
+
+==== Optional parameters for CML
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|CML_WS_INSTANCE_TYPE
+|Possible values: **m5.2xlarge, r5.4xlarge** etc.
+|Default value is **m5.2xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
+
+No quotes, only string, only lowercase (with integers)
+|CML_MIN_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CML_MAX_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **40**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CML_ENABLE_GPU
+|Possible values: **TRUE, FALSE**
+|Default value is **FALSE**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
+
+No quotes, Only from the provided values
+|CML_GPU_INSTANCE_TYPE
+|Possible values: *g4dn.xlarge, p3.2xlarge* etc.
+|Default value is **g4dn.xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation.
+
+No quotes, only string, only lowercase (with integers)
+|CML_MIN_GPU_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|CML_MAX_GPU_INSTANCES
+|Possible values: **0** to **100**.
+|Default value is **40**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
+
+No quotes, only integer
+|===
+
+
+[NOTE]
+ The availability of GPU instances is specific to AWS region and Quotas available to an AWS account and may vary for different accounts and region used for deployement. Please provide the correct/suitable values only, after referring to the official AWS and CDP public documentations.
+
+[NOTE]
+ Please refer to the official AWS and CDP public documentations, for checking the correct and suitable values for AWS regions and Instance Types.
+
+==== D):
+If the **AWS_KEY_PAIR** value is not defined in `configfile`, automation will generate a new keypair and place pem file inside **userconfig** directory.
+In case you have defined **AWS_KEY_PAIR** in `configfile` in earlier step, Place the same **AWS_KEY_PAIR.pem** file under **userconfig** directory.
+
+---
+
+=== Step 3: Provision Stack
+Once the `configfile` is created as outlined in **Step 2** . The provisioning of infrastructure in interactive mode can be started by executing below command.
+
+
+[NOTE]
+ Make sure that total number of IAM Groups present in your CDP tenant, in which you are trying to deploy using automation, are less than 48 (i.e. default limit is 50 Groups and automation will create 2 more).
+
+
+[NOTE]
+ Though, there are pre-checks configured for S3 buckets count and VPC, EIP Quotas in the provided region. Please make sure from your side as well that enough quotas are available in the region to consume and total number of S3 buckets present in your AWS account are less than 99 (i.e. default limit is 100 buckets, 1 more bucket will be created by the automation).
+
+
+
+**For Mac/Linux/Windows Users:**
+
+[.shell]
+----
+docker run -it \
+-v ~/userconfig:/userconfig \
+-v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
+clouderapartners/cdp-public-cloud-hol-provisioner:latest \
+provision
+
+----
+
+[NOTE]
+The above commands will start the `Docker` container in interactive mode and will display the process output and messages on the terminal. Make sure you don't close the terminal or your machine does not go to into sleep mode because of inactivity. 
+If you wan to run the container in background/detach mode then replace the '-it' flag in above commands with '-d'(without quotes). You can check the logs of container by below commands.
+
+To get the container ID or Name:
+[.shell]
+----
+docker ps
+
+----
+To get the logs:
+[.shell]
+----
+docker logs -f <CONTINER_ID> OR <CONTAINER_NAME>
+
+----
+
+The overall time for provisioning is nearly ~1.5 to ~4 hours (Total Time = Time Reqd for DataLake Provisioning + Time Reqd for CDE and/or CDW and/or CML Provisioning). 
+
+---
+
+[NOTE]
+If the execution of `Docker` container for provisioning fails (due to timeout or any kind of intermittent/API issues at CDP/AWS side), you can use the same command mentioned above to refresh the state and resume the execution.
+
+---
+
+==== The Outcome
+===== Keycloak Server:
+[%header,cols="1,1"]
+|===
+|Type
+|Name
+
+|KeyCloak Server EC2 Instance
+|<WORKSHOP_NAME>-keyc; e.g: accn-workshp-keyc
+
+|===
+The successful execution of **Step 3** will generate a .txt file in 'userconfig' folder on your local machine. The name of the file will be <VALUE_OF_WORKSHOP_NAME>.txt
+e.g : If in the `configfile` the value of WORKSHOP_NAME is **accn-wrkshp** the output file will be **accn-wrkshp.txt**
+
+This file contains details about the provisioned `Keycloak` Server and the SSO URL which will be used for participants for login. It will look similar like below
+
+image::build/images/out_put_kc.png[during_process,650,300]
+
+
+---
+
+===== CDP Environment & Datalake:
+[%header,cols="1,1"]
+|===
+|Type
+|Name
+
+
+|Environment
+|<WORKSHOP_NAME>-cdp-env; e.g : accn-workshp-cdp-env
+
+|Admin User Group
+|<WORKSHOP_NAME>-aw-cdp-admin-group; e.g: accn-workshp-aw-cdp-admin-group
+
+|User Group
+|<WORKSHOP_NAME>-aw-cdp-user-group; e.g: accn-workshp-aw-cdp-user-group
+
+|===
+
+---
+
+===== CDW
+
+Based on number of workshop users defined in `configfile` the provisioner will take care of deploying required number of **xsmall** warehouses of both Hive & Impala and a
+data visualization cluster of **large** size.
+[%header,cols="1,1"]
+|===
+|Type
+|Name
+
+
+|Activated CDW Environment
+|<WORKSHOP_NAME>-cdp-env; e.g : accn-workshp-cdp-env
+
+|Database Catalog
+|
+
+|Hive Warehouses(xsmall)
+|<WORKSHOP_NAME>-hive-<number>; e.g: accn-workshp-hive-01
+
+|Impala Warehouses(xsmall)
+|<WORKSHOP_NAME>-impala-<number>; e.g: accn-workshp-impala-01
+
+|Data Visualization(large)
+|<WORKSHOP_NAME>-data-viz; e.g: accn-workshp-data-viz
+
+|===
+
+[NOTE]
+The number of users assigned to each VW is 10 users. That means for every 10 users there'll be one warehouse created.
+
+---
+
+===== CDE
+Based on number of workshop users defined in `configfile` the provisioner will take care of activating CDE service and deploying required number of CDE Virtual clusters having **SPARK3** configuration. Based on the scope of workshop the owner needs to grant access through Ranger manually.
+[%header,cols="1,1"]
+|===
+|Type
+|Name
+
+|Activated CDE Service
+|<WORKSHOP_NAME>-cde; e.g : accn-workshp-cde
+
+
+|Virtual Clusters
+|<WORKSHOP_NAME>-cde-vc-<number>; e.g: accn-workshp-cde-vc-01
+
+|===
+
+---
+
+===== CML
+
+The provisioner will take care of deploying ML workspace.
+[%header,cols="1,1"]
+|===
+|Type
+|Name
+
+
+|Activated CML Workspace
+|<WORKSHOP_NAME>-cml-ws; e.g : accn-workshp-cml-ws
+
+
+|===
+
+---
+
+The provisioned CDP environment will have all the `Keycloak` users created in CDP and assigned to the *-aw-cdp-user-group and synched to FreeIpa.
+
+[NOTE]
+During provisioning the process creates files and hidden folder inside the local userconfig folder. Do not delete any
+files and folder as these are required for destroying the stack.
+
+---
+
+=== Step 4: Destroy Stack
+After succesful delivery of your HOL/Workshop the complete stack can be destroyed using one single command as below. The **destroy** operation will take care of deleting/removing all of the below (if all three of CDW, CML & CDE are deployed): 
+
+1. Machine Learning Workspace
+2. Data Visualization Cluster
+3. Hive & Impala Warehouses
+4. Deactivation of CDW Cluster
+5. CDE Virtual Cluster
+6. Deactivation of CDE Service
+7. CDP Environment & Data Lake
+8. AWS components related to the deployment(e.g bucket, roles, policies etc.)
+9. Users
+10. `Keycloak` Server
+
+
+
+**For Mac/Linux/Windows Users:**
+ 
+[.shell]
+----
+docker run -it \
+-v ~/userconfig:/userconfig \
+-v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
+clouderapartners/cdp-public-cloud-hol-provisioner:latest \
+destroy
+
+----
+
+[NOTE]
+The above commands will start the `Docker` container in interactive mode and will display the process output
+and messages on the terminal. Make sure you don't close the terminal or
+your machine does not go to into sleep mode because of inactivity. 
+If you wan to run the container in background/detach mode then replace the '-it' flag in above commands
+with '-d'(without quotes). You can check the logs of container by below commands
+
+To get the container ID or Name:
+[.shell]
+----
+docker ps
+
+----
+To get the logs:
+[.shell]
+----
+docker logs -f <CONTINER_ID> OR <CONTAINER_NAME>
+
+----
+
+
+[NOTE]
+If the execution of `Docker` container for destroy the infra fails (due to timeout or any kind of intermittent/API issues at CDP/AWS side), you can use the same command mentioned above to refresh the state and resume the execution. 
+
+Also, there are chances that it might not cleanup the directory structure/files on the executor machine properly. In that case, you can manually cleanup with the help of below commands:
+
+[.shell]
+----
+rm -rf /userconfig/.<workshop_name>
+rm -rf /userconfig/<workshop_name>.txt
+----
+---
+
+== Access URLs
+
+[NOTE]
+====
+
+**The Link for SSO to CDP Workshop Environment for External Workshop Users:**
+
+Keycloak URL: **http://<KeyCloak_Server_IP>/realms/master/protocol/saml/clients/cdp-sso**
+
+**The Link for SSO to `KeyCloak` Server WebUI for Workshop Owners (Admin User):**
+
+Keycloak URL: **http://<KeyCloak_Server_IP>/ **
+
+The same details can be found in `<workshop_name>.txt` file present under `userconfig` directory on your local machine from where you executed the provisioner.
+
+====
+
+image::build/images/keycloak_login.png[keycloak_login,600,400]
+
+[NOTE]
+====
+**Keycloak User Assignment Application link for external workshop users:**
+
+Admin URL: **http://<KeyCloak_Server_IP>:5000/admin**
+
+Participant URL: **http://<KeyCloak_Server_IP>:5000/participant**
+
+====
+

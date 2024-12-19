@@ -1,0 +1,16 @@
+---
+# defaults file for keycloak_data
+
+keycloak__admin_username: "admin"
+keycloak__admin_password: "xxxxPASSWORDxxxx"
+
+# Settings for creating realms, groups and users
+keycloak__domain: "{{ keycloak.domain | default('https://keycloak.example.com') }}"
+keycloak__auth_realm: master
+keycloak__auth_client_id: admin-cli
+
+keycloak__realms_to_create: []
+keycloak__groups_to_create: []
+keycloak__user_to_create: []
+
+keycloak__user_temporary_password: "false"

@@ -1,0 +1,7 @@
+boto
+boto3
+botocore
+kubernetes
+cdpcli
+jmespath
+git+https://github.com/cloudera-labs/cdpy@main#egg=cdpy

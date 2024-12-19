@@ -1,0 +1,95 @@
+---
+- name: Authenticate with Keycloak
+  ansible.builtin.uri:
+    url: "{{ keycloak__domain }}/realms/{{ keycloak__auth_realm }}/protocol/openid-connect/token"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      grant_type: password
+      client_id: "{{ keycloak__auth_client_id }}"
+      username: "{{ keycloak__admin_username }}"
+      password: "{{ keycloak__admin_password }}"
+    return_content: yes
+    status_code:
+      - 200
+    validate_certs: no
+  no_log: true
+  register: __keycloak_api_login
+
+- name: Create Keycloak User
+  block:
+    - name: Check if the user exists
+      ansible.builtin.uri:
+        url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__user_to_create.realm_name }}/users?username={{ keycloak__user_to_create.username }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+          Content-Type: application/json
+        status_code:
+          - 200
+          - 404
+        validate_certs: no
+      register: __keycloak_user_exists
+
+    - name: Create new Keycloak User
+      when: "__keycloak_user_exists.json | length == 0"
+      ansible.builtin.uri:
+        url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__user_to_create.realm_name }}/users"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+          Content-Type: application/json
+        body_format: json
+        body:
+          enabled: True
+          username: "{{ keycloak__user_to_create.username }}"
+          firstName: "{{ keycloak__user_to_create.firstName }}"
+          lastName: "{{ keycloak__user_to_create.lastName }}"
+          email: "{{ keycloak__user_to_create.email }}"
+          groups: "{{ keycloak__user_to_create.groups }}"
+          credentials:
+            - type: password
+              value: "{{ keycloak__user_to_create.password }}"
+              temporary: "{{ keycloak__user_temporary_password }}"
+        return_content: yes
+        status_code:
+          - 201
+        validate_certs: no
+
+    - name: Handle pre-existing user
+      when: "__keycloak_user_exists.json | length > 0"
+      block:
+        - name: Set the user ID
+          ansible.builtin.set_fact:
+            __keycloak_user_id: "{{ __keycloak_user_exists.json[0].id }}"
+    
+
+#        - name: Update existing Keycloak User
+#          ansible.builtin.uri:
+#            url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__user_to_create.realm_name }}/users/{{ __keycloak_user_id }}"
+#            method: PUT
+#            headers:
+#              Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+#              Content-Type: application/json
+#            body_format: json
+#            body:
+#              enabled: True
+#              username: "{{ keycloak__user_to_create.username }}"
+#              firstName: "{{ keycloak__user_to_create.firstName }}"
+#              lastName: "{{ keycloak__user_to_create.lastName }}"
+#              email: "{{ keycloak__user_to_create.email }}"
+#              groups: "{{ keycloak__user_to_create.groups }}"
+#              credentials:
+#                - type: password
+#                  value: "{{ keycloak__user_to_create.password }}"
+#                  temporary: false
+#            return_content: yes
+#            status_code:
+#              - 204
+#            validate_certs: no
+#          register: __keycloak_update_user_result
+#          changed_when: __keycloak_update_user_result.status == 204
+# NOTE: Debugging
+# - name: User created
+#   pause:
+#     prompt: "Check the ui for user {{ keycloak__user_to_create.username }} in realm {{ keycloak__user_to_create.realm_name }}"

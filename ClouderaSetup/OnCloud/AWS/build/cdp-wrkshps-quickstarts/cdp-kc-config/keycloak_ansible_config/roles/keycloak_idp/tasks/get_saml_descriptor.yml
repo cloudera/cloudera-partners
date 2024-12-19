@@ -1,0 +1,13 @@
+---
+# Download the SAML Identity Provider descriptor
+- name: Download the SAML Identity Provider descriptor
+  ansible.builtin.uri:
+    url: "{{ keycloak__domain }}/realms/{{ keycloak__realm }}/protocol/saml/descriptor"
+    method: GET
+    validate_certs: no
+    return_content: yes
+  register: __keycloak_idp_saml_descriptor
+
+- name: Set the SAML descriptor
+  ansible.builtin.set_fact:
+    keycloak__idp_saml_metadata: "{{ __keycloak_idp_saml_descriptor.content }}"

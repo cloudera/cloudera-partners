@@ -1,0 +1,153 @@
+---
+- name: Enable CDW data service
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars:
+    vw_size: 'xsmall'
+    cdvc_size: 'viz-default'  #Possible-Values: viz-default, viz-low, viz-medium, viz-large
+
+  tasks:
+    - name: Check and print variable status
+      debug:
+        msg: "env_lb_public_subnet: {{ env_lb_public_subnet }}, env_wrkr_private_subnet: {{ env_wrkr_private_subnet }}, vw_size: {{ vw_size }}, cdvc_size: {{ cdvc_size }}"
+
+    - name: Activating CDW cluster
+      cloudera.cloud.dw_cluster:
+        env: "{{ cdp_env_name }}"
+        aws_lb_subnets: "{{ env_lb_public_subnet }}"
+        aws_worker_subnets: "{{ env_wrkr_private_subnet }}"
+        overlay: True
+        private_load_balancer: False
+        public_worker_node: True
+        wait: False
+      register: dwcluster
+
+    - name: Check and print cluster status
+      debug:
+        msg: "Cluster is in {{ dwcluster['cluster']['status'] }} State. If Cluster is not already Running and there are no errors in the execution, usually it takes around ~18 minutes."
+
+    - name: Getting CDW cluster Status
+      cloudera.cloud.dw_cluster_info:
+        env: "{{ cdp_env_name }}"
+      register: dw_cluster_status
+      until: dw_cluster_status['clusters'][0]['status'] in ["Running", "Error", "Failed"]
+      retries: 45
+      delay: 30
+
+    - name: Check and print cluster status
+      debug:
+        msg: "Cluster is in {{ dw_cluster_status['clusters'][0]['status'] }} State"
+
+    - name: Fail task on Cluster Creation Failed
+      fail:
+        msg: "Cluster Creation Got Failed."
+      when: dw_cluster_status['clusters'][0]['status'] in ["Error", "Failed"]
+
+    - name: Waiting for default database catalog to be running
+      cloudera.cloud.dw_database_catalog_info:
+        cluster_id: "{{ dwcluster['cluster']['id'] }}"
+      register: dbcatalogstatus
+      until: dbcatalogstatus['database_catalogs'][0]['status'] == "Running"
+      retries: 50
+      delay: 30
+
+    - name: List existing virtual warehouses
+      ansible.builtin.shell: >
+        cdp dw list-vws --cluster-id "{{ dwcluster['cluster']['id'] }}" | jq -r '.vws[]?.name // empty'
+      register: existing_vws
+      failed_when: false
+    
+    - name: Debug existing virtual warehouses
+      debug:
+        msg: "Existing virtual warehouses: {{ existing_vws.stdout_lines }}"
+    
+    - name: Set facts for hive virtual warehouse
+      block:
+        - name: Set facts for each hive virtual warehouse
+          set_fact:
+            hive_vw_exists: "{{ (existing_vws.stdout_lines | select('match', workshop_name ~ '-hive-' ~ item) | list | length) > 0 }}"
+          with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"
+          register: hive_vw_facts
+
+        - name: Debug hive VW existence
+          debug:
+            msg: "Hive Virtual Warehouse {{ workshop_name }}-hive-{{ item.item }} exists: {{ item.ansible_facts.hive_vw_exists }}"
+          loop: "{{ hive_vw_facts.results }}"
+          when: item.ansible_facts.hive_vw_exists
+    
+    - name: Deploy hive virtual warehouses if not exists
+      block:
+        - name: Deploy hive virtual warehouse
+          ansible.builtin.command: >
+            cdp dw create-vw \
+            --cluster-id "{{ dwcluster['cluster']['id'] }}" \
+            --dbc-id "{{ dbcatalogstatus['database_catalogs'][0]['id'] }}" \
+            --vw-type "hive" \
+            --name "{{ workshop_name }}-hive-{{ item }}" \
+            --template "{{ vw_size }}" \
+            --autoscaling disableAutoSuspend="true"
+          with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"
+          #loop: "{{ range(1, number_vw_to_create | default(1) + 1) | list }}"
+          loop_control:
+            pause: 30
+          when: not (existing_vws.stdout_lines | select('match', workshop_name ~ '-hive-' ~ item) | list | length > 0)
+          ignore_errors: true
+
+    - name: Set facts for impala virtual warehouse
+      block:
+        - name: Set facts for each impala virtual warehouse
+          set_fact:
+            impala_vw_exists: "{{ (existing_vws.stdout_lines | select('match', workshop_name ~ '-impala-' ~ item) | list | length) > 0 }}"
+          with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"          
+          register: impala_vw_facts
+
+        - name: Debug impala VW existence
+          debug:
+            msg: "Impala Virtual Warehouse {{ workshop_name }}-impala-{{ item.item }} exists: {{ item.ansible_facts.impala_vw_exists }}"
+          loop: "{{ impala_vw_facts.results }}"
+          when: item.ansible_facts.impala_vw_exists
+
+    - name: Deploy impala virtual warehouses if not exists
+      block:
+        - name: Deploy impala virtual warehouse
+          ansible.builtin.command: >
+            cdp dw create-vw \
+            --cluster-id "{{ dwcluster['cluster']['id'] }}" \
+            --dbc-id "{{ dbcatalogstatus['database_catalogs'][0]['id'] }}" \
+            --vw-type "impala" \
+            --name "{{ workshop_name }}-impala-{{ item }}" \
+            --template "{{ vw_size }}" \
+            --impala-ha-settings highAvailabilityMode="DISABLED" \
+            --autoscaling disableAutoSuspend="true"
+          with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"
+          #loop: "{{ range(1, number_vw_to_create | default(1) + 1) | list }}"
+          loop_control:
+            pause: 30
+          when: not (existing_vws.stdout_lines | select('match', workshop_name ~ '-impala-' ~ item) | list | length > 0)
+          ignore_errors: true
+    
+    - name: List existing data visualizations
+      ansible.builtin.shell: >
+        cdp dw list-data-visualizations --cluster-id "{{ dwcluster['cluster']['id'] }}" | jq -r '.dataVisualizations[]?.name // empty'
+      register: existing_data_visualizations
+      failed_when: false
+    
+    - name: Set fact for data visualization existence
+      set_fact:
+        data_viz_exists: "{{ (existing_data_visualizations.stdout_lines | select('match', workshop_name ~ '-data-viz') | list | length) > 0 }}"
+    
+    - name: Debug data visualization existence
+      debug:
+        msg: "Data Visualization Cluster {{ workshop_name }}-data-viz already exists."
+      when: data_viz_exists
+    
+    - name: Deploy data visualization cluster if not exists
+      ansible.builtin.command: >
+        cdp dw create-data-visualization \
+        --cluster-id "{{ dwcluster['cluster']['id'] }}" \
+        --name "{{ workshop_name }}-data-viz" \
+        --template-name "{{ cdvc_size }}" \
+        --config adminGroups="{{ workshop_name }}-aw-cdp-user-group"
+      when: not data_viz_exists
+      ignore_errors: true

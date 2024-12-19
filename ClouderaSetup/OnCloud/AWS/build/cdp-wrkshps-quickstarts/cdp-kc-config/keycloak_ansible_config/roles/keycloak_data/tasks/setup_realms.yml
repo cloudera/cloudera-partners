@@ -1,0 +1,24 @@
+---
+- name: Realm details
+  debug:
+    msg:
+      - "{{ keycloak__realms_to_create }}"
+
+- name: Create Keycloak realm
+  community.general.keycloak_realm:
+    state: present
+    id: "{{ item.realm_name }}"
+    realm: "{{ item.realm_name }}"
+    enabled: True
+    not_before: 0
+    ssl_required: "all"
+    brute_force_protected: yes
+    failureFactor: 10
+    events_enabled: yes
+    auth_client_id: "{{ keycloak__auth_client_id }}"
+    auth_keycloak_url: "{{ keycloak__domain }}"
+    validate_certs: no
+    auth_realm: "{{ keycloak__auth_realm }}"
+    auth_username: "{{ keycloak__admin_username }}"
+    auth_password: "{{ keycloak__admin_password }}"
+  loop: "{{ keycloak__realms_to_create }}"

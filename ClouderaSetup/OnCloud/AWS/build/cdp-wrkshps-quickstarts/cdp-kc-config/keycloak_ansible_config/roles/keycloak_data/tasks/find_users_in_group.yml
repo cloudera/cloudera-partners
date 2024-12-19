@@ -1,0 +1,73 @@
+---
+- name: Authenticate with Keycloak
+  ansible.builtin.uri:
+    url: "{{ keycloak__domain }}/realms/{{ keycloak__auth_realm }}/protocol/openid-connect/token"
+    method: POST
+    body_format: form-urlencoded
+    body: 
+      grant_type: password
+      client_id: "{{ keycloak__auth_client_id }}"
+      username: "{{ keycloak__admin_username }}"
+      password: "{{ keycloak__admin_password }}"
+    return_content: yes
+    status_code: 
+      - 200
+    validate_certs: no
+  no_log: true
+  register: __keycloak_api_login
+
+- name: API call to get the list of groups
+  ansible.builtin.uri:
+    url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__realm_name }}/groups"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+      Content-Type: application/json
+    status_code: 
+      - 200
+      - 404
+    validate_certs: no
+  register: __keycloak_group_list
+
+- name: Find the id of the required group
+  ansible.builtin.set_fact:
+    __keycloak__group_id: "{{ ((__keycloak_group_list.json | selectattr('name','equalto',keycloak__group_name) | first).id) | default(None) }}"
+
+- name: Get the list of users in the group
+  when: 
+    - __keycloak__group_id is defined
+    - __keycloak__group_id | length > 0
+  block:
+    - name: API call to get the list of users in group
+      ansible.builtin.uri:
+        url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__realm_name }}/groups/{{ __keycloak__group_id }}/members"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+          Content-Type: application/json
+        status_code: 
+          - 200
+          - 404
+        validate_certs: no
+      register: __keycloak_group_member_list
+
+    # keycloak__group_name
+    - name: Extract the members of the group
+      ansible.builtin.set_fact:
+        keycloak__users_in_group: "{{ __keycloak_group_member_list.json | community.general.json_query(query_string) | default([]) }}"
+      vars: 
+        query_string: "[].{id:id,username:username}"
+
+- name: Set keycloak__users_in_group to empty list if keygroup group not found
+  when: 
+    - __keycloak__group_id | length == 0
+  ansible.builtin.set_fact:
+    keycloak__users_in_group: "[]"
+
+- name: Print the variables
+  debug:
+    msg:
+      - "__keycloak__group_id is {{ __keycloak__group_id}}"
+      # - "__keycloak_group_member_list is {{ __keycloak_group_member_list}}"
+      - "keycloak__users_in_group is {{ keycloak__users_in_group }}"
+      # - "Group Info {{ __keycloak_group_list.json | selectattr('name','equalto',keycloak__group_name) }}"

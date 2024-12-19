@@ -1,0 +1,33 @@
+---
+# Create and Configure the iDP in CDP
+- name: Ensure the CDP Identify Provider Exists
+  block:
+    - name: Get list of SAML providers in the env
+      command: > 
+        cdp iam list-saml-providers
+      register: __cdp_saml_provider_list
+
+    - name: Set fact if SAML provider exists
+      ansible.builtin.set_fact:
+        saml_provider_exists: "{{ keycloak__cdp_idp_name in __cdp_saml_provider_list.stdout }}"
+
+    - name: Set the SAML Proivder ID from prexisting
+      when: saml_provider_exists
+      ansible.builtin.set_fact: 
+        keycloak__cdp_saml_provider_id: "{{ (__cdp_saml_provider_list.stdout | from_json | json_query(jmesquery) | first ) }}"
+      vars:
+        jmesquery: "samlProviders[? samlProviderName=='{{ keycloak__cdp_idp_name }}'].samlProviderId"
+
+    - name: Create and Set the SAML Provider
+      when: "not saml_provider_exists"
+      block:
+        - name: Create the CDP SAML Provider via CLI
+          command: >
+            cdp iam create-saml-provider --saml-provider-name {{ keycloak__cdp_idp_name }} --saml-metadata-document '{{ keycloak__idp_saml_metadata }}' --sync-groups-on-login
+          register: __cdp_saml_provider_created
+
+        - name: Set the saml_id from CLI output
+          ansible.builtin.set_fact: 
+            keycloak__cdp_saml_provider_id: "{{ (__cdp_saml_provider_created.stdout | from_json | json_query(jmesquery) ) }}"
+          vars:
+            jmesquery: "samlProvider.samlProviderId"  

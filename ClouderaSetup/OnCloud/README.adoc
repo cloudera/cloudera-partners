@@ -1,0 +1,23 @@
+= Cloudera Public Cloud Onboarding (OnCloud)
+This repository provides automation scripts and configurations for deploying Cloudera Data Platform on public cloud platforms: `AWS`, `Azure`, and `GCP`. The automation enables efficient and repeatable provisioning of CDP environments tailored to your needs.
+
+////
+== Supported Cloud Platforms
+* **AWS**: Automate CDP deployment on Amazon Web Services.
+* **Azure**: Automate CDP deployment on Microsoft Azure.
+* **GCP**: Automate CDP deployment on Google Cloud Platform.
+////
+
+== Repository Structure
+The repository is structured by cloud platform, with each platform having its own folder containing relevant automation resources.
+
+== Usage Instructions
+1. Click on below link to Navigate to the folder for your chosen cloud platform.
+* link:./AWS/[**`AWS`**]
+* link:./AZURE/[**`Azure`**] [Not available yet]
+* link:./GCP/[**`GCP`**]  [Not available yet]
+
+2. Follow the `README` file in that folder for detailed steps on configuring and running the automation.
+3. Ensure all prerequisites are met before initiating deployment.
+
+---

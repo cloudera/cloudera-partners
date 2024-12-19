@@ -1,4 +1,4 @@
-= PARTNER HANDBOOK
+= PARTNER RESOURCES
 mmehra@cloudera.com
 v1.0, May 31, 2024:
 :toc:
@@ -60,7 +60,7 @@ Course material is appropriate for those with limited technical knowledge.  Cour
 
 The CSP Accreditation is not intended for technical sellers (pre-sales engineers), data practitioners, platform administrators, architects nor alike.
 
-https://clouderaconnect.learnupon.com/catalog/learning-paths/52386[Take up the CSP]
+https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79347[Take up the CSP]
 
 === Technical Accreditation Program
 
@@ -68,19 +68,19 @@ https://clouderaconnect.learnupon.com/catalog/learning-paths/52386[Take up the C
 
 The first level of the accreditation lays the foundation for your journey, providing you with a comprehensive overview of Cloudera's data management and analytics technologies. You will gain a solid understanding of the core concepts, architecture, and best practices, along with hands-on experience through practical exercises and use cases. This level is designed to give you a strong foothold in Cloudera's platform.
 
-https://clouderaconnect.learnupon.com/catalog/learning-paths/52418[Take up the CTP]
+https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79363[Take up the CTP]
 
 * *CTS* - Cloudera Technical Specialist
 
 Building on the foundational knowledge, the second level covers advanced topics and use cases. You will dive deeper into Cloudera's technologies, exploring advanced data processing, data warehousing, data engineering, and machine learning capabilities. This level is designed to expand your skill set and provide you with the expertise to tackle complex data challenges and drive innovation in your organizations.
 
-https://clouderaconnect.learnupon.com/catalog/learning-paths/65341[Take up the CTS]
+https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79362[Take up the CTS]
 
 * *CTE* - Cloudera Technical Expert
 
 This level will equip you with the domain-specific knowledge and expertise needed to deliver tailored solutions and address the unique data challenges of your industry. You will explore how Cloudera's technologies are applied in various industries, such as finance, healthcare, retail, telecommunications, and more. 
 
-https://clouderaconnect.learnupon.com/catalog/learning-paths/73834[Take up the CTE]
+https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79360[Take up the CTE]
 
 [cols="^,^,^"]
 |===

@@ -1,0 +1,35 @@
+---
+- name: Load Keycloak Data
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    # Create realms
+    - name: Create Keycloak realms
+      ansible.builtin.include_role: 
+        name: keycloak_data
+        tasks_from: setup_realms
+
+    # Create groups
+    - name: Create Keycloak groups
+      ansible.builtin.include_role: 
+        name: keycloak_data
+        tasks_from: setup_groups
+
+    # Create users
+    # NOTE: setup_user takes a single user, so we need to loop over keycloak__users_to_create here
+    - name: Create Keycloak users (in loop)
+      ansible.builtin.include_role: 
+        name: keycloak_data
+        tasks_from: setup_user
+      vars:
+        keycloak__user_to_create:
+          realm_name: "{{ item.realm_name }}"
+          username: "{{ item.userName }}"
+          firstName: "{{ item.firstName }}"
+          lastName: "{{ item.lastName }}"
+          email: "{{ item.email }}"
+          groups: "{{ item.groups }}"
+          password: "{{ item.password }}"
+      loop: "{{ keycloak__users_to_create }}"

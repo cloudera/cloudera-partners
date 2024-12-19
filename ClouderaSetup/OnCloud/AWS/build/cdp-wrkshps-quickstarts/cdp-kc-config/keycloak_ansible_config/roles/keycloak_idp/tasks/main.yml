@@ -1,0 +1,24 @@
+---
+# tasks file for keycloak_idp
+
+# Download the SAML Identity Provider descriptor
+- name: Download the SAML Identity Provider descriptor
+  include_tasks: "get_saml_descriptor.yml"
+
+- name: Print SAML Identity Provider descriptor
+  debug:
+    msg:
+      - "keycloak__idp_saml_metadata is {{ keycloak__idp_saml_metadata }}"
+
+# Create and Configure the iDP in CDP
+- name: Create and Configure the iDP in CDP
+  include_tasks: "configure_cdp_idp.yml"
+
+- name: Print SAML Provider ID
+  debug:
+    msg:
+      - "SAML Provider ID is {{ keycloak__cdp_saml_provider_id }}"
+
+# Create Keycloak SAML Client
+- name: Create Keycloak SAML Client
+  include_tasks: "setup_saml_client.yml"

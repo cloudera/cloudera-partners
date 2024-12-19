@@ -1,0 +1,37 @@
+---
+- name: FETCH HOL Users
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Print variables
+      debug:
+        msg:
+          - "hol_session_name: {{ hol_session_name }}"
+          - "==================="
+          - "hol_keycloak_realm: {{ hol_keycloak_realm }}"
+          - "keycloak__domain: {{ keycloak__domain }}"
+          - "keycloak__admin_username: {{ keycloak__admin_username }}"
+
+    ############# Initialization of Keycloak Variables #############
+    - name: Set variables for ease-of-use
+      ansible.builtin.set_fact:
+        workshop_group: "{{ hol_session_name | lower }}"
+        workshop_realm: "{{ hol_keycloak_realm | lower }}"
+
+    ############# Fetching created users for generating report #########
+
+    - name: Fetch user details
+      ansible.builtin.include_role:
+        name: keycloak_data
+        tasks_from: find_users_in_group
+      vars:
+        keycloak__group_name: "{{ hol_session_name }}"
+        keycloak__realm_name: "{{ hol_keycloak_realm }}"
+      register: workshopusers
+
+    - name: Storing in local file
+      copy:
+        content: "{{ keycloak__users_in_group }}"
+        dest: "/tmp/{{ hol_session_name | lower }}.json"
+      delegate_to: localhost

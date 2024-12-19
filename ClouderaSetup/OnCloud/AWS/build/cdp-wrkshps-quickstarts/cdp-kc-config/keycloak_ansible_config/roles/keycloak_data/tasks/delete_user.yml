@@ -1,0 +1,54 @@
+---
+# NOTE: Debugging
+# - name: User details
+#   debug:
+#     msg:
+#       - "{{ keycloak__user_to_delete }}"
+
+- name: Authenticate with Keycloak
+  ansible.builtin.uri:
+    url: "{{ keycloak__domain }}/realms/{{ keycloak__auth_realm }}/protocol/openid-connect/token"
+    method: POST
+    body_format: form-urlencoded
+    body: 
+      grant_type: password
+      client_id: "{{ keycloak__auth_client_id }}"
+      username: "{{ keycloak__admin_username }}"
+      password: "{{ keycloak__admin_password }}"
+    return_content: yes
+    status_code: 
+      - 200
+    validate_certs: no
+  no_log: true
+  register: __keycloak_api_login
+
+- name: Delete Keycloak User
+  block:
+  - name: Check if the user exists
+    ansible.builtin.uri:
+      url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__user_to_delete.realm_name }}/users?username={{ keycloak__user_to_delete.username }}"
+      method: GET
+      headers:
+        Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+        Content-Type: application/json
+      status_code: 
+        - 200
+        - 404
+      validate_certs: no
+    register: __keycloak_user_exists
+
+  - name: Delete User if exists Keycloak
+    when: "__keycloak_user_exists.json | length > 0"
+    # ansible.builtin.debug:
+    #   msg:
+    #     - "Am going to delete user {{keycloak__user_to_delete.username }}"
+    ansible.builtin.uri:
+      url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__user_to_delete.realm_name }}/users/{{ keycloak__user_to_delete.userid }}"
+      method: DELETE
+      headers:
+        Authorization: "Bearer {{ __keycloak_api_login.json.access_token }}"
+        Content-Type: application/json
+      return_content: yes
+      status_code: 
+        - 204
+      validate_certs: no

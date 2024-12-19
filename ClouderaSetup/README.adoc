@@ -1,0 +1,19 @@
+= ClouderaSetup
+
+This folder contains resources and scripts for setting up Cloudera environments on public cloud platforms (such as `AWS`, `Azure`, and `GCP`) as well as private cloud/on-premise infrastructures (e.g. `VMware`, `Openshift`).
+
+== Repository Structure
+The repository is structured by form factors, with each form factor having its own folder containing relevant automation resources.
+
+== Usage Instructions
+
+Click on the links below to navigate to the folder for your chosen form factor:
+
+* link:./OnCloud[**`OnCloud`**]
+* link:./OnPremise[**`OnPremise`**]
+
+Follow the `README` file in the respective folder for detailed steps on configuring and running the automation.
+
+[NOTE]
+In the subfolders, Cloudera Data Platform may be referred to as CDP or simply Cloudera. Both terms refer to the same platform.
+

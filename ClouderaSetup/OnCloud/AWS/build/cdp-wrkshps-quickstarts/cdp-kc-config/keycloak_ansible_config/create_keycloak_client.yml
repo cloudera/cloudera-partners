@@ -1,0 +1,13 @@
+# TODO: Create Keycloak SAML Client
+# TODO: Create and Configure the iDP in CDP
+# TODO: Link CDP iDP to Keycloak (Update SamlProvider ID in Keycloak)
+
+- name: Create Keycloak Client and Setup iDP
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Call the keycloak_idp role
+      include_role:
+        name: keycloak_idp

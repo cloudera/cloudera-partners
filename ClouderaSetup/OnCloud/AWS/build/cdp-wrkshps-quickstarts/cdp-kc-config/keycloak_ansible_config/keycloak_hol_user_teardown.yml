@@ -1,0 +1,101 @@
+---
+- name: HOL User Teardown
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Print variables
+      debug:
+        msg:
+          - "hol_session_name: {{ hol_session_name }}"
+          - "==================="
+          - "hol_keycloak_realm: {{ hol_keycloak_realm }}"
+          - "keycloak__domain: {{ keycloak__domain }}"
+          - "keycloak__admin_username: {{ keycloak__admin_username }}"
+
+    ############# Initialization of Keycloak Variables #############
+    - name: Set variables for ease-of-use
+      ansible.builtin.set_fact:
+        workshop_group: "{{ hol_session_name | lower }}"
+        workshop_realm: "{{ hol_keycloak_realm | lower }}"
+
+    ############# Discover Details of Keycloak Group #############
+
+    # Retrieve Users in Keycloak group
+    # NOTE: This sets a keycloak__users_in_group fact, used later
+    - name: Get list of users in hol_session_name Keycloak group
+      ansible.builtin.include_role:
+        name: keycloak_data
+        tasks_from: find_users_in_group
+      vars:
+        keycloak__realm_name: "{{ workshop_realm }}"
+        keycloak__group_name: "{{ workshop_group }}"
+
+    ############# Keycloak Deletion #############
+
+    # Delete users
+    - name: Delete the users in hol_session_name Keycloak group
+      ansible.builtin.include_role:
+        name: keycloak_data
+        tasks_from: delete_user
+      vars:
+        keycloak__user_to_delete:
+          realm_name: "{{ workshop_realm }}"
+          username: "{{ item.username }}"
+          userid: "{{ item.id }}"
+      loop: "{{ keycloak__users_in_group }}"
+
+    # Delete group
+    - name: Delete Keycloak groups
+      ansible.builtin.include_role:
+        name: keycloak_data
+        tasks_from: delete_groups
+      vars:
+        keycloak__groups_to_delete:
+          - group_name: "{{ workshop_group }}"
+            realm_name: "{{ workshop_realm }}"
+
+    ############# CDP Deletion #############
+
+    # Get users in CDP group workshop_group
+    - name: Gather details about the CDP group
+      cloudera.cloud.iam_group_info:
+        name: "{{ workshop_group }}"
+      register: __cdp_workshop_group_info
+
+    - name: Extract the list of users in the group
+      debug:
+        msg:
+          - "__cdp_workshop_group_info is {{ __cdp_workshop_group_info }}"
+          - "Users in __cdp_workshop_group_info is {{ __cdp_workshop_group_info.groups | map(attribute='users') | flatten }}"
+
+    - name: Remove hol_session_name CDP Group and associated Users if exist
+      when: # without this check below will get all users in CDP (scary)
+        - __cdp_workshop_group_info.groups is defined
+        - __cdp_workshop_group_info.groups | length > 0
+      block:
+        - name: Get further detail about the CDP users
+          cloudera.cloud.iam_user_info:
+            name: "{{ __cdp_workshop_group_info.groups | map(attribute='users') | flatten }}"
+          register: __cdp_user_details
+
+        - name: Extract the user id and group from CDP details
+          ansible.builtin.set_fact:
+            cdp_hol_users: "{{ __cdp_user_details.users | community.general.json_query(query_string) | default([]) }}"
+          vars:
+            query_string: "[].{crn:crn,username:workloadUsername}"
+
+        # Delete any HOL workshop Keycloak users that are in CDP user list
+        - name: Delete the Keycloak user from CDP if they exist
+          when: __user.username in (cdp_hol_users | map(attribute='username'))
+          ansible.builtin.command: >
+            cdp iam delete-user --user-id {{ (cdp_hol_users | selectattr('username','equalto', __user.username))[0]['crn'] }}
+          loop_control:
+            loop_var: __user
+          loop: "{{ keycloak__users_in_group }}"
+
+    # Delete CDP group
+    # - name: Remove the hol_session_name group from CDP
+    #   cloudera.cloud.iam_group:
+    #     name: "{{ workshop_group }}"
+    #     state: absent

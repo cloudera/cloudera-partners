@@ -1,0 +1,87 @@
+---
+- name: Enable CDE data service
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars:
+    instance_type: 'm5.2xlarge'
+    initial_instances: 10
+    minimum_instances: 10
+    maximum_instances: 40
+    spark_version: 'SPARK3'
+
+  tasks:
+    - name: Check and print variable status
+      debug:
+        msg: "instance_type: {{ instance_type }}, initial_instances: {{ initial_instances }}, minimum_instances: {{ minimum_instances }}, maximum_instances: {{ maximum_instances }}, spark_version: {{ spark_version }}, workshop_name: {{ workshop_name }}, cdp_env_name: {{ cdp_env_name }}, number_vc_to_create: {{ number_vc_to_create | default(1) }}"
+
+    - name: Check if CDE service exists and is running
+      cloudera.cloud.de_info:
+        name: "{{ workshop_name }}-cde"
+      register: deservicestatus
+      failed_when: false
+
+    - name: Debug CDE service info
+      debug:
+        msg: "{{ deservicestatus }}"
+
+    - name: Determine if CDE service needs to be created
+      set_fact:
+        cde_service_exists: "{{ deservicestatus.services | selectattr('status', 'equalto', 'ClusterCreationCompleted') | list | length > 0 }}"
+      when: deservicestatus is defined and deservicestatus.services is defined
+
+    - name: Activate CDE service if it does not exist
+      cloudera.cloud.de:
+        name: "{{ workshop_name }}-cde"
+        env: "{{ cdp_env_name }}"
+        instance_type: "{{ instance_type }}"
+        minimum_instances: "{{ minimum_instances | int }}"
+        maximum_instances: "{{ maximum_instances | int }}"
+        initial_instances: "{{ initial_instances | int }}"
+        enable_public_endpoint: true
+        state: present
+        wait: no
+      when: not cde_service_exists
+      register: deservice
+
+    - name: Check the CDE service status
+      cloudera.cloud.de_info:
+        name: "{{ workshop_name }}-cde"
+      register: deservicestatus
+      until: deservicestatus.services[0].status == "ClusterCreationCompleted"
+      retries: 35
+      delay: 120
+      #when: not cde_service_exists
+
+    - name: Print the status
+      debug:
+        msg: "{{ deservicestatus }}"
+
+    - name: List existing virtual clusters
+      ansible.builtin.shell: >
+        cdp de list-vcs --cluster-id "{{ deservicestatus.services[0].clusterId }}" | jq -r '.vcs[]?.vcName // empty'
+      register: existing_vcs
+      failed_when: false
+
+    - name: Debug existing virtual clusters
+      debug:
+        msg: "Existing virtual clusters: {{ existing_vcs.stdout_lines }}"
+
+    - name: Determine the names of CDE virtual clusters to create, if they do not exist
+      debug:
+        msg: "{{ workshop_name }}-cde-vc-{{ item }}"
+      with_sequence: start=1 end="{{ number_vc_to_create | default(1) }}" format=%02d
+
+    - name: Deploy CDE virtual clusters if they do not exist
+      ansible.builtin.command: >
+        cdp de create-vc \
+        --name "{{ workshop_name }}-cde-vc-{{ item }}" \
+        --cluster-id "{{ deservicestatus.services[0].clusterId }}" \
+        --spark-version "{{ spark_version }}" \
+        --cpu-requests "{{ '20' }}" \
+        --memory-requests "{{ '80Gi' }}"
+      with_sequence: start=1 end="{{ number_vc_to_create | default(1) }}" format=%02d
+      loop_control:
+        pause: 30
+      when: "workshop_name + '-cde-vc-' + item not in existing_vcs.stdout_lines"
+

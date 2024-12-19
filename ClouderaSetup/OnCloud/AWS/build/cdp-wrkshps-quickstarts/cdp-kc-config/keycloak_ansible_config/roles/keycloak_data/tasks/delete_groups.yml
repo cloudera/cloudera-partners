@@ -1,0 +1,18 @@
+---
+- name: Group details
+  debug:
+    msg:
+      - "{{ keycloak__groups_to_delete }}"
+
+- name: Delete Keycloak group
+  community.general.keycloak_group:
+    state: absent
+    name: "{{ item.group_name }}"
+    realm: "{{ item.realm_name }}"
+    auth_client_id: "{{ keycloak__auth_client_id }}"
+    auth_keycloak_url: "{{ keycloak__domain }}"
+    validate_certs: no
+    auth_realm: "{{ keycloak__auth_realm }}"
+    auth_username: "{{ keycloak__admin_username }}"
+    auth_password: "{{ keycloak__admin_password }}"
+  loop: "{{ keycloak__groups_to_delete }}"

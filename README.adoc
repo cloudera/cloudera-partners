@@ -1,17 +1,55 @@
-# Cloudera Repository For Partners
+= Cloudera Repository for Partners
 
-*AlphavantageE2ELabs*
-       
-       Description : An end to end lab that covers a wide variety of Data Services
+Welcome to the Cloudera Repository for Partners! This repository is designed to provide all the resources, tools, and hands-on labs needed for Cloudera's Data Platform. Below, you'll find detailed descriptions of the folders within this repository, helping you quickly locate the resources you need based on your requirements.
 
-*ClouderaPublicCloudOnBoarding*
-       
-       Description : Automation for on-boarding CDP on public cloud(AWS, Azure and GCP)
+image::./PartnerResources/images/RepoDiagram.png[RepoDiagram,700,425]
 
-*PartnerHandbook*
-      
-       Description : Everything that a partner would need to excel with Cloudera can be found here
+== Folders Overview
 
-*Workshops*
-      
-       Description : Hands-on lab for all our Data Services
+=== 1. PartnerResources
+*Description:*
+A comprehensive guide tailored for Cloudera partners. This folder contains everything you need to partner with Cloudera, including registration on the partner portal, getting developer licenses, sales and technical accreditations, blogs, and resources.
+
+*When to Use:*
+- For an overview of Cloudera's partner resources.
+- If you're looking for quick access to essential materials to support your journey with Cloudera.
+
+=== 2. ClouderaSetup
+*Description:*
+This folder contains automation scripts and documentation for onboarding Cloudera Data Platform on public cloud, including `AWS`, `Azure`, `GCP` and on on-premise platforms like `VMware` and `Openshift`. It simplifies the deployment process and ensures a smooth setup experience.
+
+*When to Use:*
+- If you need to set up Cloudera on a public cloud or on-premise platform for the first time.
+- For reference on lab/workshop setup for cloud onboarding.
+
+=== 3. DataServicesLabs
+*Description:*
+Contains hands-on labs for each of Cloudera's Data Services, including `Cloudera Data Flow`, `Cloudera Data Engineering`, `Cloudera Data Warehouse`, `Cloudera AI` (earlier known as `Cloudera Machine Learning`).
+
+*When to Use:* 
+- If you want to learn and explore individual Cloudera Data Services.
+- Ideal for gaining practical experience with specific services.
+
+=== 4. EndToEndLabs
+*Description:*
+This folder contains comprehensive, end-to-end labs designed to showcase integrated workflows using multiple Cloudera Data Services. These labs provide a holistic view of data processing, from ingestion and transformation to analysis and visualization, simulating real-world scenarios.
+
+*When to Use:*
+- If you're looking to explore how different Cloudera Data Services work together in a unified workflow.
+- Ideal for advanced hands-on sessions, workshops, or exploring real-world implementation scenarios.
+
+== How to Navigate This Repository
+
+=== Determine Your Goal:
+- Looking for Partner Resources? Head to `link:./PartnerResources[**PartnerResources**]`.
+- Setting Up Cloudera? Visit `link:./ClouderaSetup[**ClouderaSetup**]`.
+- Exploring Data Services? Start with `link:./DataServicesLabs[**DataServicesLabs**]`.
+- Need Hands-On Practice? Check out `link:./EndToEndLabs[**EndToEndLabs**]`.
+
+=== Read the Documentation:
+Each folder contains detailed documentation to guide you through its content.
+
+=== Reach Out for Help:
+If you have questions or need assistance, feel free to contact the repository maintainers.
+
+We hope this repository helps you make the most of Cloudera's offerings. Happy learning and collaboration! 😊

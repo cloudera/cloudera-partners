@@ -1,0 +1,18 @@
+---
+
+collections:
+  - name: community.general
+    version: '>=1.2.0'
+  - name: community.aws
+    version: '>=1.2.0'
+  - name: cloud.common
+  - name: kubernetes.core
+    version: '>=2.2.0'
+  - name: amazon.aws
+    version: '>=1.2.1'
+  - name: community.crypto
+    version: '>=2.11.1'
+  # For HOL setup and teardown
+  - name: https://github.com/cloudera-labs/cloudera.cloud
+    type: git
+    version: devel
