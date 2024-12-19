@@ -8,9 +8,9 @@ pipeline {
         string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region')
         string(name: 'CDP_DEPLOYMENT_TYPE', defaultValue: 'public', description: 'CDP Deployment Type (public/private/semi-private)')
         string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'Local Machine IP (don’t remove /32)')
-        string(name: 'WORKSHOP_NAME', defaultValue: 'accn-workshop', description: 'Workshop Name')
+        string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name')
         string(name: 'NUMBER_OF_WORKSHOP_USERS', defaultValue: '1', description: 'Number of Workshop Users')
-        string(name: 'WORKSHOP_USER_PREFIX', defaultValue: 'accn-workshop', description: 'Workshop User Prefix')
+        string(name: 'WORKSHOP_USER_PREFIX', defaultValue: 'pseworkshop', description: 'Workshop User Prefix')
         string(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', defaultValue: 'changeme', description: 'Workshop User Default Password')
         extendedChoice(
             name: 'ENABLE_DATA_SERVICES',
