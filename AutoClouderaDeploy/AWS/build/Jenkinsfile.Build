@@ -5,7 +5,7 @@ pipeline {
         DOCKER_REGISTRY = 'docker.io'
         IMAGE_NAME = 'clouderapartners/cdp-public-cloud-hol-provisioner'
         DOCKER_CREDENTIALS_ID = 'dockerhub-cloudera-partners'
-        DOCKERFILE_DIR = 'ClouderaPublicCloudOnBoarding/AWS/build'
+        DOCKERFILE_DIR = 'ClouderaSetup/OnCloud/AWS/build'
         BUILDER_NAME = 'mybuilder'
         RECIPIENTS = 'ksahu@cloudera.com,aktiwari@cloudera.com'
     }
