@@ -741,10 +741,12 @@ rm -rf /userconfig/<workshop_name>.txt
 **The Link for SSO to CDP Workshop Environment for External Workshop Users:**
 
 Keycloak URL: **http://<KeyCloak_Server_IP>/realms/master/protocol/saml/clients/cdp-sso**
+Keycloak HTTPS URL: **https://<KeyCloak_Server_IP>/realms/master/protocol/saml/clients/cdp-sso**
 
 **The Link for SSO to `KeyCloak` Server WebUI for Workshop Owners (Admin User):**
 
 Keycloak URL: **http://<KeyCloak_Server_IP>/ **
+Keycloak HTTPS URL: **https://<KeyCloak_Server_IP>/ **
 
 The same details can be found in `<workshop_name>.txt` file present under `userconfig` directory on your local machine from where you executed the provisioner.
 
