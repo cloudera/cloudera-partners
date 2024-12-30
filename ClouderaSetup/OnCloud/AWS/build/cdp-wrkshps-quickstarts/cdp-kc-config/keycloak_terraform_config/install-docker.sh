@@ -128,7 +128,7 @@ chmod 644 *.pem
 echo "All SSL cert related operations completed successfully!"
 docker run -d -p 5000:5000 --name hol_user_assignment_app clouderapartners/hol_user_assignment:latest
 #docker run -d -p 80:8080 --name=keycloak -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=${keycloak_admin_password} keycloak/keycloak start-dev >> /tmp/kc_init.log
-docker run -d -p 80:8080 -p 443:8443 -v /root/kcsslcerts/server-cert.pem:/etc/x509/https/tls.crt -v /root/kcsslcerts/server.pem:/etc/x509/https/tls.key --name=keycloak -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin -e KC_HTTPS_CERTIFICATE_FILE=/etc/x509/https/tls.crt -e KC_HTTPS_CERTIFICATE_KEY_FILE=/etc/x509/https/tls.key -e KC_HTTP_ENABLED=true -e KC_HTTPS_ENABLED=true -e KC_HOSTNAME_STRICT=false keycloak/keycloak:latest start >> /tmp/kc_init.log
+docker run -d -p 80:8080 -p 443:8443 -v /root/kcsslcerts/server-cert.pem:/etc/x509/https/tls.crt -v /root/kcsslcerts/server.pem:/etc/x509/https/tls.key --name=keycloak -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=${keycloak_admin_password} -e KC_HTTPS_CERTIFICATE_FILE=/etc/x509/https/tls.crt -e KC_HTTPS_CERTIFICATE_KEY_FILE=/etc/x509/https/tls.key -e KC_HTTP_ENABLED=true -e KC_HTTPS_ENABLED=true -e KC_HOSTNAME_STRICT=false keycloak/keycloak:latest start >> /tmp/kc_init.log
 sleep 40
 docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin --password ${keycloak_admin_password} >> /tmp/kc_init.log
 sleep 5
