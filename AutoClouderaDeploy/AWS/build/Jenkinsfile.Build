@@ -11,7 +11,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'PRIMARY_TAG', defaultValue: 'testmain', description: 'Primary tag for the Docker image')
+        string(name: 'PRIMARY_TAG', defaultValue: 'testmain', description: 'Primary tag (e.g. 2.4.1 or latest) for the Docker image')
         choice(name: 'DELETE_WORKDIR', choices: ['false', 'true'], description: 'Delete the Work directory at the end of the job.')
         booleanParam(name: 'REFRESH_JENKINSFILE', defaultValue: false, description: 'Reload changes from Jenkinsfile and exit.')
         booleanParam(name: 'MULTI_PLATFORM_BUILD', defaultValue: false, description: 'Check to enable multi-platform build and push.')
