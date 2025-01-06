@@ -278,7 +278,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                 def errorLog = currentBuild.description ?: "Unknown error occurred."
                 emailext(
                     to: "${env.BUILD_USER_EMAIL}",
-                    subject: "❌ Jenkins Build Failure: ${currentBuild.fullDisplayName}",
+                    subject: "❌ Jenkins Build Failed: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
                     body: """
                         <html>
                             <head>
@@ -298,7 +298,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                             </head>
                             <body>
                                 <div class="container">
-                                    <h3>❌ Jenkins Build Failure Notification</h3>
+                                    <h3>❌ CDP <b>${params.ACTION}</b> Failure Notification</h3>
                                     <p class="content">The build encountered errors. Below are the details:</p>
                                     
                                     <div class="table-container">
@@ -344,28 +344,28 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                 
             }
         }
-                    
         success {
             sh "echo 'SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})'"
             script {
-                env.WORKSHOP_NAME_LOWER = WORKSHOP_NAME.toLowerCase()
-
-                //download below artifacts and send on email
-                def attachments = "${env.WORKSHOP_NAME_LOWER}.txt," +
-                  "configfile," +
-                  "${env.WORKSHOP_NAME_LOWER}-keypair.pem"
-
+                env.WORKSHOP_NAME_LOWER = params.WORKSHOP_NAME.toLowerCase()
                 if (params.ACTION == 'provision') {
                     sh """
-                        cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && sudo chown jenkins:jenkins . && \
+                        cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && sudo chown -R jenkins:jenkins . && \
                         sudo cp -p ${env.WORKSHOP_NAME_LOWER}.txt configfile .${env.WORKSHOP_NAME_LOWER}/${env.WORKSHOP_NAME_LOWER}-keypair.pem ${WORKSPACE}
-                        
+        		
                     """
-                    archiveArtifacts artifacts: "${env.WORKSHOP_NAME_LOWER}.txt,configfile", allowEmptyArchive: true
-
-                    emailext(
+                }
+		archiveArtifacts artifacts: "${env.WORKSHOP_NAME_LOWER}.txt,configfile", allowEmptyArchive: true
+                def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem"
+                // Debug: Verify email and files
+                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
+                sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
+                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
+        
+                // Send email
+                emailext(
                     to: "${env.BUILD_USER_EMAIL}",
-                    subject: "✅ Jenkins Build Success: ${JOB_NAME} [${BUILD_NUMBER}]",
+                    subject: "✅ Jenkins Build Success: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
                     body: """
                         <html>
                             <head>
@@ -385,7 +385,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                             </head>
                             <body>
                                 <div class="container">
-                                    <h3>✅ Jenkins Build Completed Successfully!</h3>
+                                    <h3>✅ CDP <b>${params.ACTION}</b> Completed Successfully!</h3>
                                     <p class="content">The build has completed without any issues. Below are the details of the build:</p>
                                     
                                     <div class="table-container">
@@ -422,11 +422,9 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                     """,
                     mimeType: 'text/html',
                     attachmentsPattern: attachments,
-                    from: 'jenkins@example.com'
-                    )
-                }
-
-
+                    from: 'psejenkins@cloudera.com'
+                )
+                
             }
         }
         cleanup {
