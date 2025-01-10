@@ -226,7 +226,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
         }
         stage('Assign admin roles to builduser') {
             when {
-            expression { params.action == 'provision' }
+            expression { params.ACTION == 'provision' }
             }
             steps {
                 echo 'Assigning Resorce roles'
