@@ -1,0 +1,20 @@
+name: PSE Labs
+
+entries:
+  - title: Hands on Lab with RAG Agents
+    label: reinvent-agents-hol
+    short_description: |
+      This AMP is used for the Cloudera AI Hands on Labs at AWS re:Invent 2024 and focuses on Cloudera AI's ability to integrate
+      with external components and orchestrate multiple AI agents.
+    long_description: |
+      Hands on Lab which demonstrates a number of concepts including vector databases, LLMs, Graph DB based Knowledge Graphs, and AI Agent application building. IMPORTANT: Please read the following before proceeding.  This AMP includes or otherwise depends on certain third party software packages.  Information about such third party software packages are made available in the notice file associated with this AMP.  By configuring and launching this AMP, you will cause such third party software packages to be downloaded and installed into your environment, in some instances, from third parties’ websites.  For each third party software package, please see the notice file and the applicable websites for more information, including the applicable license terms. If you do not wish to download and install the third party software packages, do not configure, launch or otherwise use this AMP.  By configuring, launching or otherwise using the AMP, you acknowledge the foregoing statement and agree that Cloudera is not responsible or liable in any way for the third party software packages.
+    image_path: "https://raw.githubusercontent.com/shreshtab/reinvent-agents-hol/e984587923cab2837dbd2d7482d21a89c2fb4c03/assets/reinvent-agents-banner.png"
+    tags: 
+      - Cloudera AI Labs
+      - Exercises
+      - LLM
+      - AI Agents
+      - Graph RAG
+      - Model Deployment
+    git_url: "https://github.com/shreshtab/reinvent-agents-hol/"
+    is_prototype: true
