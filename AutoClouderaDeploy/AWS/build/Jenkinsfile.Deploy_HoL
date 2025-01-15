@@ -8,7 +8,7 @@ pipeline {
         string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region')
         string(name: 'CDP_DEPLOYMENT_TYPE', defaultValue: 'public', description: 'CDP Deployment Type (public/private/semi-private)')
         string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'Local Machine IP (don’t remove /32)')
-        string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name')
+        string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name should be within 12 characters only')
         string(name: 'NUMBER_OF_WORKSHOP_USERS', defaultValue: '1', description: 'Number of Workshop Users')
         string(name: 'WORKSHOP_USER_PREFIX', defaultValue: 'pseworkshop', description: 'Workshop User Prefix')
         password(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', defaultValue: '', description: 'Workshop User Default Password')
@@ -351,7 +351,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                 if (params.ACTION == 'provision') {
                     sh """
                         cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && sudo chown -R jenkins:jenkins . && \
-                        sudo cp -p ${env.WORKSHOP_NAME_LOWER}.txt configfile .${env.WORKSHOP_NAME_LOWER}/${env.WORKSHOP_NAME_LOWER}-keypair.pem ${WORKSPACE}
+                        sudo cp -p ${env.WORKSHOP_NAME_LOWER}.txt configfile .${env.WORKSHOP_NAME_LOWER}/${env.WORKSHOP_NAME_LOWER}-keypair.pem ${WORKSPACE} 2>/dev/null || true
         		
                     """
                 }
