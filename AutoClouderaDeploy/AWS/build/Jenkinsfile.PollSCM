@@ -1,0 +1,237 @@
+pipeline {
+    agent any
+
+    environment {
+        GIT_REPO_URL = 'https://github.com/cloudera-labs/cdp-tf-quickstarts.git'
+        REMOTE_JOB = 'hol-automation'  // Replace with your remote job's name
+        EMAIL_RECIPIENTS = 'pse-apac@cloudera.com,aktiwari@cloudera.com,ksahu@cloudera.com'  // Email recipient(s)
+        HOL_AUTO_EXEC_DIR = "/home/holautosa/HOL_AUTO_EXEC_DIR"
+        REPO_DIR = "${HOL_AUTO_EXEC_DIR}/cdp-tf-quickstarts"
+    }
+
+    parameters {
+        string(name: 'BUILD_BRANCH', defaultValue: 'main', description: 'Branch to be used for building Docker image')
+    }
+    
+    triggers {
+        pollSCM('30 21 * * 3')  // Adjust polling schedule as needed
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the repository
+                dir(REPO_DIR) {
+                    git url: "${GIT_REPO_URL}", branch: 'main'
+                }
+            }
+        }
+        stage('Build Test Image') {
+            steps {
+                script {
+                    // Define parameters for build image job
+                    echo 'Triggering hol-automation-build job...'
+                    build job: 'hol-automation-build',
+                        parameters: [
+                            string(name: 'BUILD_BRANCH', value: "${params.BUILD_BRANCH}")
+                        ],
+                        propagate: true
+                }
+            }
+        }
+        stage('Test Deploy') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                script {
+                    // Define common parameters for deploy
+                    def deployParams = [
+                        string(name: 'PROVISION_KEYCLOAK', value: 'YES'),
+                        string(name: 'KEYCLOAK_ADMIN_PASSWORD', value: 'admin'),
+                        string(name: 'AWS_REGION', value: 'ap-southeast-1'),
+                        string(name: 'CDP_DEPLOYMENT_TYPE', value: 'public'),
+                        string(name: 'LOCAL_MACHINE_IP', value: '0.0.0.0/0'),
+                        string(name: 'WORKSHOP_NAME', value: 'CICDworkshop'),
+                        string(name: 'NUMBER_OF_WORKSHOP_USERS', value: '1'),
+                        string(name: 'WORKSHOP_USER_PREFIX', value: 'CICDworkshop'),
+                        string(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', value: 'changeme'),
+                        extendedChoice(name: 'ENABLE_DATA_SERVICES', value: 'CDE'),
+                        string(name: 'CDW_VRTL_WAREHOUSE_SIZE', value: 'xsmall'),
+                        string(name: 'CDW_DATAVIZ_SIZE', value: 'viz-default'),
+                        string(name: 'CDE_SPARK_VERSION', value: 'SPARK3'),
+                        string(name: 'CDE_INSTANCE_TYPE', value: 'm5.2xlarge'),
+                        string(name: 'CDE_INITIAL_INSTANCES', value: '1'),
+                        string(name: 'CDE_MIN_INSTANCES', value: '1'),
+                        string(name: 'CDE_MAX_INSTANCES', value: '1'),
+                        string(name: 'CML_WS_INSTANCE_TYPE', value: 'm5.2xlarge'),
+                        string(name: 'CML_MIN_INSTANCES', value: '1'),
+                        string(name: 'CML_MAX_INSTANCES', value: '1'),
+                        booleanParam(name: 'CML_ENABLE_GPU', value: false),
+                        string(name: 'CML_GPU_INSTANCE_TYPE', value: 'g4dn.xlarge'),
+                        string(name: 'CML_MIN_GPU_INSTANCES', value: '1'),
+                        string(name: 'CML_MAX_GPU_INSTANCES', value: '1'),
+                        string(name: 'ACTION', value: 'provision'),  // Set action for deploy
+                        string(name: 'IMAGE_TAG', value: 'testmain')        
+                    ]
+
+                    echo 'Triggering deploy job...'
+                    build job: REMOTE_JOB, parameters: deployParams
+                }
+            }
+            post {
+                success {
+                    script {
+                        currentBuild.result = 'SUCCESS'
+                    }
+                }
+                failure {
+                    script {
+                        currentBuild.result = 'FAILURE'
+                        // Send failure notification for deploy
+                        emailext (
+                            to: EMAIL_RECIPIENTS,
+                            subject: "❌  Pipeline Status: Deploy Stage Failed",
+                            body: """
+                            <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #ffdddd; background-color: #f8d7da; color: #721c24;">
+                                <h2 style="color: #c82333;">❌ The Deploy Stage Has Failed</h2>
+                                <p>Please check the logs for more details.</p>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                                    <tr>
+                                        <th style="background-color: #f2dede; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job Name</th>
+                                        <th style="background-color: #f2dede; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job URL</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid #e0e0e0;">${JOB_NAME}</td>
+                                        <td style="padding: 10px; border: 1px solid #e0e0e0;"><a href="${env.BUILD_URL}" style="text-decoration: none; color: #337ab7;">${env.BUILD_URL}</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            """,
+                            mimeType: 'text/html',
+                            from: 'jenkins@example.com'
+                        )
+                        error('Deployment failed, aborting pipeline.')
+                    }
+                }
+            }
+        }
+
+        stage('Test Destroy') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                script {
+                    // Define common parameters for destroy
+                    def destroyParams = [
+                        string(name: 'PROVISION_KEYCLOAK', value: 'YES'),
+                        string(name: 'KEYCLOAK_ADMIN_PASSWORD', value: 'admin'),
+                        string(name: 'AWS_REGION', value: 'ap-southeast-1'),
+                        string(name: 'CDP_DEPLOYMENT_TYPE', value: 'public'),
+                        string(name: 'LOCAL_MACHINE_IP', value: '0.0.0.0/0'),
+                        string(name: 'WORKSHOP_NAME', value: 'CICDworkshop'),
+                        string(name: 'NUMBER_OF_WORKSHOP_USERS', value: '1'),
+                        string(name: 'WORKSHOP_USER_PREFIX', value: 'CICDworkshop'),
+                        string(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', value: 'changeme'),
+                        extendedChoice(name: 'ENABLE_DATA_SERVICES', value: 'CDE'),
+                        string(name: 'CDW_VRTL_WAREHOUSE_SIZE', value: 'xsmall'),
+                        string(name: 'CDW_DATAVIZ_SIZE', value: 'viz-default'),
+                        string(name: 'CDE_SPARK_VERSION', value: 'SPARK3'),
+                        string(name: 'CDE_INSTANCE_TYPE', value: 'm5.2xlarge'),
+                        string(name: 'CDE_INITIAL_INSTANCES', value: '1'),
+                        string(name: 'CDE_MIN_INSTANCES', value: '1'),
+                        string(name: 'CDE_MAX_INSTANCES', value: '1'),
+                        string(name: 'CML_WS_INSTANCE_TYPE', value: 'm5.2xlarge'),
+                        string(name: 'CML_MIN_INSTANCES', value: '1'),
+                        string(name: 'CML_MAX_INSTANCES', value: '1'),
+                        booleanParam(name: 'CML_ENABLE_GPU', value: false),
+                        string(name: 'CML_GPU_INSTANCE_TYPE', value: 'g4dn.xlarge'),
+                        string(name: 'CML_MIN_GPU_INSTANCES', value: '1'),
+                        string(name: 'CML_MAX_GPU_INSTANCES', value: '1'),
+                        string(name: 'ACTION', value: 'destroy'),  // Set action for deploy
+                        string(name: 'IMAGE_TAG', value: 'testmain')        
+                    ]
+
+                    echo 'Triggering destroy job...'
+                    build job: REMOTE_JOB, parameters: destroyParams
+                }
+            }
+            post {
+                success {
+                    script {
+                        currentBuild.result = 'SUCCESS'
+                    }
+                }
+                failure {
+                    script {
+                        currentBuild.result = 'FAILURE'
+                        // Send email notification when deploy succeeded but destroy failed
+                        emailext (
+                            to: EMAIL_RECIPIENTS,
+                            subject: "❌ Pipeline Status: Deploy Success, Destroy Failed",
+                            body: """
+                            <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #ffdddd; background-color: #f8d7da; color: #721c24;">
+                                <h2 style="color: #c82333;">❌ Pipeline Status Update</h2>
+                                <p style="color: #c82333;">Deploy Stage: <strong>SUCCESS</strong></p>
+                                <p style="color: #c82333;">Destroy Stage: <strong>FAILED</strong></p>
+                                <p>Please check the logs for more details.</p>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                                    <tr>
+                                        <th style="background-color: #f2dede; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job Name</th>
+                                        <th style="background-color: #f2dede; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job URL</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px; border: 1px solid #e0e0e0;">${JOB_NAME}</td>
+                                        <td style="padding: 10px; border: 1px solid #e0e0e0;"><a href="${env.BUILD_URL}" style="text-decoration: none; color: #337ab7;">${env.BUILD_URL}</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            """,
+                            mimeType: 'text/html',
+                            from: 'jenkins@example.com'
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            // Send email when both deploy and destroy succeed
+            emailext (
+                to: EMAIL_RECIPIENTS,
+                subject: "✅ Pipeline Status: Deploy and Destroy Success",
+                body: """
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #d4edda; background-color: #d4edda; color: #155724;">
+                    <h2 style="color: #155724;">✅ Pipeline Completed Successfully!</h2>
+                    <p>Both Deploy and Destroy stages have succeeded.</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <tr>
+                            <th style="background-color: #c3e6cb; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job Name</th>
+                            <th style="background-color: #c3e6cb; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job URL</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #e0e0e0;">${JOB_NAME}</td>
+                            <td style="padding: 10px; border: 1px solid #e0e0e0;"><a href="${env.BUILD_URL}" style="text-decoration: none; color: #337ab7;">${env.BUILD_URL}</a></td>
+                        </tr>
+                    </table>
+                </div>
+                """,
+                mimeType: 'text/html',
+                from: 'jenkins@example.com'
+            )
+        }
+        failure {
+            script {
+                echo "Pipeline has failed"
+            }
+        }
+        always {
+            script {
+                echo "Pipeline completed with status: ${currentBuild.result}"
+            }
+        }
+    }
+}
