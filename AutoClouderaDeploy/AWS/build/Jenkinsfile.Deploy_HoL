@@ -8,7 +8,7 @@ pipeline {
         string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region')
         string(name: 'CDP_DEPLOYMENT_TYPE', defaultValue: 'public', description: 'CDP Deployment Type (public/private/semi-private)')
         string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'Enter the machine IP or network range to whitelist (e.g., 172.31.x.x/32). Use /32 for a single IP or a subnet mask for a range. Default 0.0.0.0/0 allows open access for all.')
-        string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name should be within 12 characters only')
+        string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name should be within 12 characters only and not contain _ ')
         string(name: 'NUMBER_OF_WORKSHOP_USERS', defaultValue: '1', description: 'Number of Workshop Users')
         string(name: 'WORKSHOP_USER_PREFIX', defaultValue: 'pseworkshop', description: 'Workshop User Prefix')
         password(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', defaultValue: '', description: 'Workshop User Default Password')
