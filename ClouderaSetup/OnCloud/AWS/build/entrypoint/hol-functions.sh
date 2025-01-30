@@ -52,6 +52,8 @@ validating_variables() {
          "CDP_DEPLOYMENT_TYPE"
          "LOCAL_MACHINE_IP"
          "ENABLE_DATA_SERVICES"
+         "DOMAIN"
+         "HOSTEDZONEID"
       )
       echo "Provision_keycloak: $provision_keycloak"
       # Conditionally add Keycloak keys based on PROVISION_KEYCLOAK
@@ -59,9 +61,7 @@ validating_variables() {
          REQUIRED_KEYS+=(
             # "KEYCLOAK_SERVER_NAME"
             "KEYCLOAK_ADMIN_PASSWORD"
-
             #"KEYCLOAK_SECURITY_GROUP_NAME"
-
          )
       fi
 
@@ -123,21 +123,21 @@ validating_variables() {
 
       #workshop_name variable to validate
       validate_workshop_name() {
-	if [[ ! "$workshop_name" =~ ^[a-z0-9-]+$ || ${#workshop_name} -gt 12 ]]; then
-	  echo "Error: workshop_name must be 12 characters or less and consist only of lowercase letters, numbers, and hyphens (-)."
-  	  exit 1
-	fi
+         if [[ ! "$workshop_name" =~ ^[a-z0-9-]+$ || ${#workshop_name} -gt 12 ]]; then
+            echo "Error: workshop_name must be 12 characters or less and consist only of lowercase letters, numbers, and hyphens (-)."
+            exit 1
+         fi
       }
       validate_datalake_version() {
-  	if [[ -z "$datalake_version" || "$datalake_version" == "latest" || "$datalake_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    	  return 0  # Valid value
-        else
-    	  echo "Error: Valid values for datalake_version are 'latest' or a semantic version (e.g., 7.2.17)."
-    	  return 1  # Invalid value
-  	fi
-     }	
-   validate_workshop_name
-   validate_datalake_version
+         if [[ -z "$datalake_version" || "$datalake_version" == "latest" || "$datalake_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            return 0 # Valid value
+         else
+            echo "Error: Valid values for datalake_version are 'latest' or a semantic version (e.g., 7.2.17)."
+            return 1 # Invalid value
+         fi
+      }
+      validate_workshop_name
+      validate_datalake_version
    }
 
    #--------------------------------------------------------------------------------------------------#
@@ -178,7 +178,7 @@ validating_variables() {
                deployment_template=$value
             else
                echo "=================================================================================="
-               echo "FATAL: Invalid value for CDP Deployment Type. The allowed values are: 
+               echo "FATAL: Invalid value for CDP Deployment Type. The allowed values are:
                public (* all in lowercase *)
                private (* all in lowercase *)
                semi-private (* all in lowercase and one hyphen (-) *)
@@ -211,6 +211,27 @@ validating_variables() {
             ;;
          WORKSHOP_USER_DEFAULT_PASSWORD)
             workshop_user_default_password=$value
+            ;;
+         # New domain and hostedzoneid fields
+         DOMAIN)
+            if [[ -z "$value" || ! "$value" =~ ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+               echo "=================================================================================="
+               echo "FATAL: Invalid value for DOMAIN. Please provide a valid domain name."
+               echo "=================================================================================="
+               exit 1
+            else
+               domain=$(echo $value | tr '[:upper:]' '[:lower:]')
+            fi
+            ;;
+         HOSTEDZONEID)
+            if [[ -z "$value" || ! "$value" =~ ^[A-Z0-9]{0,32}$ ]]; then
+               echo "=================================================================================="
+               echo "FATAL: Invalid value for HOSTEDZONEID. Hosted Zone ID should be in the format: ZXXXXXXXXX"
+               echo "=================================================================================="
+               exit 1
+            else
+               hostedzoneid=$(echo $value | tr '[:lower:]' '[:upper:]')
+            fi
             ;;
          # CDP_ACCESS_KEY_ID)
          #    cdp_access_key_id=$value
@@ -275,10 +296,10 @@ validating_variables() {
          CDP_GROUP_LIMIT)
             cdp_group_limit=$value
             ;;
-	 DATALAKE_VERSION)
-	    datalake_version=$value
-	    ;;
-            # Can Add more cases if required.
+         DATALAKE_VERSION)
+            datalake_version=$value
+            ;;
+         # Can Add more cases if required.
          esac
       fi
    done <"$USER_CONFIG_FILE"
@@ -298,7 +319,7 @@ key_pair_file() {
    # Checking if SSH Keypair File exists.
    if [[ ! -f "/userconfig/$aws_key_pair.pem" ]]; then
       echo "=================================================================================="
-      echo "FATAL: SSH Key Pair File Not Found. Please place the '$aws_key_pair.pem' 
+      echo "FATAL: SSH Key Pair File Not Found. Please place the '$aws_key_pair.pem'
 file in your config directory and try again.
 EXITING....."
       echo "=================================================================================="
@@ -311,7 +332,7 @@ EXITING....."
 
 check_key_pair() {
    USER_NAMESPACE=$workshop_name
-# Check if aws_key_pair exists as input
+   # Check if aws_key_pair exists as input
    echo "USER_NAMESPACE: ${USER_NAMESPACE}"
    if [[ -z "$aws_key_pair" ]]; then
       # If keypair is empty, check if it's already generated and stored internally
@@ -345,7 +366,7 @@ aws_prereq() {
       --service-code vpc \
       --output json \
       --region $aws_region \
-      --quota-code L-F678F1CE | jq -r '.[]["Value"]')
+      --quota-code L-F678F1CE | jq -r '.[]["Value"]' | cut -d'.' -f1)
 
    vpc_used=$(aws ec2 describe-vpcs --output json --region $aws_region | jq -r '.[] | length')
    echo -e "\nCurrent VPC count: $vpc_used"
@@ -363,7 +384,7 @@ aws_prereq() {
       --service-code ec2 \
       --output json \
       --region $aws_region \
-      --quota-code L-0263D0A3 | jq -r '.[]["Value"]')
+      --quota-code L-0263D0A3 | jq -r '.[]["Value"]' | cut -d'.' -f1)
    eip_used=$(aws ec2 describe-addresses --output json --region $aws_region | jq -r '.[] | length')
    echo -e "\nCurrent ElasticIP count: $eip_used"
 
@@ -423,22 +444,22 @@ cdp_prereq() {
    # Default Values
    DEFAULT_CDP_SAML_PROVIDER_LIMIT=10
    DEFAULT_CDP_USER_LIMIT=1000
-   DEFAULT_CDP_GROUP_LIMIT=50  
+   DEFAULT_CDP_GROUP_LIMIT=50
 
    #CDP_limit_variables
    export cdp_saml_provider_limit="${cdp_saml_provider_limit:-$DEFAULT_CDP_SAML_PROVIDER_LIMIT}"
    export cdp_user_limit="${cdp_user_limit:-$DEFAULT_CDP_USER_LIMIT}"
    export cdp_group_limit="${cdp_group_limit:-$DEFAULT_CDP_GROUP_LIMIT}"
- 
-    # Print Assigned Values for CDP_limits
-         echo "  cdp_saml_provider_limit: $cdp_saml_provider_limit"
-         echo "  cdp_user_limit: $cdp_user_limit"
-         echo "  cdp_group_limit: $cdp_group_limit"
-   
+
+   # Print Assigned Values for CDP_limits
+   echo "  cdp_saml_provider_limit: $cdp_saml_provider_limit"
+   echo "  cdp_user_limit: $cdp_user_limit"
+   echo "  cdp_group_limit: $cdp_group_limit"
+
    # Check current CDP IAM Groups count
    cdp_group_count=$(cdp iam list-groups | jq -r '.groups[].groupName' | wc -l)
    echo -e "\nCurrent CDP Groups count: $cdp_group_count"
-   
+
    remaining_groups=$(($cdp_group_limit - $cdp_group_count))
    if [ "$remaining_groups" -lt 0 ]; then
       echo
@@ -507,7 +528,7 @@ cdp_prereq() {
 #-------------------------------------------------------------------------------------------------#
 # Function to provision EC2 Instance for Keycloak
 generate_keypair() {
-echo -e "\n               ==============================Generating keypair if not exists ========================================="
+   echo -e "\n               ==============================Generating keypair if not exists ========================================="
    USER_NAMESPACE=$workshop_name
    mkdir -p /userconfig/.$USER_NAMESPACE
 
@@ -516,32 +537,32 @@ echo -e "\n               ==============================Generating keypair if no
    fi
 
    cd /userconfig/.$USER_NAMESPACE/keypair_gen
-     terraform init
-     terraform apply -auto-approve \
-         -var "keypair_name=$workshop_name" \
-         -var "aws_key_pair=$aws_key_pair" \
-         -var "aws_region=$aws_region"
-     RETURN=$?
-      if [ $RETURN -eq 0 ]; then
-         export aws_key_pair=$(terraform output -raw aws_key_pair_output) #updated the value of aws_key_pair if initially not exists         
-         echo "true" > keypair_generated.flag  # Store a flag to indicate the keypair was generated
-         cp -f ${workshop_name}-keypair.pem /userconfig/.$USER_NAMESPACE/
-         return 0
-      else
-         return 1
-      fi
+   terraform init
+   terraform apply -auto-approve \
+      -var "keypair_name=$workshop_name" \
+      -var "aws_key_pair=$aws_key_pair" \
+      -var "aws_region=$aws_region"
+   RETURN=$?
+   if [ $RETURN -eq 0 ]; then
+      export aws_key_pair=$(terraform output -raw aws_key_pair_output) #updated the value of aws_key_pair if initially not exists
+      echo "true" >keypair_generated.flag                              # Store a flag to indicate the keypair was generated
+      cp -f ${workshop_name}-keypair.pem /userconfig/.$USER_NAMESPACE/
+      return 0
+   else
+      return 1
+   fi
 }
 
 destroy_keypair() {
-echo -e "\n               ==============================Destroying generated keypair========================================="
+   echo -e "\n               ==============================Destroying generated keypair========================================="
    USER_NAMESPACE=$workshop_name
    cd /userconfig/.$USER_NAMESPACE/keypair_gen
-     terraform init
-     terraform destroy -auto-approve \
-         -var "keypair_name=$workshop_name" \
-         -var "aws_key_pair=$aws_key_pair" \
-         -var "aws_region=$aws_region"
-RETURN=$?
+   terraform init
+   terraform destroy -auto-approve \
+      -var "keypair_name=$workshop_name" \
+      -var "aws_key_pair=$aws_key_pair" \
+      -var "aws_region=$aws_region"
+   RETURN=$?
    if [ $RETURN -eq 0 ]; then
       rm -rf /userconfig/.$USER_NAMESPACE/keypair_gen
       return 0
@@ -563,9 +584,53 @@ setup_keycloak_ec2() {
       cp -R "$KC_ANS_CONFIG_DIR" "/userconfig/.$USER_NAMESPACE/"
    fi
 
-   cd /userconfig/.$USER_NAMESPACE/keycloak_terraform_config   
+   cd /userconfig/.$USER_NAMESPACE/keycloak_terraform_config
+
+   ########## SSL Certs Genertaion Logic
+   DOMAIN=$domain               # Base domain (e.g., example.com)
+   HOSTED_ZONE_ID=$hostedzoneid # Route53 Hosted Zone ID
+   CERT_EMAIL=admin@$DOMAIN     # Email for Let's Encrypt (e.g., admin@example.com)
+   # Check if required variables are provided
+   if [[ -z "$workshop_name" || -z "$DOMAIN" || -z "$HOSTED_ZONE_ID" || -z "$CERT_EMAIL" ]]; then
+      echo "Missing Values for required parameters for SSL Certs"
+      exit 1
+   fi
+   # Derived Variables
+   SUBDOMAIN="$workshop_name.$DOMAIN"
+   CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
+   echo "=== Generating Wildcard SSL Certificates ==="
+   # Install Certbot if not installed
+   if ! command -v certbot &>/dev/null; then
+      echo "Certbot not found. Installing..."
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update >/dev/null 2>&1 && apt-get install -y certbot python3-certbot-dns-route53 >/dev/null 2>&1
+   fi
+   # Generate Wildcard SSL Certificates
+   certbot certonly \
+      --dns-route53 \
+      -d "*.$DOMAIN" \
+      --non-interactive \
+      --agree-tos \
+      -m "$CERT_EMAIL"
+   # Check if certificates were generated successfully
+   if [[ ! -f "$CERT_PATH/fullchain.pem" || ! -f "$CERT_PATH/privkey.pem" ]]; then
+      echo "Error: SSL certificates not generated. Exiting."
+      exit 1
+   fi
+   chmod 644 /etc/letsencrypt/live/$DOMAIN/*.pem
+   echo "SSL certificates successfully generated for *.$DOMAIN"
+   # Encode SSL Certificates in Base64 (for Terraform user_data)
+   FULLCHAIN=$(cat "$CERT_PATH/fullchain.pem" | base64 -w 0)
+   PRIVKEY=$(cat "$CERT_PATH/privkey.pem" | base64 -w 0)
+
+   #######
+
    #local sg_name="$1"
    local sg_name="$workshop_name-keyc-sg"
+
+   echo "=== Running Terraform ==="
+   # Run Terraform to provision Keycloak instance
+
    if check_aws_sg_exists "$sg_name"; then
       echo "EC2 Security Group With the same name already exists. To avoid the failure the Security Group
 name is now updated to $sg_name-$workshop_name-sg"
@@ -575,6 +640,9 @@ name is now updated to $sg_name-$workshop_name-sg"
          -var "local_ip=$local_ip" \
          -var "instance_keypair=$aws_key_pair" \
          -var "aws_region=$aws_region" \
+         -var "domain=$DOMAIN" \
+         -var "wildcard_fullchain=$FULLCHAIN" \
+         -var "wildcard_privkey=$PRIVKEY" \
          -var "kc_security_group=$sg_name-$workshop_name" \
          -var "keycloak_admin_password=$keycloak__admin_password"
       RETURN=$?
@@ -592,6 +660,9 @@ name is now updated to $sg_name-$workshop_name-sg"
          -var "local_ip=$local_ip" \
          -var "instance_keypair=$aws_key_pair" \
          -var "aws_region=$aws_region" \
+         -var "domain=$DOMAIN" \
+         -var "wildcard_fullchain=$FULLCHAIN" \
+         -var "wildcard_privkey=$PRIVKEY" \
          -var "kc_security_group=$sg_name" \
          -var "keycloak_admin_password=$keycloak__admin_password"
 
@@ -604,6 +675,34 @@ name is now updated to $sg_name-$workshop_name-sg"
          return 1
       fi
    fi
+
+   # Fetch the public IP of the created Keycloak instance
+   if [[ -z "$KEYCLOAK_SERVER_IP" ]]; then
+      echo "Error: Unable to retrieve Keycloak instance IP. Exiting."
+      exit 1
+   fi
+   echo "Keycloak instance public IP: $KEYCLOAK_SERVER_IP"
+   echo "=== Updating DNS Record ==="
+   # Update Route53 DNS record to map subdomain to instance IP
+   aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" \
+      --change-batch '{
+        "Changes": [{
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "'"$SUBDOMAIN"'",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [{"Value": "'"$KEYCLOAK_SERVER_IP"'"}]
+            }
+        }]
+    }'
+   if [[ $? -ne 0 ]]; then
+      echo "Error: Failed to update DNS record. Exiting."
+      exit 1
+   fi
+   echo "DNS record updated: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
+   echo "=== Keycloak Setup Completed Successfully ==="
+
 }
 #--------------------------------------------------------------------------------------------------#
 # Function to rollback keycloack EC2 Instance in case of failure during provision.
@@ -612,6 +711,23 @@ destroy_keycloak() {
    echo -e "\n               ===================================Destroying Keycloak======================================="
    cd /userconfig/.$USER_NAMESPACE/keycloak_terraform_config
    terraform init
+   echo "=== Wait for 30 seconds... ==="
+   sleep 30
+   echo "=== Deleting DNS Record ==="
+   # Delete Route53 DNS record to unmap subdomain to instance IP
+   aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" \
+      --change-batch '{
+        "Changes": [{
+            "Action": "DELETE",
+            "ResourceRecordSet": {
+                "Name": "'"$workshop_name.$domain"'",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [{"Value": "'"$(terraform output -raw elastic_ip)"'"}]
+            }
+        }]
+    }'
+   echo "DNS record deleted: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
    terraform destroy -auto-approve \
       -var "workshop_name=$workshop_name" \
       -var "local_ip=$local_ip" \
@@ -716,7 +832,7 @@ destroy_cdp() {
 #--------------------------------------------------------------------------------------------------#
 # Function to destroy Complete HOL Infrastructure.
 destroy_hol_infra() {
-USER_NAMESPACE=$workshop_name
+   USER_NAMESPACE=$workshop_name
    destroy_cdp
    cdp_destroy_status=$?
    if [[ "$provision_keycloak" == "yes" && "$cdp_destroy_status" -eq 0 ]]; then

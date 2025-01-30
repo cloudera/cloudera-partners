@@ -39,7 +39,7 @@ resource "tls_private_key" "kc_private_key" {
 }
 # Save the private key to <keypair_name>-keypair.pem
 resource "local_sensitive_file" "pem_file" {
-  count = local.create_keypair ? 1 : 0
+  count                = local.create_keypair ? 1 : 0
   filename             = "${var.keypair_name}-keypair.pem"
   file_permission      = "600"
   directory_permission = "700"
@@ -47,7 +47,7 @@ resource "local_sensitive_file" "pem_file" {
 }
 # Create an AWS EC2 keypair from the generated public key
 resource "aws_key_pair" "kc_keypair" {
-  count = local.create_keypair ? 1 : 0
+  count      = local.create_keypair ? 1 : 0
   key_name   = "${var.keypair_name}-keypair"
   public_key = tls_private_key.kc_private_key[0].public_key_openssh
 }

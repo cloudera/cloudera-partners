@@ -4,8 +4,8 @@
   connection: local
   gather_facts: yes
   vars:
-    vw_size: 'xsmall'
-    cdvc_size: 'viz-default'  #Possible-Values: viz-default, viz-low, viz-medium, viz-large
+    vw_size: "xsmall"
+    cdvc_size: "viz-default" #Possible-Values: viz-default, viz-low, viz-medium, viz-large
 
   tasks:
     - name: Check and print variable status
@@ -57,11 +57,11 @@
         cdp dw list-vws --cluster-id "{{ dwcluster['cluster']['id'] }}" | jq -r '.vws[]?.name // empty'
       register: existing_vws
       failed_when: false
-    
+
     - name: Debug existing virtual warehouses
       debug:
         msg: "Existing virtual warehouses: {{ existing_vws.stdout_lines }}"
-    
+
     - name: Set facts for hive virtual warehouse
       block:
         - name: Set facts for each hive virtual warehouse
@@ -75,7 +75,7 @@
             msg: "Hive Virtual Warehouse {{ workshop_name }}-hive-{{ item.item }} exists: {{ item.ansible_facts.hive_vw_exists }}"
           loop: "{{ hive_vw_facts.results }}"
           when: item.ansible_facts.hive_vw_exists
-    
+
     - name: Deploy hive virtual warehouses if not exists
       block:
         - name: Deploy hive virtual warehouse
@@ -99,7 +99,7 @@
         - name: Set facts for each impala virtual warehouse
           set_fact:
             impala_vw_exists: "{{ (existing_vws.stdout_lines | select('match', workshop_name ~ '-impala-' ~ item) | list | length) > 0 }}"
-          with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"          
+          with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"
           register: impala_vw_facts
 
         - name: Debug impala VW existence
@@ -126,22 +126,22 @@
             pause: 30
           when: not (existing_vws.stdout_lines | select('match', workshop_name ~ '-impala-' ~ item) | list | length > 0)
           ignore_errors: true
-    
+
     - name: List existing data visualizations
       ansible.builtin.shell: >
         cdp dw list-data-visualizations --cluster-id "{{ dwcluster['cluster']['id'] }}" | jq -r '.dataVisualizations[]?.name // empty'
       register: existing_data_visualizations
       failed_when: false
-    
+
     - name: Set fact for data visualization existence
       set_fact:
         data_viz_exists: "{{ (existing_data_visualizations.stdout_lines | select('match', workshop_name ~ '-data-viz') | list | length) > 0 }}"
-    
+
     - name: Debug data visualization existence
       debug:
         msg: "Data Visualization Cluster {{ workshop_name }}-data-viz already exists."
       when: data_viz_exists
-    
+
     - name: Deploy data visualization cluster if not exists
       ansible.builtin.command: >
         cdp dw create-data-visualization \

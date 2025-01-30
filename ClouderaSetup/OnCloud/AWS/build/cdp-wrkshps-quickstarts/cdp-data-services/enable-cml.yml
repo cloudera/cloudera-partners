@@ -28,7 +28,7 @@
           maximum_gpu_instances: {{ maximum_gpu_instances }},
           root_volume_size: {{ root_volume_size }},
           enable_gpu: {{ enable_gpu }}
-        
+
     - name: List CML Workspaces for existence check
       ansible.builtin.shell: >
         cdp ml list-workspaces | jq -r '.workspaces[].instanceName'
