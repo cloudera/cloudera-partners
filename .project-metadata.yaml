@@ -1,0 +1,22 @@
+name: Agent-Powered Workflows 
+description: |
+  This AMP demonstrates an Agentic workflow application which uses a variety of existing tools and agents to help users traverse varied and difficult problems
+author: Cloudera Inc.
+specification_version: 1.0
+prototype_version: 1.0
+date: "2025-01-30"
+
+runtimes:
+  - editor: JupyterLab
+    kernel: Python 3.10
+    edition: Standard
+    version: "2024.10"
+
+tasks:
+  - type: run_session
+    name: Install Dependencies
+    script: 0_install_prerequisites/download_reqs.py
+    short_summary: Install Dependencies
+    kernel: python3
+    cpu: 2
+    memory: 12
