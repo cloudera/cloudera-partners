@@ -1,10 +1,10 @@
 import logging
-from .neptune_query_strings import GET_DEMO_CUSTOMER_IDS, GET_TIER, GET_TIERS_FOR_ALL_SAMPLE, GET_PROMOTIONS_FOR_ALL_TIERS
+from chat_utils.neptune_query_strings import GET_DEMO_CUSTOMER_IDS, GET_TIER, GET_TIERS_FOR_ALL_SAMPLE, GET_PROMOTIONS_FOR_ALL_TIERS
 import os
 import random
 
 from neo4j import GraphDatabase
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 
 logging.basicConfig(
     level=logging.INFO, 
@@ -12,18 +12,20 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-USERNAME = os.getenv("AWS_NEPTUNE_USERNAME")
-PASSWORD = os.getenv("AWS_NEPTUNE_PASSWORD")
-ENDPOINT = os.getenv("AWS_NEPTUNE_ENDPOINT")
-PORT = os.getenv("AWS_NEPTUNE_ENDPOINT_PORT")
-URI = "bolt://{0}:{1}".format(ENDPOINT, PORT)
+URI = os.getenv("NEO4J_ENDPOINT")
+USERNAME = os.getenv("NEO4J_USERNAME")
+PASSWORD = os.getenv("NEO4J_PASSWORD")
+
+def run_graph_query(query: str) -> Any:
+    pass
 
 def getSampleCustomerIds()->List[str]:
     customer_ids = []
     try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD), encrypted=True) as driver:
+        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
             driver.verify_connectivity()
             drs = driver.session()
+            print("Connected to Neo4j!")
             res = drs.run(GET_DEMO_CUSTOMER_IDS)
             for rec in res:
                 customer_ids.append(rec["id"])
@@ -37,7 +39,7 @@ def getSampleCustomerIds()->List[str]:
 def getTierForCustomerId(customer_id: str)->str:
     tier = ""
     try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD), encrypted=True) as driver:
+        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
             driver.verify_connectivity()
             drs = driver.session()
             res = drs.run(GET_TIER, customer_id=customer_id)
@@ -54,7 +56,7 @@ def getTierForCustomerId(customer_id: str)->str:
 def getTiersForAllSampleCustomers()->Dict[str, str]:
     tiers = {}
     try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD), encrypted=True) as driver:
+        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
             driver.verify_connectivity()
             drs = driver.session()
             res = drs.run(GET_TIERS_FOR_ALL_SAMPLE)
@@ -70,7 +72,7 @@ def getTiersForAllSampleCustomers()->Dict[str, str]:
 def getPromotionsForAllTiers()->Dict[str, str]:
     promotions = {}
     try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD), encrypted=True) as driver:
+        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
             driver.verify_connectivity()
             drs = driver.session()
             res = drs.run(GET_PROMOTIONS_FOR_ALL_TIERS)
@@ -103,11 +105,11 @@ def getPromotionsForCustomerId(customer_id: str)->Tuple[str, str]:
 
 if __name__ == "__main__":
 # Execute all APIs to test
-    customer_ids = getSampleCustomerIds()
-    logger.info(customer_ids)
+    # customer_ids = getSampleCustomerIds()
+    # logger.info(customer_ids)
 
-    tier = getTierForCustomerId(random.choice(customer_ids))
-    logger.info(tier)
+    # tier = getTierForCustomerId(random.choice(customer_ids))
+    # logger.info(tier)
 
     tiers = getTiersForAllSampleCustomers()
     logger.info(tiers)
@@ -115,6 +117,6 @@ if __name__ == "__main__":
     promotions = getPromotionsForAllTiers()
     logger.info(promotions)
 
-    promotions = getPromotionsForCustomerId(random.choice(customer_ids))
-    logger.info(promotions)
+    # promotions = getPromotionsForCustomerId(random.choice(customer_ids))
+    # logger.info(promotions)
 

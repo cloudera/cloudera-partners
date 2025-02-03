@@ -6,7 +6,7 @@ import litellm
 import uuid
 litellm.set_verbose=False
 
-from chat_app.crew_agents import ecommerce_policies_agent, sales_agent, customer_service_manager, agent_task
+from chat_app.crew_agents import ecommerce_policies_agent, sales_agent, customer_service_manager, agent_task, customer_satisfaction_agent
 from chat_app.app_config import configuration
 
 llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
@@ -20,7 +20,7 @@ def crew_launch(req_id, req_input):
     # Instantiate your crew with a sequential process
     print("Instantiating Crew")
     crew = Crew(
-        agents=[ecommerce_policies_agent, sales_agent],
+        agents=[ecommerce_policies_agent, sales_agent, customer_satisfaction_agent],
         tasks=[agent_task],
         verbose=True,  # You can set it to True or False
         manager_agent=customer_service_manager,

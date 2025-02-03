@@ -22,6 +22,8 @@ class TargetedPromosTool(BaseTool):
     
     def _run(self, customer_id: str) -> Tuple[str, str]:
 
-        tier_promo = getPromotionsForCustomerId(customer_id)
+        # tier_promo = getPromotionsForCustomerId(customer_id)
+
+        tier_promo = ("Member", "")
 
         return tier_promo

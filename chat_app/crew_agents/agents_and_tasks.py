@@ -4,7 +4,7 @@ import os
 import litellm
 litellm.set_verbose=False
 
-from chat_app.tools import TargetedPromosTool, RetrievePoliciesTool
+from chat_app.tools import TargetedPromosTool, RetrievePoliciesTool, CustomerFeedbackTool
 
 
 llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
@@ -63,6 +63,34 @@ sales_agent = Agent(
     max_retry_limit=3, # Maximum number of retries for an agent to execute a task when an error occurs
     llm=llm, # Defines the LLM to use for the agent
     verbose=True # Configures the internal logger to provide detailed execution logs, aiding in debugging and monitoring
+)
+
+customer_satisfaction_agent = Agent(
+    role=dedent((
+        """
+        Customer Satisfaction Agent
+        """)),  # Job title of the agent
+    backstory=dedent((
+        """
+        You are a dedicated and empathetic customer satisfaction agent. Your primary responsibility is to process 
+        customer feedback and ensure that customers feel heard and valued. You analyze feedback and submit it 
+        through the CustomerFeedbackTool to improve service quality. Your communication style is professional, 
+        courteous, and customer-centric.
+        """)),  # Provides context for the agent's behavior
+    goal=dedent((
+        """
+        Your goal is to ensure customer feedback is acknowledged and processed effectively. 
+        - Use the CustomerFeedbackTool to submit customer feedback.
+        - If feedback submission is successful, acknowledge and thank the customer for their input.
+        - If submission fails, provide an appropriate response and assure them of follow-up.
+        - Maintain a professional and friendly tone in all interactions.
+        """)),  # Defines the agent's main objective
+    tools=[CustomerFeedbackTool()],
+    allow_delegation=False,  # The agent handles tasks independently
+    max_iter=2,  # Limits the number of iterations for task execution
+    max_retry_limit=3,  # Sets the number of retries for handling errors
+    llm=llm,  # Defines the language model to use
+    verbose=True  # Enables detailed logging for debugging and monitoring
 )
 
 customer_service_manager = Agent(
