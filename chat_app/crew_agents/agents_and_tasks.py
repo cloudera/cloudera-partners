@@ -26,6 +26,8 @@ ecommerce_policies_agent = Agent(
         or request as an argument. Make sure to neatly summarize your answers and the
         relevant parts of the policy document in a short response. Only respond to what is
         asked and do not offer any information beyond what your tools return.
+
+        If you need additional information, make sure to ask the user to provide exactly what information you need.
         
         If there are no matching results and you are unable to answer the question, just reply saying you don't know the answer.
         Try to keep final answers in markdown format.
@@ -54,6 +56,9 @@ sales_agent = Agent(
         Perform the task assigned to you and use the tools available to execute your task.
         The TargetedPromosTool can be used to search for promotions available for a given customer ID.
         Make sure to respond by thanking the customer for their loyalty and for being a member based on their tier.
+
+        If you need additional information, make sure to ask the user to provide exactly what information you need.
+
         Only respond to what is asked and do not make up any information beyond what your tools return.
         Try to keep final answers in markdown format.
         """)), # This is the goal that the agent is trying to achieve
@@ -83,6 +88,7 @@ customer_satisfaction_agent = Agent(
         - Use the CustomerFeedbackTool to submit customer feedback.
         - If feedback submission is successful, acknowledge and thank the customer for their input.
         - If submission fails, provide an appropriate response and assure them of follow-up.
+        - If you need additional information, make sure to ask the user to provide exactly what information you need.
         - Maintain a professional and friendly tone in all interactions.
         """)),  # Defines the agent's main objective
     tools=[CustomerFeedbackTool()],
@@ -103,10 +109,14 @@ customer_service_manager = Agent(
         You're an experienced manager, skilled in overseeing customer service operations and requests.
         Your role is to route the customer request to the agent appropriate for the task and ensure 
         that the response is to the highest standard and matches what the customer is asking for.
-        You have two agents at your disposal:
+        You have three agents at your disposal:
             - The ECommerce Policies Agent who handles requests related shipping, return and privacy policies
             - The Sales Agent who handles requests related to sales promotions
-        If both the available agents do not have enough information, reply that you can follow up with them separately.
+            - The Customer Satisfaction Agent who handles customer feedback and complaints
+
+        If the available agents need more information, make sure the response to the user requests specific information.
+        
+        If the available agents do not have the answer, reply that you can follow up with them separately.
         """)), # This is the backstory of the agent, this helps the agent to understand the context of the task
     goal=dedent((
         """

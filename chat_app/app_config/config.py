@@ -71,9 +71,10 @@ class Initialize:
         self.user_input = None
 
         self.chat_interface = None
+        self.messages = None
         self.assets_folder = f"{self.project_root}/assets"
 
-        self.user_id = random.choice(user_ids)
+        self.user_id = None
 
     def reset_config(self):
         self.user_id = random.choice(user_ids)

@@ -2,6 +2,7 @@ from crewai import Crew, Process, LLM
 import asyncio
 from textwrap import dedent
 import os
+import re
 import litellm
 import uuid
 litellm.set_verbose=False
@@ -16,7 +17,28 @@ print("Importing available tools")
 import datetime
 print("Defining Primary Task")
 
-def crew_launch(req_id, req_input):
+
+def format_chat_messages(chat_list):
+    def remove_html(text):
+        if text is None:
+            return None
+        return re.sub(r"<.*?>", "", text).strip()  # Remove HTML tags and extra spaces
+
+    formatted_messages = []
+    
+    # Ignore the last element using list slicing
+    for msg1, msg2 in chat_list[:-1]:  
+        clean_msg1 = remove_html(msg1)
+        clean_msg2 = remove_html(msg2)
+
+        if clean_msg1 is None and clean_msg2 is not None:
+            formatted_messages.append({"role": "system", "content": clean_msg2})
+        elif clean_msg2 is None and clean_msg1 is not None:
+            formatted_messages.append({"role": "user", "content": clean_msg1})
+
+    return formatted_messages
+
+def crew_launch(req_id, req_input, chat_history):
     # Instantiate your crew with a sequential process
     print("Instantiating Crew")
     crew = Crew(
@@ -27,15 +49,18 @@ def crew_launch(req_id, req_input):
         # ↑ indicates the verbosity level for logging during execution.
         # process=Process.sequential
     )
+    formated_messages = format_chat_messages(chat_history)
     print("Setting req_input")
     inputs = {
         "req_id": req_id,
         "req_input": req_input,
         "req_customer_id": configuration.user_id,
+        "chat_history": formated_messages
     }
     print("Kicking off crew")
     result = crew.kickoff(inputs=inputs)
     print(result.tasks_output)
+    
     return result
 
 
@@ -76,7 +101,7 @@ def respond(request_id, message_text, chat_history):
     agent_usage_template = """
 <h3 style="text-align:left;">🛠️ Calling Agent ...</h3>
 """
-    crew_response = crew_launch(request_id, message_text)
+    crew_response = crew_launch(request_id, message_text, chat_history)
     chat_history.append((None, agent_usage_template))
     chat_history.append((None, bot_msg % (datetime.datetime.now().strftime('%H:%M'), str(crew_response))))
     return chat_history
@@ -168,6 +193,8 @@ with gr.Blocks(css=css, theme=theme, title="ECSS") as demo:
                 elem_id = "chatbot",
                 show_label = False
             )
+            # configuration.chat_interface = chatbot
+            # configuration.messages = startup_history
             input.render()
             
     user_msg = input.submit(display_user_message, [input, chatbot],  [request_id, request_text, chatbot])
