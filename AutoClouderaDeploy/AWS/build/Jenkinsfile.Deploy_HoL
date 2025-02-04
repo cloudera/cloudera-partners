@@ -339,7 +339,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
                     """,
                     mimeType: 'text/html',
                     attachmentsPattern: "hol-provisioner-${BUILD_NUMBER}.log",
-                    from: 'jenkins@example.com'
+                    from: 'psejenkins@cloudera.com'
                 )
                 
             }
@@ -364,7 +364,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
         
                 // Send email
                 emailext(
-                    to: "${env.BUILD_USER_EMAIL}",
+                    to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
                     subject: "✅ Jenkins Build Success: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
                     body: """
                         <html>
