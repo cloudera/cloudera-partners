@@ -277,7 +277,7 @@ DATALAKE_VERSION:${params.DATALAKE_VERSION}
             script {
                 def errorLog = currentBuild.description ?: "Unknown error occurred."
                 emailext(
-                    to: "${env.BUILD_USER_EMAIL}",
+                    to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}"
                     subject: "❌ Jenkins Build Failed: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
                     body: """
                         <html>
