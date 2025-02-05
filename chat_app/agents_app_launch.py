@@ -174,6 +174,8 @@ with gr.Blocks(css=css, theme=theme, title="ECSS") as demo:
                                           [3, {"text":"Am I eligible for any promos currently?"}],
                                       ],
                                       inputs=[example_num, input], elem_id="examples_table", label="")
+            with gr.Accordion("User Data", open = True):
+                gr.Markdown(f"### **Orders:**\n1. {configuration.order_id}", elem_id="order-id-box")
         with gr.Column(scale=15, elem_id="col"):
             chatbot = gr.Chatbot(
                 value = startup_history,

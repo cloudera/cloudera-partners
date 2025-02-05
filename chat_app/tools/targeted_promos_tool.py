@@ -2,7 +2,7 @@ from typing import Type, List, Tuple
 from crewai_tools import BaseTool
 from pydantic import BaseModel, Field
 
-from chat_app.chat_utils import getTierForCustomerId, getPromotionsForCustomerId
+from chat_app.chat_utils import getTierForCustomer, getPromotionsForCustomerId
 
 
 class TargetedPromosToolInput(BaseModel):

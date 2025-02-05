@@ -8,7 +8,7 @@ from chat_utils.neptune_query_strings import (
     GET_CUSTOMERS_AND_ORDERS,
     GET_TIER_FOR_CUSTOMER
     )
-from chat_utils.util_functions import select_random_first_element
+from chat_utils.util_functions import select_random_element
 import os
 
 from neo4j import GraphDatabase
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     cus_and_orders = getCustomersWithOrders()
 
-    selected_customer = select_random_first_element(cus_and_orders)
+    selected_customer = select_random_element(cus_and_orders)[0]
 
     customer_tier_promo = getPromotionsForCustomerId(selected_customer)
     logger.info(customer_tier_promo)

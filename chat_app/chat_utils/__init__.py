@@ -10,4 +10,4 @@ from .neptune_query_strings import (
     GET_CUSTOMERS_AND_ORDERS,
     GET_TIER_FOR_CUSTOMER
     )
-from .util_functions import select_random_first_element
+from .util_functions import select_random_element

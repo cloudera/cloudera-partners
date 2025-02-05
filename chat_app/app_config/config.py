@@ -2,6 +2,8 @@ from pathlib import Path
 from os import environ
 import random
 
+from chat_utils import getCustomersWithOrders, select_random_element
+
 user_ids = [
 "018d3918d60c2e821b654b8eb4cfde55",
 "2ad313a8287a197d9b303c380a6981db",
@@ -75,10 +77,16 @@ class Initialize:
         self.assets_folder = f"{self.project_root}/assets"
 
         self.user_id = None
+        self.order_id = None
 
     def reset_config(self):
-        self.user_id = random.choice(user_ids)
+        sample_customers_and_orders = getCustomersWithOrders()
+        selected_customer = select_random_element(sample_customers_and_orders)
+        self.user_id = selected_customer[0]
+        self.order_id = selected_customer[1]
 
+        print("User ID: " + self.user_id)
+        print("Order ID: " + self.order_id)
 
 
 global configuration
