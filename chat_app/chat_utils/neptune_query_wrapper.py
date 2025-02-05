@@ -4,10 +4,12 @@ from chat_utils.neptune_query_strings import (
     GET_TIER,
     GET_TIERS_FOR_ALL_SAMPLE,
     GET_PROMOTIONS_FOR_ALL_TIERS,
-    GET_CUSTOMERS_WITH_TIER
+    GET_CUSTOMERS_WITH_TIER,
+    GET_CUSTOMERS_AND_ORDERS,
+    GET_TIER_FOR_CUSTOMER
     )
+from chat_utils.util_functions import select_random_first_element
 import os
-import random
 
 from neo4j import GraphDatabase
 from typing import Dict, List, Tuple, Any
@@ -22,99 +24,15 @@ URI = os.getenv("NEO4J_ENDPOINT")
 USERNAME = os.getenv("NEO4J_USERNAME")
 PASSWORD = os.getenv("NEO4J_PASSWORD")
 
-def run_graph_query(query: str) -> List[Any]:
+def run_graph_query(query: str, **kwargs) -> List[Any]:
     with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
         driver.verify_connectivity()
         drs = driver.session()
         print("Connected to Neo4j!")
-        res = drs.run(query)
+        res = drs.run(query, **kwargs)
         records = list(res)
         drs.close()
         return records
-
-def getSampleCustomerIds()->List[str]:
-    customer_ids = []
-    try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
-            driver.verify_connectivity()
-            drs = driver.session()
-            print("Connected to Neo4j!")
-            res = drs.run(GET_DEMO_CUSTOMER_IDS)
-            for rec in res:
-                customer_ids.append(rec["id"])
-            drs.close()
-
-    except Exception as e:
-        raise Exception(f"A Neptune error occurred in getSampleCustomerIds: {e}")
-    
-    return customer_ids
-
-def getTierForCustomerId(customer_id: str)->str:
-    tier = ""
-    try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
-            driver.verify_connectivity()
-            drs = driver.session()
-            res = drs.run(GET_TIER, customer_id=customer_id)
-            for rec in res:
-                tier = rec["tier"]            
-                break
-            drs.close()
-
-    except Exception as e:
-        raise Exception(f"A Neptune error occurred in getTierForCustomerId: {e}")
-
-    return tier
-
-def getTiersForAllSampleCustomers()->Dict[str, str]:
-    tiers = {}
-    try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
-            driver.verify_connectivity()
-            drs = driver.session()
-            res = drs.run(GET_TIERS_FOR_ALL_SAMPLE)
-            for rec in res:
-                tiers[rec["customer_id"]] = rec["tier"]
-            drs.close()
-
-    except Exception as e:
-        raise Exception(f"A Neptune error occurred in getTiersForAllSampleCustomers: {e}")
-
-    return tiers
-
-def getPromotionsForAllTiers()->Dict[str, str]:
-    promotions = {}
-    try:
-        with GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD)) as driver:
-            driver.verify_connectivity()
-            drs = driver.session()
-            res = drs.run(GET_PROMOTIONS_FOR_ALL_TIERS)
-            for rec in res:
-                promotions["diamond"] = rec["diamond"]
-                promotions["gold"] = rec["gold"]
-                promotions["silver"] = rec["silver"]
-                promotions["member"] = rec["member"]
-                break
-            drs.close()
-
-    except Exception as e:
-        raise Exception(f"A Neptune error occurred in getPromotionsForAllTiers: {e}")
-
-    return promotions
-
-def getPromotionsForCustomerId(customer_id: str)->Tuple[str, str]:
-    print("Getting promos now")
-    try:
-        tier = getTierForCustomerId(customer_id)
-        all_promotions: {} = getPromotionsForAllTiers()
-        print("All Promos:" + str(all_promotions))
-        print("Customer Tier:" + tier)
-        promotions = all_promotions[tier.lower()]
-        print("Customer Promo:" + promotions)
-        return (tier, promotions)
-
-    except Exception as e:
-        raise Exception(f"A Neptune error occurred in getPromotionsForCustomerId: {e}")
     
 def getCustomersWithTiers()->Any:
     print("Getting customers and tiers")
@@ -129,11 +47,74 @@ def getCustomersWithTiers()->Any:
     
     return result
 
+def getCustomersWithOrders()->Any:
+    print("Getting customers and orders")
+    result = []
+    try:
+        res = run_graph_query(GET_CUSTOMERS_AND_ORDERS)
+        for rec in res:
+            # print(rec["customer_id"])
+            result.append((rec["customer_id"], rec["orders"][0]))
+            
+    except Exception as e:
+        raise Exception(f"A Neo4j error occurred in getCustomersWithOrders: {e}")
+    
+    return result
+
+def getTierForCustomer(customer_id: str)->str:
+    tier = ""
+    try:
+        res = run_graph_query(GET_TIER_FOR_CUSTOMER, customer_id=customer_id)
+        for rec in res:
+            tier = rec["tier"]
+            break
+
+    except Exception as e:
+        raise Exception(f"A Neptune error occurred in getTierForCustomerId: {e}")
+
+    return tier
+
+def getPromotionsForAllTiers()->Dict[str, str]:
+    promotions = {}
+    try:
+        res = run_graph_query(GET_PROMOTIONS_FOR_ALL_TIERS)
+        for rec in res:
+                promotions["diamond"] = rec["diamond"]
+                promotions["gold"] = rec["gold"]
+                promotions["silver"] = rec["silver"]
+                promotions["member"] = rec["member"]
+                break
+
+    except Exception as e:
+        raise Exception(f"A Neptune error occurred in getPromotionsForAllTiers: {e}")
+
+    return promotions
+
+def getPromotionsForCustomerId(customer_id: str)->Tuple[str, str]:
+    print("Getting promos now")
+    try:
+        tier = getTierForCustomer(customer_id)
+        all_promotions: {} = getPromotionsForAllTiers()
+        print("All Promos:" + str(all_promotions))
+        print("Customer Tier:" + tier)
+        promotions = all_promotions[tier.lower()]
+        print("Customer Promo:" + promotions)
+        return (tier, promotions)
+
+    except Exception as e:
+        raise Exception(f"A Neptune error occurred in getPromotionsForCustomerId: {e}")
+
 
 if __name__ == "__main__":
 # Execute all APIs to test
-    cus_and_tier = getCustomersWithTiers()
-    logger.info(cus_and_tier)
+
+    cus_and_orders = getCustomersWithOrders()
+
+    selected_customer = select_random_first_element(cus_and_orders)
+
+    customer_tier_promo = getPromotionsForCustomerId(selected_customer)
+    logger.info(customer_tier_promo)
+
 
     # customer_ids = getSampleCustomerIds()
     # logger.info(customer_ids)

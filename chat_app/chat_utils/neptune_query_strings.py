@@ -41,7 +41,7 @@ MATCH (o:order)-[r:has_item]->(p:product)
 RETURN o.order_id AS order_id, p.product_category_name as product_category_name
 """
 
-GET_CUSTOMERS_AND_ORDERS="MATCH (c:Customer)-[:placed]->(o:Order) RETURN c.customer_id, COLLECT(o.order_id) AS orders"
+GET_CUSTOMERS_AND_ORDERS="MATCH (c:Customer)-[:placed]->(o:Order) RETURN c.customer_id as customer_id, COLLECT(o.order_id) AS orders"
 
 GET_TIER_FOR_CUSTOMER="""
 MATCH (c:Customer {customer_id: $customer_id})-[:placed]->(o)-[r:has_item]->(p:Product), 
