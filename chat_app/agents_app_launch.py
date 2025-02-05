@@ -174,18 +174,6 @@ with gr.Blocks(css=css, theme=theme, title="ECSS") as demo:
                                           [3, {"text":"Am I eligible for any promos currently?"}],
                                       ],
                                       inputs=[example_num, input], elem_id="examples_table", label="")
-            # with gr.Group():
-            #     # Loop through products and render them inside the box
-            #     for idx, product in enumerate(configuration.user_promos):
-            #         with gr.Row(elem_id=f"row{idx}"):  # Each product is rendered in a row
-            #             # Textbox for product name
-            #             product_textbox = gr.Textbox(value=product, label="Product", interactive=False, elem_id=f"product_{idx}")
-                        
-            #             # Add to Cart button
-            #             add_button = gr.Button("Add to Cart", elem_id=f"add_button_{idx}")
-                        
-            #             # Attach the button click event
-            #             add_button.click(add_to_cart, inputs=[product_textbox, startup_history], outputs=[startup_history])
         with gr.Column(scale=15, elem_id="col"):
             chatbot = gr.Chatbot(
                 value = startup_history,
