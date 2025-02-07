@@ -4,7 +4,7 @@
 FROM ubuntu:24.04
 
 ARG TF_VER=1.10.5
-ARG TF_QUICKSTART_VERSION=v0.8.5
+ARG TF_QUICKSTART_VERSION=v0.9.1
 # Directory for storing scripts.
 RUN mkdir -p /opt/cdp-public-cloud-automation
 
@@ -19,6 +19,7 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 \
 RUN apt-get update && apt-get install -y jq wget git make unzip gcc build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev openssl libssl-dev libreadline-dev \
     bzip2 libffi-dev curl libbz2-dev libdb-dev liblzma-dev libsqlite3-dev uuid-dev python3.12 python3-pip && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
     apt-get install -y certbot python3-certbot-dns-route53 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -26,7 +27,7 @@ RUN python3 -m pip config set global.break-system-packages true && \
     #pip3 install --upgrade pip && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && ./aws/install && rm -rf aws awscliv2.zip && \
-    pip3 install setuptools_rust ansible-core==2.18 jmespath==1.0.1 && \
+    pip3 install setuptools_rust ansible-core==2.16.8 jmespath==1.0.1 && \
     pip3 install git+https://github.com/cloudera-labs/cdpy@main#egg=cdpy && \
     #pip3 install git+https://github.com/cloudera-labs/cdpy@devel#egg=cdpy && \
     pip3 uninstall -y cdpcli-beta && pip install cdpcli && \
