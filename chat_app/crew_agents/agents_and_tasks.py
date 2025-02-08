@@ -4,7 +4,7 @@ import os
 import litellm
 litellm.set_verbose=False
 
-from chat_app import TargetedPromosTool, RetrievePoliciesTool, FeedbackSubmissionTool
+from chat_app.tools import TargetedPromosTool, RetrievePoliciesTool, FeedbackSubmissionTool
 
 
 llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
@@ -59,7 +59,7 @@ sales_agent = Agent(
 
         If you need additional information, make sure to ask the user to provide exactly what information you need.
 
-        Only respond to what is asked and do not make up any information beyond what your tools return.
+        Only respond to what is asked and only refer to what details your tools return when crafting your response.
         Try to keep final answers in markdown format.
         """)), # This is the goal that the agent is trying to achieve
     tools=[TargetedPromosTool()],
@@ -91,6 +91,8 @@ customer_satisfaction_agent = Agent(
         - If submission fails, provide an appropriate response and assure them of follow-up.
         - If you need additional information, make sure to ask the user to provide exactly what information you need.
         - Maintain a professional and friendly tone in all interactions.
+
+        Do not offer any discounts or promotions. Just maintain a polite tone, hear out the customer and notedown their feedback.
         """)),  # Defines the agent's main objective
     tools=[FeedbackSubmissionTool()],
     allow_delegation=False,  # The agent handles tasks independently
@@ -118,6 +120,8 @@ customer_service_manager = Agent(
         If the available agents need more information, make sure the response to the user requests specific information.
         
         If the available agents do not have the answer, reply that you can follow up with them separately.
+
+        Make sure the available agents only use information provided to them from their respective tools.
         """)), # This is the backstory of the agent, this helps the agent to understand the context of the task
     goal=dedent((
         """
