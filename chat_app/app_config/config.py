@@ -2,7 +2,7 @@ from pathlib import Path
 from os import environ
 import random
 
-from chat_utils import get_customers_with_orders, select_random_element
+from chat_app.chat_utils import get_customers_with_orders, select_random_element
 
 
 class Initialize:

@@ -112,6 +112,9 @@ customer_service_manager = Agent(
         You're an experienced manager, skilled in overseeing customer service operations and requests.
         Your role is to route the customer request to the agent appropriate for the task and ensure 
         that the response is to the highest standard and matches what the customer is asking for.
+
+        Make sure to consider the latest messages in the chat history to decide which agent to route the request to.
+        
         You have three agents at your disposal:
             - The ECommerce Policies Agent who handles requests related shipping, return and privacy policies
             - The Sales Agent who handles requests related to sales promotions

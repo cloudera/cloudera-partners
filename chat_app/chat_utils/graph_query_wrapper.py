@@ -1,5 +1,5 @@
 import logging
-from chat_utils import (
+from chat_app.chat_utils import (
     GET_PROMOTIONS_FOR_ALL_TIERS,
     GET_CUSTOMERS_WITH_TIER,
     GET_CUSTOMERS_AND_ORDERS,
@@ -7,6 +7,7 @@ from chat_utils import (
     SET_ORDER_FEEDBACK,
     select_random_element
     )
+# from chat_utils.util_functions import 
 import os
 
 from neo4j import GraphDatabase
