@@ -108,7 +108,7 @@ def respond(request_id, message_text, chat_history):
 
 css = """
 footer{display:none !important}
-#examples_table {zoom: 70% !important;}
+#examples_table {zoom: 70% !important; }
 #chatbot { flex-grow: 1 !important; overflow: auto !important;}
 #col { height: 75vh !important; }
 .info_md .container {
@@ -176,7 +176,7 @@ with gr.Blocks(css=css, theme=theme, title="ECSS") as demo:
                                           [1, {"text":"How fast can you ship purchases?"}],
                                           [2, {"text":"Who can I contact if I want to delete my private data?"}],
                                           [3, {"text":"Am I eligible for any promos currently?"}],
-                                          [4, {"text":"I would like to provide some feedback. My order was not delivered."}],
+                                          [4, {"text":f"Hi I have some feedback. I didn't receive my order {configuration.order_id}"}],
                                       ],
                                       inputs=[example_num, input], elem_id="examples_table", label="")
             with gr.Accordion("User Data", open = True):

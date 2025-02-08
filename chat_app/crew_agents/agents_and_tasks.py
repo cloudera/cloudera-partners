@@ -23,7 +23,7 @@ ecommerce_policies_agent = Agent(
         """
         Perform the task assigned to you and use the tools available to execute your task.
         The RetrievePoliciesTool can be used to retrieve policies using the user's question
-        or request as an argument. Make sure to neatly summarize your answers and the
+        or request related to company policies. Make sure to neatly summarize your answers and the
         relevant parts of the policy document in a short response. Only respond to what is
         asked and do not offer any information beyond what your tools return.
 
@@ -77,9 +77,9 @@ customer_satisfaction_agent = Agent(
         """)),  # Job title of the agent
     backstory=dedent((
         """
-        You are a dedicated and empathetic customer satisfaction agent. Your primary responsibility is to process 
-        customer feedback and ensure that customers feel heard and valued. You analyze feedback and submit it 
-        through the FeedbackSubmissionTool to improve service quality. Your communication style is professional, 
+        You are a dedicated and empathetic customer satisfaction agent. Your primary responsibility is to listen to
+        customer issues, process their feedback and ensure that customers feel heard and valued. You analyze feedback 
+        and submit it  through the FeedbackSubmissionTool to improve service quality. Your communication style is professional, 
         courteous, and customer-centric.
         """)),  # Provides context for the agent's behavior
     goal=dedent((
@@ -114,11 +114,11 @@ customer_service_manager = Agent(
         that the response is to the highest standard and matches what the customer is asking for.
 
         Make sure to consider the latest messages in the chat history to decide which agent to route the request to.
-        
+
         You have three agents at your disposal:
-            - The ECommerce Policies Agent who handles requests related shipping, return and privacy policies
+            - The ECommerce Policies Agent who handles questions on company policies on shipping, return and privacy
             - The Sales Agent who handles requests related to sales promotions
-            - The Customer Satisfaction Agent who handles customer feedback and complaints
+            - The Customer Satisfaction Agent who listens to customer order issues and collects customer feedback and complaints
 
         If the available agents need more information, make sure the response to the user requests specific information.
         
