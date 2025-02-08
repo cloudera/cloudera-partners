@@ -2,7 +2,7 @@ from typing import Type, List, Tuple
 from crewai_tools import BaseTool
 from pydantic import BaseModel, Field
 
-from chat_app.chat_utils import getTierForCustomer, getPromotionsForCustomerId
+from chat_app.chat_utils import get_promos_for_customer
 
 
 class TargetedPromosToolInput(BaseModel):
@@ -22,8 +22,6 @@ class TargetedPromosTool(BaseTool):
     
     def _run(self, customer_id: str) -> Tuple[str, str]:
 
-        # tier_promo = getPromotionsForCustomerId(customer_id)
-
-        tier_promo = ("Member", "")
+        tier_promo = get_promos_for_customer(customer_id)
 
         return tier_promo

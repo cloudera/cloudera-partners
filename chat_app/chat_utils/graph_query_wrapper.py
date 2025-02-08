@@ -1,14 +1,12 @@
 import logging
-from chat_utils.neptune_query_strings import (
-    GET_DEMO_CUSTOMER_IDS,
-    GET_TIER,
-    GET_TIERS_FOR_ALL_SAMPLE,
+from chat_utils import (
     GET_PROMOTIONS_FOR_ALL_TIERS,
     GET_CUSTOMERS_WITH_TIER,
     GET_CUSTOMERS_AND_ORDERS,
-    GET_TIER_FOR_CUSTOMER
+    GET_TIER_FOR_CUSTOMER,
+    SET_ORDER_FEEDBACK,
+    select_random_element
     )
-from chat_utils.util_functions import select_random_element
 import os
 
 from neo4j import GraphDatabase
@@ -34,7 +32,7 @@ def run_graph_query(query: str, **kwargs) -> List[Any]:
         drs.close()
         return records
     
-def getCustomersWithTiers()->Any:
+def get_customers_with_tiers()->Any:
     print("Getting customers and tiers")
     result = []
     try:
@@ -43,11 +41,11 @@ def getCustomersWithTiers()->Any:
             result.append((rec["customer_id"], rec["tier"]))
             
     except Exception as e:
-        raise Exception(f"A Neo4j error occurred in getCustomersWithTiers: {e}")
+        raise Exception(f"A Neo4j error occurred in get_customers_with_tiers: {e}")
     
     return result
 
-def getCustomersWithOrders()->Any:
+def get_customers_with_orders()->Any:
     print("Getting customers and orders")
     result = []
     try:
@@ -57,11 +55,11 @@ def getCustomersWithOrders()->Any:
             result.append((rec["customer_id"], rec["orders"][0]))
             
     except Exception as e:
-        raise Exception(f"A Neo4j error occurred in getCustomersWithOrders: {e}")
+        raise Exception(f"A Neo4j error occurred in get_customers_with_orders: {e}")
     
     return result
 
-def getTierForCustomer(customer_id: str)->str:
+def get_tier_for_customer(customer_id: str)->str:
     tier = ""
     try:
         res = run_graph_query(GET_TIER_FOR_CUSTOMER, customer_id=customer_id)
@@ -70,11 +68,11 @@ def getTierForCustomer(customer_id: str)->str:
             break
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in getTierForCustomerId: {e}")
+        raise Exception(f"A Neptune error occurred in get_tier_for_customer: {e}")
 
     return tier
 
-def getPromotionsForAllTiers()->Dict[str, str]:
+def get_tier_promos()->Dict[str, str]:
     promotions = {}
     try:
         res = run_graph_query(GET_PROMOTIONS_FOR_ALL_TIERS)
@@ -86,15 +84,15 @@ def getPromotionsForAllTiers()->Dict[str, str]:
                 break
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in getPromotionsForAllTiers: {e}")
+        raise Exception(f"A Neptune error occurred in get_tier_promos: {e}")
 
     return promotions
 
-def getPromotionsForCustomerId(customer_id: str)->Tuple[str, str]:
+def get_promos_for_customer(customer_id: str)->Tuple[str, str]:
     print("Getting promos now")
     try:
-        tier = getTierForCustomer(customer_id)
-        all_promotions: {} = getPromotionsForAllTiers()
+        tier = get_tier_for_customer(customer_id)
+        all_promotions: {} = get_tier_promos()
         print("All Promos:" + str(all_promotions))
         print("Customer Tier:" + tier)
         promotions = all_promotions[tier.lower()]
@@ -102,32 +100,37 @@ def getPromotionsForCustomerId(customer_id: str)->Tuple[str, str]:
         return (tier, promotions)
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in getPromotionsForCustomerId: {e}")
+        raise Exception(f"A Neptune error occurred in get_promos_for_customer: {e}")
+    
+
+def submit_feedback_for_order(customer_id: str, order_id: str, feedback: str)->bool:
+
+    try:
+        res = run_graph_query(SET_ORDER_FEEDBACK, customer_id=customer_id, order_id=order_id, feedback=feedback)
+        if res:
+            return True
+
+    except Exception as e:
+        raise Exception(f"A Neptune error occurred in submit_feedback_for_order: {e}")
+
+    return False
 
 
 if __name__ == "__main__":
 # Execute all APIs to test
 
-    cus_and_orders = getCustomersWithOrders()
+    cus_and_orders = get_customers_with_orders()
 
-    selected_customer = select_random_element(cus_and_orders)[0]
+    selected_cust_order = select_random_element(cus_and_orders)
 
-    customer_tier_promo = getPromotionsForCustomerId(selected_customer)
-    logger.info(customer_tier_promo)
+    selected_customer = selected_cust_order[0]
+    selected_order = selected_cust_order[1]
+    logger.info("Selected Customer: " + selected_customer)
+    logger.info("Selected Order: " + selected_order)
 
+    # customer_tier_promo = get_promos_for_customer(selected_customer)
 
-    # customer_ids = getSampleCustomerIds()
-    # logger.info(customer_ids)
+    # feedback_submitted = submit_feedback_for_order(selected_customer, selected_order, "Test Feedback")
+    # logger.info("Feedback Submitted: " + str(feedback_submitted))
 
-    # tier = getTierForCustomerId(random.choice(customer_ids))
-    # logger.info(tier)
-
-    # tiers = getTiersForAllSampleCustomers()
-    # logger.info(tiers)
-
-    # promotions = getPromotionsForAllTiers()
-    # logger.info(promotions)
-
-    # promotions = getPromotionsForCustomerId(random.choice(customer_ids))
-    # logger.info(promotions)
 

@@ -146,6 +146,10 @@ Looks up the latest policy and answers questions you may have.
                                
 AI Sales Agent that will look up sales promotions targeted towards the specific customer.
 
+##### 😌 Customer Satisfaction Agent
+                               
+AI Customer Advocate that will collect customer feedback for a specific order.
+
 </div>
 """
 
@@ -172,6 +176,7 @@ with gr.Blocks(css=css, theme=theme, title="ECSS") as demo:
                                           [1, {"text":"How fast can you ship purchases?"}],
                                           [2, {"text":"Who can I contact if I want to delete my private data?"}],
                                           [3, {"text":"Am I eligible for any promos currently?"}],
+                                          [4, {"text":"I would like to provide some feedback. My order was not delivered."}],
                                       ],
                                       inputs=[example_num, input], elem_id="examples_table", label="")
             with gr.Accordion("User Data", open = True):

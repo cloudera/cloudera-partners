@@ -4,7 +4,7 @@ import os
 import litellm
 litellm.set_verbose=False
 
-from chat_app.tools import TargetedPromosTool, RetrievePoliciesTool, CustomerFeedbackTool
+from chat_app import TargetedPromosTool, RetrievePoliciesTool, FeedbackSubmissionTool
 
 
 llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
@@ -79,19 +79,20 @@ customer_satisfaction_agent = Agent(
         """
         You are a dedicated and empathetic customer satisfaction agent. Your primary responsibility is to process 
         customer feedback and ensure that customers feel heard and valued. You analyze feedback and submit it 
-        through the CustomerFeedbackTool to improve service quality. Your communication style is professional, 
+        through the FeedbackSubmissionTool to improve service quality. Your communication style is professional, 
         courteous, and customer-centric.
         """)),  # Provides context for the agent's behavior
     goal=dedent((
         """
         Your goal is to ensure customer feedback is acknowledged and processed effectively. 
-        - Use the CustomerFeedbackTool to submit customer feedback.
+        - Make sure to collect as much detail as possible from the customer, along with an order ID
+        - Use the FeedbackSubmissionTool to submit customer feedback.
         - If feedback submission is successful, acknowledge and thank the customer for their input.
         - If submission fails, provide an appropriate response and assure them of follow-up.
         - If you need additional information, make sure to ask the user to provide exactly what information you need.
         - Maintain a professional and friendly tone in all interactions.
         """)),  # Defines the agent's main objective
-    tools=[CustomerFeedbackTool()],
+    tools=[FeedbackSubmissionTool()],
     allow_delegation=False,  # The agent handles tasks independently
     max_iter=2,  # Limits the number of iterations for task execution
     max_retry_limit=3,  # Sets the number of retries for handling errors

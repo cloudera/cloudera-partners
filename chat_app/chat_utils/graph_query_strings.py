@@ -69,3 +69,9 @@ CASE
     ELSE "Member"
 END AS tier
 """
+
+SET_ORDER_FEEDBACK="""
+MATCH (c:Customer {customer_id: $customer_id})-[r:placed]->(o:Order {order_id: $order_id})
+SET r.feedback = $feedback
+RETURN r
+"""
