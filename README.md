@@ -8,7 +8,7 @@ Because the applications of LLMs can be quite broad across industries, we will h
  
 ## Lab Flow
 
-In this lab, you will interact with the knowledge base that has been loaded into a Pinecone vector database. You will explore how customer and product relationships are stored in a Knowledge Graph to create a rich agentic workflow application to service an E-Commerce Chat application
+In this lab, you will interact with the knowledge base that has been loaded into a Pinecone vector database. You will explore how customer and product relationships are stored in a Graph Database to create a rich agentic workflow application to service an E-Commerce Chat application
 
 There are currently 4 exercises in the lab. It is important to follow the exercise order, as there are dependencies between different stages. 
   - [0. Getting into Cloudera AI](#0-getting-into-cloudera-ai)
@@ -24,12 +24,12 @@ After login, you will be taken to the home screen of Cloudera Data Platform. Som
 > **0a.** Click on the "Cloudera AI" icon.
 ![Control Plane to CML](./assets/new-home-page.png)
 
-> **0b.** Then click on ML Workspace called _reinv24-workspace_.
+> **0b.** Then click on ML Workspace called _sko-ai-agent-cml-ws_.
 ![CML Home Page](./assets/ML_Workspaces_Home.png)
 
 If you are new to Cloudera AI, take a moment to explore the dashboard.
 
-Cloudera uses the concept of _projects_ to organize the workspace. Each project is typically linked to a remote repository (e.g. git) and can have multiple collaborators working on it. In the interest of time, a _Hands on Lab with RAG Agents_ project has already been created for you and you are the sole _Owner_ of that project. 
+Cloudera uses the concept of _projects_ to organize the workspace. Each project is typically linked to a remote repository (e.g. git) and can have multiple collaborators working on it. In the interest of time, a _Hands on Lab with RAG Agents_ project has already been created for you and you are the sole _Owner_ of that project.
 
 > **0c.** When ready click into the project:
 ![Workspace Home](./assets/Workspace_Home.png)
@@ -96,7 +96,7 @@ Unlike LLM-based chatbots or inference endpoints that you may be familiar with, 
 >**3b.**  Once Jupyter UI comes up, open file ```3_crewai_intro/intro_to_crewai.ipynb``` by double clicking it.
 ![Interact with Pinecone](./assets/crewai-intro.png)
 
->**3c.** Work through the notebook by running each cell. When you are finished come back to this guide.
+>**3c.** Work through the notebook by running each cell. Notice here that the base LLM is hosted by the AI Inference Service. When you are finished come back to this guide.
 
 :pencil2: You have all of the starting building blocks for building a full RAG-based, ECommerce Chat application.
 
@@ -108,7 +108,7 @@ So far we have interacted with our models and vector database through a Jupyter 
 The exercise will walk you through the steps to deploy the application using the UI. We'll also explore how to do this programatically through the Cloudera AI APIv2. Below, you can see how we have multiple AI Agents working together within Cloudera AI and how they interact with external AWS and non-AWS services.
 
 **Agentic Workflow Architecture**
-![Alt text](./assets/agentic-workflow.png)
+![Alt text](./assets/agentic-workflow1.png)
 
 >**4a.** Go back to your project screen, by clicking ![<-- Project](./assets/project-btn.png) in the top bar of your session. 
 
@@ -138,25 +138,26 @@ The exercise will walk you through the steps to deploy the application using the
 ### Interacting with an Application
 The application will take a couple of miuntes to start, once it does you can click on its card to open the UI. While it's starting you can review the code in the ```chat_app``` directory.
 
-You will notice that we have folders for ```crew_agents``` and ```tools```, where we define the agents and tools for the application. The ```chat_utils``` folder is used to host utility functions that make it easier to interact with Pinecone and AWS Neptune. We store the application's global state using the ```app_config``` folder. You will notice the reliance on some environment variables. These have been setup at the ML Workspace level and can be shared accross all projects. Alternatively, environment variables can be specific to a Project or even a session, job, or application.
+You will notice that we have folders for ```crew_agents``` and ```tools```, where we define the agents and tools for the application. The ```chat_utils``` folder is used to host utility functions that make it easier to interact with Pinecone and Neo4j. We store the application's global state using the ```app_config``` folder. You will notice the reliance on some environment variables. These have been setup at the ML Workspace level and can be shared accross all projects. Alternatively, environment variables can be specific to a Project or even a session, job, or application.
 
 >**4j.** Check to confirm your app has deployed successfuly. You should see a message confirming this. 
 ![Alt-text](./assets/image-click-on-app.png)
 
 >**4k.** Click on the App's URL to navigate to the Gradio UI. In a new tab you should see the appliction open:
-![alt text](.assets/../assets/image_app3.png)
+![alt text](.assets/../assets/chat-app-1.png)
 
 Take some time to ask different questions about CML. Some examples to get you started... 
 - How fast can you ship purchases?
 - Who can I contact if I want to delete my private data?
 - Am I eligible for any promos currently?
+- Hi I didn't receive my order
 
-Note that the privacy question's response is based on the policy document loaded into the Pinecone Vector DB. The promos question is served using AWS Neptune Knowledge Graph. Both are RAG-based techniques. Detailed esplaination of how the promos feature has been prepared in in the section below. 
+Note that the privacy question's response is based on the policy document loaded into the Pinecone Vector DB. The promos question is served using Neo4j Graph DB. Both are RAG-based techniques. Detailed esplaination of how the promos feature has been prepared in in the section below. 
 
 :pencil2: One of the key capabilities of Cloudera AI is the hosting Applications integrated as part of the Data Science workflow. Practitioners can iterate rapidly and securely share insights, features, and prototypes to interested stakeholders. 
 
 
-### Implementing a Rewards System with AWS Neptune KG
+### Implementing a Rewards System with Neo4j GraphDB
 
 ### 1. Creating Rewards Tiers:
    To enhance our customer loyalty program, we start by defining different rewards tiers based on specific benefits. This helps us categorize customers and provide tailored incentives.
@@ -186,7 +187,7 @@ These metrics are stored in a node called **lifetime_rewards_variable**, providi
 
 This sample allows us to visualize the distribution of customers across different tiers and evaluate the effectiveness of our rewards system.
 
-Through these steps, we establish a comprehensive rewards program that not only incentivizes customer loyalty but also provides a clear framework for tier-based benefits. By leveraging AWS Neptune's graph database capabilities, we gain valuable insights into customer behavior and ensure targeted, effective rewards distribution.
+Through these steps, we establish a comprehensive rewards program that not only incentivizes customer loyalty but also provides a clear framework for tier-based benefits. By leveraging Neo4j's graph database capabilities, we gain valuable insights into customer behavior and ensure targeted, effective rewards distribution.
 
 
 You've learned a lot in the last few hours, but this is just the beginning. [Cloudera AI ](https://www.cloudera.com/products/machine-learning.html) has a lot more to offer for your enterprise as part of an overall [Cloudera](https://www.cloudera.com/) on-prem and in the cloud. 
@@ -218,8 +219,8 @@ To build the application responses to User requests, we use CrewAI, a framework 
 
 **Promotional Agent RTO**
 - Takes customer reference(ID)
-- Queries the graph DB(AWS Neptune) to get the rewards  tier and the associated promotions. _As part of implementation the GraphDB engine calculates standard deviations from the average purchase amount and puts the customer into tiers: Diamond, Gold and Basic._
+- Queries the graph DB(Neo4j) to get the rewards  tier and the associated promotions. _As part of implementation the GraphDB engine calculates standard deviations from the average purchase amount and puts the customer into tiers: Diamond, Gold and Basic._
 
-**Survey Agent (NOT IMPLEMENTED)**
-- Triggers an email to ask the customer for a quick survey
-- This can leverage an agent to personalize a response, or it can be 
+**Order Issues Agent**
+- Collects feedback from the customer about any Order Issues
+- Submits the feedback to a Neo4j Graph DB
