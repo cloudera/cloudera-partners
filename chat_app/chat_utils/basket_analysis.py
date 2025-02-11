@@ -4,7 +4,7 @@
 ##################################################################################
 
 import logging
-import neptune_query_strings as q_strings
+import chat_app.chat_utils.graph_query_strings as q_strings
 import os
 import pandas as pd
 import warnings
