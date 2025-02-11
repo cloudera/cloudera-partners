@@ -7,7 +7,7 @@ from chat_app.chat_utils import (
     SET_ORDER_FEEDBACK,
     select_random_element
     )
-# from chat_utils.util_functions import 
+
 import os
 
 from neo4j import GraphDatabase
@@ -47,7 +47,6 @@ def get_customers_with_tiers()->Any:
     return result
 
 def get_customers_with_orders()->Any:
-    print("Getting customers and orders")
     result = []
     try:
         res = run_graph_query(GET_CUSTOMERS_AND_ORDERS)
@@ -69,7 +68,7 @@ def get_tier_for_customer(customer_id: str)->str:
             break
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in get_tier_for_customer: {e}")
+        raise Exception(f"A Neo4j error occurred in get_tier_for_customer: {e}")
 
     return tier
 
@@ -85,7 +84,7 @@ def get_tier_promos()->Dict[str, str]:
                 break
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in get_tier_promos: {e}")
+        raise Exception(f"A Neo4j error occurred in get_tier_promos: {e}")
 
     return promotions
 
@@ -101,7 +100,7 @@ def get_promos_for_customer(customer_id: str)->Tuple[str, str]:
         return (tier, promotions)
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in get_promos_for_customer: {e}")
+        raise Exception(f"A Neo4j error occurred in get_promos_for_customer: {e}")
     
 
 def submit_feedback_for_order(customer_id: str, order_id: str, feedback: str)->bool:
@@ -112,7 +111,7 @@ def submit_feedback_for_order(customer_id: str, order_id: str, feedback: str)->b
             return True
 
     except Exception as e:
-        raise Exception(f"A Neptune error occurred in submit_feedback_for_order: {e}")
+        raise Exception(f"A Neo4j error occurred in submit_feedback_for_order: {e}")
 
     return False
 

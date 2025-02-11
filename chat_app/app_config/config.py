@@ -32,9 +32,6 @@ class Initialize:
         self.user_id = selected_customer[0]
         self.order_id = selected_customer[1]
 
-        print("User ID: " + self.user_id)
-        print("Order ID: " + self.order_id)
-
 
 global configuration
 configuration = Initialize()

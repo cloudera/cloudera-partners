@@ -7,15 +7,16 @@ import litellm
 import uuid
 litellm.set_verbose=False
 
-from chat_app.crew_agents import ecommerce_policies_agent, sales_agent, customer_service_manager, agent_task, customer_satisfaction_agent
+from chat_app.crew_agents import ecommerce_policies_agent, sales_agent, customer_service_manager, agent_task, order_issues_agent
 from chat_app.app_config import configuration
 
 llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
-print("Importing available tools")
 
 # Task Definitions
 import datetime
-print("Defining Primary Task")
+
+# Disable sending metrics to CrewAI
+os.environ["OTEL_SDK_DISABLED"] = "true"
 
 
 def format_chat_messages(chat_list):
@@ -42,7 +43,7 @@ def crew_launch(req_id, req_input, chat_history):
     # Instantiate your crew with a sequential process
     print("Instantiating Crew")
     crew = Crew(
-        agents=[ecommerce_policies_agent, sales_agent, customer_satisfaction_agent],
+        agents=[ecommerce_policies_agent, sales_agent, order_issues_agent],
         tasks=[agent_task],
         verbose=True,  # You can set it to True or False
         manager_agent=customer_service_manager,
@@ -55,7 +56,7 @@ def crew_launch(req_id, req_input, chat_history):
         "req_id": req_id,
         "req_input": req_input,
         "req_customer_id": configuration.user_id,
-        "chat_history": formated_messages
+        "req_chat_history": formated_messages
     }
     print("Kicking off crew")
     result = crew.kickoff(inputs=inputs)
@@ -129,6 +130,9 @@ footer{display:none !important}
 
 header_text = """
 # ECommerce Customer Service Squad (ECSS)
+"""
+
+header2_text = """
 Meet your **ECommerce Customer Service Squad (ECSS)**, an Agentic Workflow Orchestrator which deciphers and sends User requests to topic specific AI Agents and Tools.
 """
 
@@ -140,13 +144,11 @@ info_text = """
                                
 Agent who is an expert in ECSS' Shipping, Returns and Privacy Policies. 
 
-Looks up the latest policy and answers questions you may have.
-
 ##### 🛍️ Sales Promotions Agent
                                
 AI Sales Agent that will look up sales promotions targeted towards the specific customer.
 
-##### 😌 Customer Satisfaction Agent
+##### 😌 Order Issues Agent
                                
 AI Customer Advocate that will collect customer feedback for a specific order.
 
@@ -165,21 +167,23 @@ with gr.Blocks(css=css, theme=theme, title="ECSS") as demo:
     request_id = gr.State("")
     request_text = gr.State("")
     with gr.Row():
-        gr.Markdown(header_text)
+        gr.Markdown(header_text, elem_id="header-text-box")
         gr.Markdown(f"### **User ID:** {configuration.user_id}", elem_id="user-id-box")
+    with gr.Row():
+        gr.Markdown(header2_text)
     with gr.Row():
         with gr.Column(scale=6):
             info = gr.Markdown(info_text, elem_classes=["info_md"])
             example_num = gr.Textbox(visible = False)
-            with gr.Accordion("Example User Inputs", open = True):
+            with gr.Accordion("Example User Inputs", open = False):
               examples_2 = gr.Examples([
                                           [1, {"text":"How fast can you ship purchases?"}],
                                           [2, {"text":"Who can I contact if I want to delete my private data?"}],
                                           [3, {"text":"Am I eligible for any promos currently?"}],
-                                          [4, {"text":f"Hi I have some feedback. I didn't receive my order {configuration.order_id}"}],
+                                          [4, {"text":f"Hi I didn't receive my order"}],
                                       ],
                                       inputs=[example_num, input], elem_id="examples_table", label="")
-            with gr.Accordion("User Data", open = True):
+            with gr.Accordion("User Data", open = False):
                 gr.Markdown(f"### **Orders:**\n1. {configuration.order_id}", elem_id="order-id-box")
         with gr.Column(scale=15, elem_id="col"):
             chatbot = gr.Chatbot(

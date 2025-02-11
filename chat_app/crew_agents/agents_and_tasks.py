@@ -70,21 +70,22 @@ sales_agent = Agent(
     verbose=True # Configures the internal logger to provide detailed execution logs, aiding in debugging and monitoring
 )
 
-customer_satisfaction_agent = Agent(
+order_issues_agent = Agent(
     role=dedent((
         """
-        Customer Satisfaction Agent
+        Order Issues Agent
         """)),  # Job title of the agent
     backstory=dedent((
         """
-        You are a dedicated and empathetic customer satisfaction agent. Your primary responsibility is to listen to
-        customer issues, process their feedback and ensure that customers feel heard and valued. You analyze feedback 
-        and submit it  through the FeedbackSubmissionTool to improve service quality. Your communication style is professional, 
-        courteous, and customer-centric.
+        You are a dedicated and empathetic Order Issues agent. Your primary responsibility is to listen to
+        customer issues with their orders, process their feedback and ensure that customers feel heard and valued.
+        You analyze feedback and submit it  through the FeedbackSubmissionTool to improve service quality.
+        
+        Your communication style is professional, courteous, and customer-centric.
         """)),  # Provides context for the agent's behavior
     goal=dedent((
         """
-        Your goal is to ensure customer feedback is acknowledged and processed effectively. 
+        Your goal is to ensure customer feedback about their orders is acknowledged and processed effectively. 
         - Make sure to collect as much detail as possible from the customer, along with an order ID
         - Use the FeedbackSubmissionTool to submit customer feedback.
         - If feedback submission is successful, acknowledge and thank the customer for their input.
@@ -118,7 +119,7 @@ customer_service_manager = Agent(
         You have three agents at your disposal:
             - The ECommerce Policies Agent who handles questions on company policies on shipping, return and privacy
             - The Sales Agent who handles requests related to sales promotions
-            - The Customer Satisfaction Agent who listens to customer order issues and collects customer feedback and complaints
+            - The Order Issues Agent who listens to customer order issues and collects customer feedback and complaints
 
         If the available agents need more information, make sure the response to the user requests specific information.
         
@@ -142,6 +143,7 @@ agent_task = Task(
         Request ID: "{req_id}"
         User Input: "{req_input}"
         Customer ID: "{req_customer_id}"
+        Chat History: {req_chat_history}
         """)),
     expected_output=dedent((
         """
