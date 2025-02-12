@@ -1,7 +1,7 @@
 name: PSE Labs
 
 entries:
-  - title: AI Agents with Partners
+  - title: Hands on Lab with RAG Agents
     label: ai-agents-hol-partners
     short_description: |
       This AMP is used for the Cloudera AI Hands on Labs at Cloudera Elevate 26, and focuses on Cloudera AI's ability to integrate
