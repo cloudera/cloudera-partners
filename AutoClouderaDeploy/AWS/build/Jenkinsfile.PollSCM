@@ -109,7 +109,7 @@ pipeline {
                             </div>
                             """,
                             mimeType: 'text/html',
-                            from: 'jenkins@example.com'
+                            from: 'psejenkins@cloudera.com'
                         )
                         error('Deployment failed, aborting pipeline.')
                     }
@@ -189,7 +189,7 @@ pipeline {
                             </div>
                             """,
                             mimeType: 'text/html',
-                            from: 'jenkins@example.com'
+                            from: 'psejenkins@cloudera.com'
                         )
                     }
                 }
@@ -220,7 +220,7 @@ pipeline {
                 </div>
                 """,
                 mimeType: 'text/html',
-                from: 'jenkins@example.com'
+                from: 'psejenkins@cloudera.com'
             )
         }
         failure {

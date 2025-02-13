@@ -119,28 +119,50 @@ pipeline {
             sh 'echo "SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
             emailext (
                 to: "${env.RECIPIENTS}",
-                subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """Good news! The build was successful.
-
-Job: ${env.JOB_NAME}
-Build: ${env.BUILD_NUMBER}
-URL: ${env.BUILD_URL}
-
-""",
+                subject: "✅ Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #d4edda; background-color: #d4edda; color: #155724;">
+                    <h2 style="color: #155724;">✅ Build Completed Successfully!</h2>
+                    <p>The build has succeeded.</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <tr>
+                            <th style="background-color: #c3e6cb; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job Name</th>
+                            <th style="background-color: #c3e6cb; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job URL</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #e0e0e0;">${env.JOB_NAME}</td>
+                            <td style="padding: 10px; border: 1px solid #e0e0e0;"><a href="${env.BUILD_URL}" style="text-decoration: none; color: #337ab7;">${env.BUILD_URL}</a></td>
+                        </tr>
+                    </table>
+                </div>
+                """,
+                mimeType: 'text/html',
+                from: 'psejenkins@cloudera.com'
             )
         }
         failure {
             sh 'echo "FAILURE: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
             emailext (
                 to: "${env.RECIPIENTS}",
-                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """Sorry, the build failed.
-
-Job: ${env.JOB_NAME}
-Build: ${env.BUILD_NUMBER}
-URL: ${env.BUILD_URL}
-
-""",
+                subject: "❌ Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #f8d7da; background-color: #f8d7da; color: #721c24;">
+                    <h2 style="color: #721c24;">❌ Build Failed</h2>
+                    <p>Unfortunately, the build has failed.</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <tr>
+                            <th style="background-color: #f5c6cb; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job Name</th>
+                            <th style="background-color: #f5c6cb; padding: 10px; border: 1px solid #e0e0e0; text-align: left;">Job URL</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #e0e0e0;">${env.JOB_NAME}</td>
+                            <td style="padding: 10px; border: 1px solid #e0e0e0;"><a href="${env.BUILD_URL}" style="text-decoration: none; color: #337ab7;">${env.BUILD_URL}</a></td>
+                        </tr>
+                    </table>
+                </div>
+                """,
+                mimeType: 'text/html',
+                from: 'psejenkins@cloudera.com'
             )
         }
         cleanup {
