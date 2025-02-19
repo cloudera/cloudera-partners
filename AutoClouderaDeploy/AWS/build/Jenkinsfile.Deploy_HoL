@@ -237,8 +237,8 @@ HOSTEDZONEID:${params.HOSTEDZONEID}
                 echo 'Assigning Resorce roles'
                 script{
                     sh '''
-                    CDP_WORKLOAD_USERNAME=${BUILD_USER_ID.replace('_', '.')}
-                    echo "CDP_WORKLOAD_USERNAME: $CDP_WORKLOAD_USERNAME"
+                    CDP_WORKLOAD_USERNAME="${BUILD_USER_ID//_/.}"
+		    echo "CDP_WORKLOAD_USERNAME: $CDP_WORKLOAD_USERNAME"
                     # Set your environment name
                     CDP_ENV_NAME="$(echo "$WORKSHOP_NAME" | tr '[:upper:]' '[:lower:]')-cdp-env"
                     echo "CDP_ENV_NAME: $CDP_ENV_NAME"
