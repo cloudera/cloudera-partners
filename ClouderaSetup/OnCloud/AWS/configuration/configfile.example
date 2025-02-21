@@ -9,7 +9,8 @@ WORKSHOP_USER_PREFIX:pse-cdpdemo-user
 WORKSHOP_USER_DEFAULT_PASSWORD:changeme
 LOCAL_MACHINE_IP:172.16.31.xx/32
 ENABLE_DATA_SERVICES:[CML,CDW,CDE]
-
+DOMAIN:clouderapartners.com
+HOSTEDZONEID:ZCLOUDERAPSEAPACTEAM1
 #==================Optional Parameters===============#
 
 #AWS_KEY_PAIR:demo-keypair

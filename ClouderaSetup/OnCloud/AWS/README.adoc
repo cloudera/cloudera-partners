@@ -334,6 +334,14 @@ Only from the provided values
 |Default password for participants
 |No quotes
 
+|DOMAIN
+|Root Public Domain Name on Route53 for hosting Workshop keycloak
+|No quotes, only lowercase
+
+|HOSTEDZONEID
+|HostedZoneId of Root Public Domain Name on Route53 for hosting Workshop keycloak
+|No quotes, preffered uppercase
+
 |LOCAL_MACHINE_IP
 |Public IPV4 address of local machine
 |No quotes and don't remove /32
@@ -755,9 +763,13 @@ rm -rf /userconfig/<workshop_name>.txt
 
 Keycloak URL: **http://<KeyCloak_Server_IP>/realms/master/protocol/saml/clients/cdp-sso**
 
+Secured HTTPS URL: **https://<WorkshopName.Domain>/realms/master/protocol/saml/clients/cdp-sso**
+
 **The Link for SSO to `KeyCloak` Server WebUI for Workshop Owners (Admin User):**
 
 Keycloak URL: **http://<KeyCloak_Server_IP>/ **
+
+Secured HTTPS URL: **https://<WorkshopName.Domain>/**
 
 The same details can be found in `<workshop_name>.txt` file present under `userconfig` directory on your local machine from where you executed the provisioner.
 
@@ -772,6 +784,7 @@ image::build/images/keycloak_login.png[keycloak_login,600,400]
 Admin URL: **http://<KeyCloak_Server_IP>:5000/admin**
 
 Participant URL: **http://<KeyCloak_Server_IP>:5000/participant**
+
 
 ====
 

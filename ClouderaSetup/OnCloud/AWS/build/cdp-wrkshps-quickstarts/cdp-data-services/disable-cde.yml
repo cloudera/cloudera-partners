@@ -28,7 +28,7 @@
       loop: "{{ vc_ids }}"
       register: delete_vc
       until: delete_vc.rc == 0
-      retries: 10
+      retries: 15
       delay: 30
       ignore_errors: true
 
@@ -51,7 +51,7 @@
         env: "{{ workshop_name }}-cdp-env"
       register: serstatus
       until: serstatus['services'] | length == 0 or serstatus['services'][0]['status'] in ["Deleting", "Error", "Failed"]
-      retries: 50
+      retries: 60
       delay: 30
 
     - name: Print status of CDE service

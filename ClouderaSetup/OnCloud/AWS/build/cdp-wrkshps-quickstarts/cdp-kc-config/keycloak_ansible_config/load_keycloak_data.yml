@@ -4,23 +4,22 @@
   connection: local
   gather_facts: no
   tasks:
-
     # Create realms
     - name: Create Keycloak realms
-      ansible.builtin.include_role: 
+      ansible.builtin.include_role:
         name: keycloak_data
         tasks_from: setup_realms
 
     # Create groups
     - name: Create Keycloak groups
-      ansible.builtin.include_role: 
+      ansible.builtin.include_role:
         name: keycloak_data
         tasks_from: setup_groups
 
     # Create users
     # NOTE: setup_user takes a single user, so we need to loop over keycloak__users_to_create here
     - name: Create Keycloak users (in loop)
-      ansible.builtin.include_role: 
+      ansible.builtin.include_role:
         name: keycloak_data
         tasks_from: setup_user
       vars:

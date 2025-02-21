@@ -8,7 +8,8 @@ WORKSHOP_USER_PREFIX:<VALUE>
 WORKSHOP_USER_DEFAULT_PASSWORD:<VALUE>
 LOCAL_MACHINE_IP:<VALUE>/32
 ENABLE_DATA_SERVICES:[Comma Separated list of data services to be enabled. NONE if not required]
-
+DOMAIN:<VALUE>
+HOSTEDZONEID:<VALUE>
 #==================Optional Parameters===============#
 
 #AWS_KEY_PAIR:demo-keypair

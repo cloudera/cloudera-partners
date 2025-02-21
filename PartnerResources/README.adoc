@@ -115,6 +115,8 @@ https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79360[Take u
 
 . https://docs.cloudera.com/cdp-public-cloud/cloud/getting-started/topics/cdp-deploy_cdp_using_terraform.html[Deploy CDP using Terraform]
 
+. link:../ClouderaSetup/OnCloud/AWS/[Deploy CDP using **AutoClouderaDeploy** Automation]
+
 * *AZURE*
 
 . https://docs.cloudera.com/cdp-public-cloud/cloud/azure-quickstart/topics/mc-azure-quickstart.html#mc-azure-quickstart[Azure Quickstart (Deprecated)]
@@ -160,9 +162,12 @@ TBD !!! - Calendar
 |===
 | Name | Region
 | mailto:czorzin@cloudera.com[Carlos Zorzin] | APAC
-| mailto:gabriele.folchi@cloudera.com[Gabriele Folchi] | SEMEA
 | mailto:dipti.dash@cloudera.com[Dipti Dash] | META
+| mailto:gabriele.folchi@cloudera.com[Gabriele Folchi] | SEMEA
 | mailto:mmehra@cloudera.com[Manick Mehra] | APAC
 | mailto:venky@cloudera.com[Venky Sellappa] | EMEA / APAC
+| mailto:ksahu@cloudera.com[Kuldeep Sahu] | APAC
+| mailto:aktiwari@cloudera.com[Avanis Tiwari] | APAC
 | mailto:sbalachandar@cloudera.com[Shreshta Balachandar] | AMER
+| mailto:ygulati@cloudera.com[Yash Gulati] | APAC
 |===

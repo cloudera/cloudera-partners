@@ -4,11 +4,11 @@
   connection: local
   gather_facts: yes
   vars:
-    instance_type: 'm5.2xlarge'
+    instance_type: "m5.2xlarge"
     initial_instances: 10
     minimum_instances: 10
     maximum_instances: 40
-    spark_version: 'SPARK3'
+    spark_version: "SPARK3"
 
   tasks:
     - name: Check and print variable status
@@ -49,7 +49,7 @@
         name: "{{ workshop_name }}-cde"
       register: deservicestatus
       until: deservicestatus.services[0].status == "ClusterCreationCompleted"
-      retries: 35
+      retries: 40
       delay: 120
       #when: not cde_service_exists
 
@@ -84,4 +84,3 @@
       loop_control:
         pause: 30
       when: "workshop_name + '-cde-vc-' + item not in existing_vcs.stdout_lines"
-

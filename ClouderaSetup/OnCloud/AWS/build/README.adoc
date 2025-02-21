@@ -130,7 +130,7 @@ link:https://docs.docker.com/build/building/multi-platform/[**Link to Official D
 
 2.  Optional provisioning of `Keycloak` Server for providing external user access to the Lab Environment with the help of SSO.
 
-3.  When `Keycloak` Server is provisioned using this automation, the workshop owner can create the required number of workshop users with Keycloak (SSO) based access to the workshop environment (depending on the type of workshop e.g. CML, CDW, or CDE).
+3.  When `Keycloak` Server is provisioned using this automation, the workshop owner can create the required number of workshop users with Keycloak (SSO) based access to the workshop environment (depending on the type of workshop e.g. CML, CDW, or CDE). The Keycloak server will be HTTPS (TLS/SSL Secured) with LetsEncrypt CA.
 
 4.  Provisioned Keycloak users are added in the backend to IAM Groups in the CDP Tenant with the least required access roles.
 
