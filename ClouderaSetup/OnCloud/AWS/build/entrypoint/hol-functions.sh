@@ -8,6 +8,7 @@ KEYGEN_TF_CONFIG_DIR=$HOME_DIR/cdp-wrkshps-quickstarts/keypair_gen
 KC_TF_CONFIG_DIR=$HOME_DIR/cdp-wrkshps-quickstarts/cdp-kc-config/keycloak_terraform_config
 KC_ANS_CONFIG_DIR=$HOME_DIR/cdp-wrkshps-quickstarts/cdp-kc-config/keycloak_ansible_config
 DS_CONFIG_DIR=$HOME_DIR/cdp-wrkshps-quickstarts/cdp-data-services
+ENHANCEMENTS_TF_CONFIG_DIR=$HOME_DIR/cdp-wrkshps-quickstarts/aws_enhancements/
 USER_ACTION=$1
 validating_variables() {
    echo
@@ -652,6 +653,9 @@ provision_cdp() {
    # Check if the private subnet output already exists
    private_subnet=$(grep "aws_private_subnet_ids" "$file")
 
+   # Check if the bucket_name output already exists
+   bucket_name=$(grep "aws_log_storage_location" "$file")
+
    # Append the public subnet output if it does not exist
    if [ -z "$public_subnet" ]; then
       cat <<EOF >>"$file"
@@ -668,6 +672,15 @@ output "aws_private_subnet_ids" {
 }
 EOF
    fi
+   # Append the bucket_name output if it does not exist
+   if [ -z "$bucket_name" ]; then
+      cat <<EOF >>"$file"
+output "log_storage_bucket_name" {
+  description = "The S3 bucket name for log storage from the cdp_aws_prereqs module"
+  value       = module.cdp_aws_prereqs.aws_log_storage_location
+}
+EOF
+   fi
    terraform init
    terraform apply --auto-approve \
       -var "env_prefix=${workshop_name}" \
@@ -680,11 +693,35 @@ EOF
    if [ $cdp_provision_status -eq 0 ]; then
       export ENV_PUBLIC_SUBNETS=$(terraform output -json aws_public_subnet_ids)
       export ENV_PRIVATE_SUBNETS=$(terraform output -json aws_private_subnet_ids)
+      export BUCKET_NAME=$(terraform output -raw log_storage_bucket_name)
+
+      aws_enhancements #calling aws_enahancements function
+      aws_enhancements_status=$?
+      if [ $aws_enhancements_status -ne 0 ]; then
+         echo "Warning: AWS enhancements failed to apply. Please check the logs for details."
+      fi
+
       return 0
    else
       return 1
    fi
 
+}
+
+#Add enhancements
+aws_enhancements() {
+   echo -e "\n               ==============================Adding aws enhancements ========================================="
+   USER_NAMESPACE=$workshop_name
+   mkdir -p /userconfig/.$USER_NAMESPACE
+
+   if [ ! -d "/userconfig/.$USER_NAMESPACE/$ENHANCEMENTS_TF_CONFIG_DIR" ]; then
+      cp -R "$ENHANCEMENTS_TF_CONFIG_DIR" "/userconfig/.$USER_NAMESPACE/"
+   fi
+
+   cd /userconfig/.$USER_NAMESPACE/aws_enhancements/s3_enhancements
+     terraform init
+     terraform apply -auto-approve \
+         -var="log_bucket_name=$BUCKET_NAME"
 }
 #--------------------------------------------------------------------------------------------------#
 # Update the User Group.
