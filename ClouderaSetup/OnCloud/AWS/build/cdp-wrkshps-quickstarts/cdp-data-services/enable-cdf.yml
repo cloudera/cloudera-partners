@@ -1,0 +1,119 @@
+---
+- name: Enable CDP Dataflow service
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars:
+    cdp_env_name: "your-environment-crn"
+    service_name: "my-service"
+    min_k8s_node_count: 3
+    max_k8s_node_count: 10
+    use_public_load_balancer: true
+    kube_api_authorized_ip_ranges: ['192.168.0.1/24']
+    load_balancer_authorized_ip_ranges: ['192.168.0.1/24']
+    cluster_subnets: "[?contains(subnetName, 'pvt')]"
+    loadbalancer_subnets: "[?contains(subnetName, 'pub')]"
+    instance_type: "m5.2xlarge"
+    service_cidr: "10.0.0.0/16"
+    pod_cidr: "10.1.0.0/16"
+
+  tasks:
+    - name: Check and print variable status
+      debug:
+        msg: |
+          cdp_env_name: {{ cdp_env_name }},
+          service_name: {{ service_name }},
+          min_k8s_node_count: {{ min_k8s_node_count }},
+          max_k8s_node_count: {{ max_k8s_node_count }},
+          use_public_load_balancer: {{ use_public_load_balancer }},
+          kube_api_authorized_ip_ranges: {{ kube_api_authorized_ip_ranges }},
+          load_balancer_authorized_ip_ranges: {{ load_balancer_authorized_ip_ranges }},
+          cluster_subnets: {{ cluster_subnets }},
+          loadbalancer_subnets: {{ loadbalancer_subnets }},
+          instance_type: {{ instance_type }},
+          service_cidr: {{ service_cidr }},
+          pod_cidr: {{ pod_cidr }}
+
+    - name: List existing Dataflow services
+      ansible.builtin.shell: >
+        cdp df list-services | jq -r '.dataflowServices[].name'
+      register: df_list_services
+
+    - name: Set Dataflow service exists flag
+      set_fact:
+        df_service_exists: "{{ df_list_services.rc == 0 and (service_name in df_list_services.stdout_lines) }}"
+
+    - name: Skip provisioning if Dataflow service already exists
+      debug:
+        msg: "Dataflow service {{ service_name }} already exists in environment {{ cdp_env_name }}."
+      when: df_service_exists
+
+    - name: Generate JSON for enable-service request
+      set_fact:
+        enable_service_request: >
+          {
+            "environmentCrn": "{{ cdp_env_name }}",
+            "minK8sNodeCount": {{ min_k8s_node_count }},
+            "maxK8sNodeCount": {{ max_k8s_node_count }},
+            "usePublicLoadBalancer": {{ use_public_load_balancer }},
+            "kubeApiAuthorizedIpRanges": {{ kube_api_authorized_ip_ranges | to_json }},
+            "loadBalancerAuthorizedIpRanges": {{ load_balancer_authorized_ip_ranges | to_json }},
+            "clusterSubnets": "{{ cluster_subnets }}",
+            "loadBalancerSubnets": "{{ loadbalancer_subnets }}",
+            "instanceType": "{{ instance_type }}",
+            "serviceCidr": "{{ service_cidr }}",
+            "podCidr": "{{ pod_cidr }}"
+          }
+
+    - name: Debug generated JSON for enable-service request
+      debug:
+        msg: "Enable Service request JSON: {{ enable_service_request | to_json }}"
+
+    - name: Enable CDP Dataflow service if it does not exist
+      cloudera.cloud.df_service:
+        name: "{{ service_name }}"
+        environment_crn: "{{ cdp_env_name }}"
+        min_k8s_node_count: "{{ min_k8s_node_count }}"
+        max_k8s_node_count: "{{ max_k8s_node_count }}"
+        use_public_load_balancer: "{{ use_public_load_balancer }}"
+        kube_api_authorized_ip_ranges: "{{ kube_api_authorized_ip_ranges }}"
+        load_balancer_authorized_ip_ranges: "{{ load_balancer_authorized_ip_ranges }}"
+        cluster_subnets_filter: "{{ cluster_subnets }}"
+        loadbalancer_subnets_filter: "{{ loadbalancer_subnets }}"
+        instance_type: "{{ instance_type }}"
+        service_cidr: "{{ service_cidr }}"
+        pod_cidr: "{{ pod_cidr }}"
+        state: present
+        wait: yes
+      register: df_provision_service
+      when: not df_service_exists
+
+    - name: Pause for 120 seconds after provisioning Dataflow service
+      pause:
+        seconds: 120
+      when: not df_service_exists
+
+    - name: Getting Dataflow service Status until Provisioning Completes
+      ansible.builtin.shell: >
+        cdp df list-services | jq -r '.dataflowServices[] | select(.name == "{{ service_name }}")  | .state'
+      register: df_service_status
+      until: >
+        df_service_status.stdout is defined and
+        (df_service_status.rc == 0 and df_service_status.stdout in ["ACTIVE", "CREATING", "FAILED", "DELETING"])
+      retries: 30
+      delay: 60
+
+    - name: Print Dataflow service Status
+      debug:
+        msg: "Dataflow service Status is {{ df_service_status.stdout }}. If service does not already exist and there are no errors in the execution, usually it takes around ~30 minutes to provision."
+      when: df_service_status.stdout is defined
+
+    - name: Print success message on successful Dataflow service creation
+      debug:
+        msg: "Successfully provisioned Dataflow service {{ service_name }} in environment {{ cdp_env_name }}."
+      when: df_service_status.stdout == "ACTIVE"
+
+    - name: Fail task on Dataflow service provisioning failure
+      fail:
+        msg: "Dataflow service provisioning failed."
+      when: df_service_status.stdout != "ACTIVE"
