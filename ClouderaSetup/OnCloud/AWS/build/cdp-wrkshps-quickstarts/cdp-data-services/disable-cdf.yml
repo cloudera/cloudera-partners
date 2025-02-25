@@ -1,0 +1,67 @@
+---
+- name: Disable CDP Dataflow service
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars:
+    cdp_env_name: "your-environment-crn"
+    service_name: "my-service"
+
+  tasks:
+    - name: Check and print variable status
+      debug:
+        msg: "cdp_env_name: {{ cdp_env_name }}, service_name: {{ service_name }}"
+
+    - name: List CDP Dataflow services for existence check
+      ansible.builtin.shell: >
+        cdp df list-services | jq -r '.dataflowServices[].name'
+      register: df_list_services
+
+    - name: Set Dataflow service exists flag
+      set_fact:
+        df_service_exists: "{{ df_list_services.rc == 0 and (service_name in df_list_services.stdout_lines) }}"
+
+    - name: Handle non-existing or deleted Dataflow service
+      debug:
+        msg: "Dataflow service {{ service_name }} does not exist or is already deleted in environment {{ cdp_env_name }}."
+      when: not df_service_exists or 'resourceCrn should not be empty or nil' in df_list_services.stderr
+
+    - name: Delete CDP Dataflow service if exists
+      cloudera.cloud.df_service:
+        name: "{{ service_name }}"
+        environment_crn: "{{ cdp_env_name }}"
+        state: absent
+        wait: yes
+      register: df_delete_service
+      when: df_service_exists
+
+    - name: Pause for 30 seconds after triggering deprovisioning Dataflow service
+      pause:
+        seconds: 30
+      when: df_service_exists
+
+    - name: Refresh the status until Dataflow service deletion completes
+      ansible.builtin.shell: >
+        cdp df list-services | jq -r '.dataflowServices[] | select(.name == "{{ service_name }}")  | .state'
+      register: df_service_status
+      until: >
+        not df_service_exists or
+        'resourceCrn should not be empty or nil' in df_service_status.stderr or
+        (df_service_status.rc == 0 and df_service_status.stdout in ["INACTIVE", "DELETING", "FAILED"])
+      retries: 150
+      delay: 30
+
+    - name: Print success message on Dataflow service deletion
+      debug:
+        msg: "Successfully deleted Dataflow service {{ service_name }} in environment {{ cdp_env_name }}."
+      when: >
+        not df_service_exists or
+        df_service_status.stdout in ["INACTIVE", "DELETING"]
+
+    - name: Fail task on Dataflow service Deletion Failed
+      fail:
+        msg: "Dataflow service Deletion Got Failed."
+      when: >
+        df_service_exists and
+        ('resourceCrn should not be empty or nil' in [df_service_status.stderr, df_service_status.stdout] or
+         df_service_status.stdout in ["DELETING", "FAILED"])
