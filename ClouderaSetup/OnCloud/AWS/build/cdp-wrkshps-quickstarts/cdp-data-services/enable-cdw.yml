@@ -5,12 +5,16 @@
   gather_facts: yes
   vars:
     vw_size: "xsmall"
-    cdvc_size: "viz-default" #Possible-Values: viz-default, viz-low, viz-medium, viz-large
+    cdvc_size: "viz-default"  # Possible Values: viz-default, viz-low, viz-medium, viz-large
 
   tasks:
     - name: Check and print variable status
       debug:
-        msg: "env_lb_public_subnet: {{ env_lb_public_subnet }}, env_wrkr_private_subnet: {{ env_wrkr_private_subnet }}, vw_size: {{ vw_size }}, cdvc_size: {{ cdvc_size }}"
+        msg: |
+          env_lb_public_subnet: {{ env_lb_public_subnet }}
+          env_wrkr_private_subnet: {{ env_wrkr_private_subnet }}
+          vw_size: {{ vw_size }}
+          cdvc_size: {{ cdvc_size }}
 
     - name: Activating CDW cluster
       cloudera.cloud.dw_cluster:
@@ -88,7 +92,6 @@
             --t-shirt-size "{{ vw_size }}" \
             --autoscaling disableAutoSuspend="true"
           with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"
-          #loop: "{{ range(1, number_vw_to_create | default(1) + 1) | list }}"
           loop_control:
             pause: 30
           when: not (existing_vws.stdout_lines | select('match', workshop_name ~ '-hive-' ~ item) | list | length > 0)
@@ -121,7 +124,6 @@
             --impala-ha-settings highAvailabilityMode="DISABLED" \
             --autoscaling disableAutoSuspend="true"
           with_sequence: start=1 end="{{ number_vw_to_create | default(1) }}"
-          #loop: "{{ range(1, number_vw_to_create | default(1) + 1) | list }}"
           loop_control:
             pause: 30
           when: not (existing_vws.stdout_lines | select('match', workshop_name ~ '-impala-' ~ item) | list | length > 0)
