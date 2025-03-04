@@ -120,6 +120,11 @@ pipeline {
                         error "ERROR: HOSTEDZONEID is invalid! Please provide a valid hosted zone ID."
                     }
 
+	            def starPattern = /\*{3,}/
+	            if (params.KEYCLOAK_ADMIN_PASSWORD ==~ starPattern || params.WORKSHOP_USER_DEFAULT_PASSWORD ==~ starPattern) {
+	                error "ERROR: Updating the password field with correct values is mandatory."
+	            }
+
                     if (!params.DATALAKE_VERSION?.matches(versionRegex)) {
                         error "ERROR: DATALAKE_VERSION must follow the format X.Y.Z (e.g., 7.2.18)."
                     }
