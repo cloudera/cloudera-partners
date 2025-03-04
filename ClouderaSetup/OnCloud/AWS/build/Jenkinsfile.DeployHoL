@@ -1,0 +1,527 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ACTION', choices: ['provision', 'destroy'], description: 'Choose whether to provision or destroy the stack')
+        choice(name: 'PROVISION_KEYCLOAK', choices: ['YES', 'NO'], description: 'Choose whether to provision Keycloak Instance (YES/NO)')
+        password(name: 'KEYCLOAK_ADMIN_PASSWORD', defaultValue: 'admin', description: 'Admin User Password for Keycloak (mandatory)')
+        choice(name: 'CDP_DEPLOYMENT_TYPE', choices: ['public', 'private', 'semi-private'], description: 'Choose the CDP Deployment Type (public/private/semi-private). Default: public')
+        string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region (e.g., ap-southeast-1). Please provide a valid AWS region format (e.g., ap-southeast-1).')
+        string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'IP or network range to whitelist (e.g., 172.31.x.x/32 or a subnet range). Default: 0.0.0.0/0 allows open access for all.')
+        string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name (5-12 characters long, no underscores allowed)')
+        string(name: 'NUMBER_OF_WORKSHOP_USERS', defaultValue: '1', description: 'Number of Workshop Users')
+        string(name: 'WORKSHOP_USER_PREFIX', defaultValue: 'pseworkshop', description: 'Prefix for Workshop Users')
+        password(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', defaultValue: 'changeme', description: 'Default password for Workshop Users (mandatory)')
+        extendedChoice(
+            name: 'ENABLE_DATA_SERVICES',
+            value: 'CDW,CML,CDE,NONE',
+            type: 'PT_CHECKBOX',
+            description: 'Select the data services to enable. Default: NONE (No data services enabled)',
+            multiSelectDelimiter: ',',
+            defaultValue: 'NONE'
+        )
+        string(name: 'CDP_SAML_PROVIDER_LIMIT', defaultValue: '10', description: 'Maximum number of SAML providers allowed')
+        string(name: 'CDP_USER_LIMIT', defaultValue: '3000', description: 'Maximum number of CDP users allowed')
+        string(name: 'CDP_GROUP_LIMIT', defaultValue: '50', description: 'Maximum number of CDP groups allowed')
+        string(name: 'CDW_VRTL_WAREHOUSE_SIZE', defaultValue: 'xsmall', description: 'Size of the CDW Virtual Warehouse (e.g., small, medium, large, etc.)')
+        string(name: 'CDW_DATAVIZ_SIZE', defaultValue: 'viz-default', description: 'Size of the CDW Dataviz (e.g., viz-small, viz-default)')
+        choice(name: 'CDE_SPARK_VERSION', choices: ['SPARK3', 'SPARK2', 'SPARK3_2', 'SPARK3_3', 'SPARK3_5'], description: 'Choose the Spark version to deploy')
+        choice(name: 'CDE_VC_TIER', choices: ['ALLP', 'CORE'], description: 'Choose Virtual Cluster Tier Type to deploy')
+        string(name: 'CDE_INSTANCE_TYPE', defaultValue: 'm5.2xlarge', description: 'CDE Instance type (e.g., m5.2xlarge)')
+        string(name: 'CDE_INITIAL_INSTANCES', defaultValue: '10', description: 'Initial number of CDE instances to deploy')
+        string(name: 'CDE_MIN_INSTANCES', defaultValue: '10', description: 'Minimum number of CDE instances to scale down to')
+        string(name: 'CDE_MAX_INSTANCES', defaultValue: '40', description: 'Maximum number of CDE instances to scale up to')
+        string(name: 'CML_WS_INSTANCE_TYPE', defaultValue: 'm5.2xlarge', description: 'CML Workspace Instance Type')
+        string(name: 'CML_MIN_INSTANCES', defaultValue: '1', description: 'Minimum number of CML instances')
+        string(name: 'CML_MAX_INSTANCES', defaultValue: '10', description: 'Maximum number of CML instances')
+        booleanParam(name: 'CML_ENABLE_GPU', defaultValue: false, description: 'Enable GPU instances for CML, if supported by the AWS region')
+        string(name: 'CML_GPU_INSTANCE_TYPE', defaultValue: 'g4dn.xlarge', description: 'CML GPU instance type')
+        string(name: 'CML_MIN_GPU_INSTANCES', defaultValue: '0', description: 'Minimum number of GPU instances for CML')
+        string(name: 'CML_MAX_GPU_INSTANCES', defaultValue: '10', description: 'Maximum number of GPU instances for CML')
+        string(name: 'DOMAIN', defaultValue: 'example.com', description: 'Route53 registered domain or subdomain (e.g., sub.example.com)')
+        string(name: 'HOSTEDZONEID', defaultValue: 'Example: ZCLOUDERAPSEAPACTEAM1', description: 'Route53 Hosted Zone Id for the above domain')
+        string(name: 'DATALAKE_VERSION', defaultValue: '7.2.18', description: 'The Datalake runtime version to be used (e.g., 7.2.18)')
+        choice(name: 'DELETE_WORKDIR', choices: ['false', 'true'], description: 'Choose whether to delete the work directory after the job completes')
+        booleanParam(name: 'REFRESH_JENKINSFILE', defaultValue: false, description: 'Reload changes from Jenkinsfile and exit.')
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag to run the automation')
+    }
+
+    options {
+        // Set a timeout for the entire pipeline
+        timeout(time: 6, unit: 'HOURS')
+        timestamps()
+        ansiColor('xterm')
+    }
+
+    environment {
+        LANG = "C.UTF-8"
+        DOCKER_IMAGE = "clouderapartners/cdp-public-cloud-hol-provisioner:${params.IMAGE_TAG}"
+        HOL_AUTO_EXEC_DIR = "/home/holautosa/HOL_AUTO_EXEC_DIR"
+        CONFIG_DIR = "${HOL_AUTO_EXEC_DIR}/userconfig"
+        CONFIG_FILE = "${CONFIG_DIR}/configfile"
+        REPO_URL = "https://github.com/cloudera/cloudera-partners.git"
+        //BRANCH_NAME = ""
+        REPO_DIR = "${HOL_AUTO_EXEC_DIR}/hol-automation"
+    }
+
+    stages {
+        stage('Build Stage') {
+            steps {
+                script {
+                    // Set a custom build name
+                    currentBuild.displayName = "#${BUILD_NUMBER} - ${params.WORKSHOP_NAME}"
+                }
+            }
+        }
+
+        stage('DRY RUN: Reload Jenkinsfile') {
+            when { expression { return params.REFRESH_JENKINSFILE ==~ /(?i)(Y|YES|T|TRUE|ON|RUN)/ } }
+            steps {
+                sh 'echo "Stage :: DRY RUN: Reload Jenkinsfile into Jenkins Project: Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})"'
+                script {
+                    currentBuild.result = 'ABORTED'
+                    error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
+                }
+            }
+        }
+
+        stage('Check Mandatory Parameters') {
+            steps {
+                script {
+                    // String and Password parameters check for mandatory value
+                    if (!params.KEYCLOAK_ADMIN_PASSWORD?.trim()) {
+                        error "ERROR: KEYCLOAK_ADMIN_PASSWORD is mandatory! Please provide a value."
+                    }
+                    if (!params.WORKSHOP_USER_DEFAULT_PASSWORD?.trim()) {
+                        error "ERROR: WORKSHOP_USER_DEFAULT_PASSWORD is mandatory! Please provide a value."
+                    }
+                    if (!params.AWS_REGION?.trim()) {
+                        error "ERROR: AWS_REGION is mandatory! Please provide a value."
+                    }
+                    if (!params.CDP_DEPLOYMENT_TYPE?.trim()) {
+                        error "ERROR: CDP_DEPLOYMENT_TYPE is mandatory! Please select a deployment type."
+                    }
+                    if (!params.WORKSHOP_NAME?.trim()) {
+                        error "ERROR: WORKSHOP_NAME is mandatory! Please provide a value."
+                    }
+                    if (!params.LOCAL_MACHINE_IP?.trim()) {
+                        error "ERROR: LOCAL_MACHINE_IP is mandatory! Please provide a value."
+                    }
+                    
+                    // Domain and Hosted Zone validity checks with updated regex
+                    def domainRegex = /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$|^(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+$/
+                    def hostedZoneRegex = /^[a-zA-Z0-9_-]+$/
+                    def versionRegex = /^\d+\.\d+\.\d+$/
+                    
+                    if (!params.DOMAIN?.trim() || !params.DOMAIN.matches(domainRegex)) {
+                        error "ERROR: DOMAIN is invalid! Please provide a valid domain name or subdomain (e.g., sub.example.com)."
+                    }
+                    if (!params.HOSTEDZONEID?.trim() || !params.HOSTEDZONEID.matches(hostedZoneRegex)) {
+                        error "ERROR: HOSTEDZONEID is invalid! Please provide a valid hosted zone ID."
+                    }
+
+                    if (!params.DATALAKE_VERSION?.matches(versionRegex)) {
+                        error "ERROR: DATALAKE_VERSION must follow the format X.Y.Z (e.g., 7.2.18)."
+                    }
+
+                    // AWS Region Validation with Regex
+                    def awsRegionRegex = /^(us|eu|ap|sa|ca|me)-[a-z]+-\d{1}$/
+                    if (!params.AWS_REGION?.trim().matches(awsRegionRegex)) {
+                        error "ERROR: AWS_REGION '${params.AWS_REGION}' is not a valid AWS region format. Please provide a valid AWS region (e.g., ap-southeast-1)."
+                    }
+
+                    // Validate Workshop Name length and no underscores
+                    if (params.WORKSHOP_NAME?.trim().length() < 5 || params.WORKSHOP_NAME?.trim().length() > 12) {
+                        error "ERROR: WORKSHOP_NAME must be between 5 and 12 characters."
+                    }
+                    if (params.WORKSHOP_NAME?.contains('_')) {
+                        error "ERROR: WORKSHOP_NAME should not contain underscores (_)."
+                    }
+
+                    // Validate number fields (like limits)
+                    if (!params.CDP_SAML_PROVIDER_LIMIT?.isNumber()) {
+                        error "ERROR: CDP_SAML_PROVIDER_LIMIT must be a number!"
+                    }
+                    if (!params.CDP_USER_LIMIT?.isNumber()) {
+                        error "ERROR: CDP_USER_LIMIT must be a number!"
+                    }
+                    if (!params.CDP_GROUP_LIMIT?.isNumber()) {
+                        error "ERROR: CDP_GROUP_LIMIT must be a number!"
+                    }
+                }
+            }
+        }
+
+        stage('Prepare Environment') {
+            steps {
+                sh 'echo "Stage :: Prepare Environment"'
+                script {
+                    // Create userconfig directory and change to that directory
+                    sh '''
+                        mkdir -p ${CONFIG_DIR}
+                        cd ${CONFIG_DIR} 
+                        pwd && ls -l
+                        echo "\n Printing configfile:\n"
+                        cat ${CONFIG_FILE}
+                    '''
+                }
+            }
+        }
+
+        stage('Create Config File') {
+            steps {
+                sh 'echo "Stage :: Create Config File"'
+                script {
+                    // Get the selected values and handle the default 'None' option
+                    def selectedServices = params.ENABLE_DATA_SERVICES.split(',').findAll { it != 'NONE' }
+                    
+                    // If nothing is selected or only 'NONE' is selected, use '[None]'
+                    def formattedServices = selectedServices.isEmpty() ? '[None]' : "[${selectedServices.join(',')}]"
+                    
+                    // Print the formatted list
+                    echo "Selected services: ${formattedServices}"
+                    
+                    // Create or overwrite the config file
+                    writeFile file: env.CONFIG_FILE, text: """PROVISION_KEYCLOAK:${params.PROVISION_KEYCLOAK}
+KEYCLOAK_ADMIN_PASSWORD:${params.KEYCLOAK_ADMIN_PASSWORD}
+AWS_REGION:${params.AWS_REGION}
+CDP_DEPLOYMENT_TYPE:${params.CDP_DEPLOYMENT_TYPE}
+LOCAL_MACHINE_IP:${params.LOCAL_MACHINE_IP}
+WORKSHOP_NAME:${params.WORKSHOP_NAME}
+NUMBER_OF_WORKSHOP_USERS:${params.NUMBER_OF_WORKSHOP_USERS}
+WORKSHOP_USER_PREFIX:${params.WORKSHOP_USER_PREFIX}
+WORKSHOP_USER_DEFAULT_PASSWORD:${params.WORKSHOP_USER_DEFAULT_PASSWORD}
+ENABLE_DATA_SERVICES:${formattedServices}
+
+CDP_SAML_PROVIDER_LIMIT:${params.CDP_SAML_PROVIDER_LIMIT}
+CDP_USER_LIMIT:${params.CDP_USER_LIMIT}
+CDP_GROUP_LIMIT:${params.CDP_GROUP_LIMIT}
+
+CDW_VRTL_WAREHOUSE_SIZE:${params.CDW_VRTL_WAREHOUSE_SIZE}
+CDW_DATAVIZ_SIZE:${params.CDW_DATAVIZ_SIZE}
+
+CDE_INSTANCE_TYPE:${params.CDE_INSTANCE_TYPE}
+CDE_INITIAL_INSTANCES:${params.CDE_INITIAL_INSTANCES}
+CDE_MIN_INSTANCES:${params.CDE_MIN_INSTANCES}
+CDE_MAX_INSTANCES:${params.CDE_MAX_INSTANCES}
+CDE_SPARK_VERSION:${params.CDE_SPARK_VERSION}
+CDE_VC_TIER:${params.CDE_VC_TIER}
+
+CML_WS_INSTANCE_TYPE:${params.CML_WS_INSTANCE_TYPE}
+CML_MIN_INSTANCES:${params.CML_MIN_INSTANCES}
+CML_MAX_INSTANCES:${params.CML_MAX_INSTANCES}
+CML_ENABLE_GPU:${params.CML_ENABLE_GPU}
+CML_GPU_INSTANCE_TYPE:${params.CML_GPU_INSTANCE_TYPE}
+CML_MIN_GPU_INSTANCES:${params.CML_MIN_GPU_INSTANCES}
+CML_MAX_GPU_INSTANCES:${params.CML_MAX_GPU_INSTANCES}
+DATALAKE_VERSION:${params.DATALAKE_VERSION}
+
+DOMAIN:${params.DOMAIN}
+HOSTEDZONEID:${params.HOSTEDZONEID}
+"""
+sh """
+    pwd
+    ls -l ${CONFIG_DIR}
+    echo 'Printing config file:'
+    cat ${CONFIG_FILE}
+"""
+                }
+            }
+        }
+
+/* stage('Clone or Update Repo') {
+            steps {
+                script {
+                    // Check if the directory exists
+                    if (fileExists(REPO_DIR)) {
+                        echo "Repository directory exists. Performing git pull."
+                        // If the directory exists, perform a git pull
+                        dir(REPO_DIR) {
+                            sh 'git pull'
+                        }
+                    } else {
+                        echo "Repository directory does not exist. Cloning repository."
+                        // If the directory does not exist, clone the repository and checkout the branch
+                        sh """
+                        git clone ${REPO_URL} ${REPO_DIR}
+                        cd ${REPO_DIR}
+                        git checkout ${BRANCH_NAME}
+                        """
+                    }
+                }
+            }
+        }*/
+
+        stage('Pull Docker Image') {
+            steps {
+                sh 'echo "Stage :: Pull Docker Image"'
+                script {
+                    // Pull the Docker image from Docker Hub
+                    sh "docker ps; docker pull ${env.DOCKER_IMAGE} && docker images"
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh 'echo "Stage :: Run Docker Container"'
+                script {
+                    sh "docker run --name hol-provisioner-${BUILD_NUMBER} -i -v ${env.CONFIG_DIR}:/userconfig -v ${REPO_DIR}:/repo -v ~/.cdp/:/root/.cdp ${env.DOCKER_IMAGE} ${params.ACTION}"
+                }
+            }
+        }
+        stage('Check Logs for Failures') {
+            steps {
+                script {
+                    // Check the container logs for failure strings
+                    sh "docker logs hol-provisioner-${BUILD_NUMBER} > ${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log"
+                    def logOutput = readFile("${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log")
+                
+                    // Initialize a list to hold error messages
+                    def errorMessages = []
+        
+                    // Check for specific failure messages
+                    if (logOutput.contains('Workspace Provisioning Got Failed.')) {
+                        errorMessages.add("CML Data service provisioning failed.")
+                    } 
+                    if (logOutput.contains('Cluster Creation Got Failed.')) {
+                        errorMessages.add("CDW data service provisioning failed.")
+                    } 
+                    if (logOutput.contains('CDE Service Deletion Failed.')) {
+                        errorMessages.add("While destroying, CDE data service deletion failed.")
+                    }
+                    if (logOutput.contains('Workspace Deletion Got Failed.')) {
+                        errorMessages.add("While destroying, CML data service deletion failed.")
+                    }
+                    if (logOutput.contains('Cluster deletion failed.')) {
+                        errorMessages.add("While destroying, CDW data service deletion failed.")
+                    }
+                    if (logOutput.toLowerCase().contains('fatal')) {
+                        errorMessages.add("Job failed with error code 'fatal'.")
+                    }
+        
+                    // If there are any error messages, fail the job with the collected messages
+                    if (!errorMessages.isEmpty()) {
+                        currentBuild.result = 'FAILURE'
+                        
+                        // Save error messages in build variable for use in post section
+                        currentBuild.description = errorMessages.join('\n')
+        
+                        // Send an email with the error logs
+                        
+
+                         // Mark the build as failed with the error messages
+                        
+                    }
+                }
+            }
+        }
+        stage('Assign admin roles to builduser') {
+            when {
+            expression { params.ACTION == 'provision' }
+            }
+            steps {
+                echo 'Assigning Resorce roles'
+                script{
+                    sh '''
+                    CDP_WORKLOAD_USERNAME="${BUILD_USER_ID//_/.}"
+		    echo "CDP_WORKLOAD_USERNAME: $CDP_WORKLOAD_USERNAME"
+                    # Set your environment name
+                    CDP_ENV_NAME="$(echo "$WORKSHOP_NAME" | tr '[:upper:]' '[:lower:]')-cdp-env"
+                    echo "CDP_ENV_NAME: $CDP_ENV_NAME"
+                    # Get User CRN
+                    export CDP_USER_CRN=$(cdp iam list-users --max-items 10000 | jq --arg CDP_WORKLOAD_USERNAME "$CDP_WORKLOAD_USERNAME" \'.users[] | select(.workloadUsername==$CDP_WORKLOAD_USERNAME).userId\'| tr -d \'"\')
+                    
+                    # Get Environment CRN
+                    export CDP_ENV_CRN=$(cdp environments describe-environment --environment-name ${CDP_ENV_NAME} | jq -r .environment.crn)
+                    
+                    export RESOURCE_ROLES=(EnvironmentAdmin Owner)
+                    
+                    # Function: Get Resource Roles CRN
+                    get_crn_resource_role () {
+                       CDP_RESOURCE_ROLE_NAME=$1
+                       CDP_RESOURCE_ROLE_CRN=$(cdp iam list-resource-roles |jq --arg CDP_RESOURCE_ROLE_NAME "$CDP_RESOURCE_ROLE_NAME" \'.resourceRoles[] | select(.crn | endswith(":" + $CDP_RESOURCE_ROLE_NAME))| .crn\')
+                       echo $CDP_RESOURCE_ROLE_CRN | tr -d \'"\'
+                    }
+                    
+                    # Set Resource Roles
+                    for role_name in "${RESOURCE_ROLES[@]}"; do \\
+                    cdp iam assign-user-resource-role \\
+                    --user ${CDP_USER_CRN} \\
+                    --resource-role-crn $(get_crn_resource_role ${role_name}) \\
+                    --resource-crn ${CDP_ENV_CRN} || true; \\
+                    done
+                    
+                    # Synchronize users
+                    cdp environments sync-all-users \
+                    --environment-name $CDP_ENV_NAME
+                    
+                    # Synchronize IDBroker Mappings
+                    cdp environments sync-id-broker-mappings \
+                    --environment-name $CDP_ENV_NAME'''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            sh "echo 'SUCCESS: Deployment : Job ${JOB_NAME} [${BUILD_NUMBER}] (${BUILD_URL})'"
+            script {
+                env.WORKSHOP_NAME_LOWER = params.WORKSHOP_NAME.toLowerCase()
+                if (params.ACTION == 'provision') {
+                    sh """
+                        cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && sudo chown -R jenkins:jenkins . && \
+                        sudo cp -p ${env.WORKSHOP_NAME_LOWER}.txt configfile .${env.WORKSHOP_NAME_LOWER}/${env.WORKSHOP_NAME_LOWER}-keypair.pem ${WORKSPACE} 2>/dev/null || true
+                    """
+                }
+                archiveArtifacts artifacts: "${env.WORKSHOP_NAME_LOWER}.txt,configfile", allowEmptyArchive: true
+                def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem"
+
+                // Debug: Verify email and files
+                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
+                sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
+                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
+
+                // Send email
+                emailext(
+                    to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
+                    subject: "✅ Jenkins Build Success: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
+                    body: """
+                        <html>
+                            <head>
+                                <style>
+                                    body { font-family: Arial, sans-serif; color: #333333; }
+                                    h3 { color: #4CAF50; font-size: 18px; }
+                                    .container { border: 1px solid #e0e0e0; padding: 16px; border-radius: 8px; background-color: #f9f9f9; }
+                                    .content { padding: 8px 16px; }
+                                    .table-container { margin-top: 16px; }
+                                    table { width: 100%; border-collapse: collapse; }
+                                    th, td { padding: 12px; text-align: left; border: 1px solid #dddddd; }
+                                    th { background-color: #f2f2f2; font-weight: bold; }
+                                    .artifact { color: #1565C0; }
+                                    .build-info { font-size: 14px; color: #555555; }
+                                    .footer { margin-top: 16px; font-size: 12px; color: #777777; }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h3>✅ CDP <b>${params.ACTION}</b> Completed Successfully!</h3>
+                                    <p class="content">The build has completed without any issues. Below are the details of the build:</p>
+                                    
+                                    <div class="table-container">
+                                        <table>
+                                            <tr>
+                                                <th>Job</th>
+                                                <td>${JOB_NAME}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Build Number</th>
+                                                <td>${BUILD_NUMBER}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Build URL</th>
+                                                <td><a href="${BUILD_URL}" style="color: #1565C0; text-decoration: none;">View Build Logs</a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <p class="content">The following artifacts are attached for your reference:</p>
+                                    <ul>
+                                        <li class="artifact">${env.WORKSHOP_NAME_LOWER}.txt</li>
+                                        <li class="artifact">configfile</li>
+                                        <li class="artifact">${env.WORKSHOP_NAME_LOWER}-keypair.pem</li>
+                                    </ul>
+                                    
+                                    <div class="footer">
+                                        <p>Triggered by: ${env.BUILD_USER}</p>
+                                        <p>For any issues, please contact the PSE team.</p>
+                                    </div>
+                                </div>
+                            </body>
+                        </html>
+                    """,
+                    mimeType: 'text/html',
+                    attachmentsPattern: attachments,  // Attach artifacts in success
+                    from: 'psejenkins@cloudera.com'
+                )
+            }
+        }
+
+        failure {
+            script {
+                def errorLog = currentBuild.description ?: "Unknown error occurred."
+                emailext(
+                    to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
+                    subject: "❌ Jenkins Build Failed: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
+                    body: """
+                        <html>
+                            <head>
+                                <style>
+                                    body { font-family: Arial, sans-serif; color: #333333; }
+                                    h3 { color: #E53935; font-size: 18px; }
+                                    .container { border: 1px solid #e0e0e0; padding: 16px; border-radius: 8px; background-color: #f9f9f9; }
+                                    .content { padding: 8px 16px; }
+                                    .table-container { margin-top: 16px; }
+                                    table { width: 100%; border-collapse: collapse; }
+                                    th, td { padding: 12px; text-align: left; border: 1px solid #dddddd; }
+                                    th { background-color: #f2f2f2; font-weight: bold; }
+                                    td { color: #E53935; }
+                                    .build-info { font-size: 14px; color: #555555; }
+                                    .footer { margin-top: 16px; font-size: 12px; color: #777777; }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h3>❌ CDP <b>${params.ACTION}</b> Failure Notification</h3>
+                                    <p class="content">The build encountered errors. Below are the details:</p>
+                                    
+                                    <div class="table-container">
+                                        <table>
+                                            <tr>
+                                                <th>Job</th>
+                                                <td>${env.JOB_NAME}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Build Number</th>
+                                                <td>${env.BUILD_NUMBER}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Build URL</th>
+                                                <td><a href="${env.BUILD_URL}" style="color: #1565C0; text-decoration: none;">View Build Logs</a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="table-container">
+                                        <table>
+                                            <tr>
+                                                <th>Error Description</th>
+                                            </tr>
+                                            <tr>
+                                                <td>${errorLog.replace('\n', '<br>')}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="footer">
+                                        <p>Triggered by: ${env.BUILD_USER}</p>
+                                        <p>For more details, please check the attached logfile or <a href="${env.BUILD_URL}" style="color: #1565C0;">Jenkins build logs</a>.</p>
+                                    </div>
+                                </div>
+                            </body>
+                        </html>
+                    """,
+                    mimeType: 'text/html',
+                    attachmentsPattern: "hol-provisioner-${BUILD_NUMBER}.log,configfile",  // Attach log and config file
+                    from: 'psejenkins@cloudera.com'
+                )
+            }
+        }
+
+        cleanup {
+            sh "rm -f ${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log"
+            sh 'echo "CLEANUP: Docker : "; docker rm -f hol-provisioner-${BUILD_NUMBER} || true'
+        }
+    }
+}
