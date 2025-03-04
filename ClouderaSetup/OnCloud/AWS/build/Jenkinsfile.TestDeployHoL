@@ -101,6 +101,12 @@ pipeline {
                     if (!params.CDP_DEPLOYMENT_TYPE?.trim()) {
                         error "ERROR: CDP_DEPLOYMENT_TYPE is mandatory! Please select a deployment type."
                     }
+                    if (!params.DOMAIN?.trim()) {
+                        error "ERROR: DOMAIN is mandatory! Please provide a value for domain."
+                    }
+                    if (!params.HOSTEDZONEID?.trim()) {
+                        error "ERROR: HOSTEDZONEID is mandatory! Please provide a value for HOSTEDZONEID."
+                    }   
                     if (!params.WORKSHOP_NAME?.trim()) {
                         error "ERROR: WORKSHOP_NAME is mandatory! Please provide a value."
                     }
