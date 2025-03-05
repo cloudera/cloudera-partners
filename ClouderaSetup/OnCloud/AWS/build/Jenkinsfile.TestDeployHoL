@@ -4,14 +4,14 @@ pipeline {
     parameters {
         choice(name: 'ACTION', choices: ['provision', 'destroy'], description: 'Choose whether to provision or destroy the stack')
         choice(name: 'PROVISION_KEYCLOAK', choices: ['YES', 'NO'], description: 'Choose whether to provision Keycloak Instance (YES/NO)')
-        password(name: 'KEYCLOAK_ADMIN_PASSWORD', defaultValue: 'admin', description: 'Admin User Password for Keycloak (mandatory)')
+        password(name: 'KEYCLOAK_ADMIN_PASSWORD', defaultValue: 'admin', description: '❗❗❗(MANDATORY) Admin User Password for Keycloak')
         choice(name: 'CDP_DEPLOYMENT_TYPE', choices: ['public', 'private', 'semi-private'], description: 'Choose the CDP Deployment Type (public/private/semi-private). Default: public')
         string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS Region (e.g., ap-southeast-1). Please provide a valid AWS region format (e.g., ap-southeast-1).')
         string(name: 'LOCAL_MACHINE_IP', defaultValue: '0.0.0.0/0', description: 'IP or network range to whitelist (e.g., 172.31.x.x/32 or a subnet range). Default: 0.0.0.0/0 allows open access for all.')
         string(name: 'WORKSHOP_NAME', defaultValue: 'pseworkshop', description: 'Workshop Name (5-12 characters long, no underscores allowed)')
         string(name: 'NUMBER_OF_WORKSHOP_USERS', defaultValue: '1', description: 'Number of Workshop Users')
         string(name: 'WORKSHOP_USER_PREFIX', defaultValue: 'pseworkshop', description: 'Prefix for Workshop Users')
-        password(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', defaultValue: 'changeme', description: 'Default password for Workshop Users (mandatory)')
+        password(name: 'WORKSHOP_USER_DEFAULT_PASSWORD', defaultValue: 'changeme', description: '❗❗❗(MANDATORY) Default password for Workshop Users')
         extendedChoice(
             name: 'ENABLE_DATA_SERVICES',
             value: 'CDW,CML,CDE,NONE',
@@ -38,8 +38,8 @@ pipeline {
         string(name: 'CML_GPU_INSTANCE_TYPE', defaultValue: 'g4dn.xlarge', description: 'CML GPU instance type')
         string(name: 'CML_MIN_GPU_INSTANCES', defaultValue: '0', description: 'Minimum number of GPU instances for CML')
         string(name: 'CML_MAX_GPU_INSTANCES', defaultValue: '10', description: 'Maximum number of GPU instances for CML')
-        string(name: 'DOMAIN', defaultValue: 'clouderapartners.click', description: 'Route53 registered domain or subdomain (e.g., sub.example.com)')
-        string(name: 'HOSTEDZONEID', defaultValue: 'Example: ZCLOUDERAPSEAPACTEAM1', description: 'Route53 Hosted Zone Id for the above domain')
+        string(name: 'DOMAIN', defaultValue: 'clouderapartners.click', description: '❗❗❗(MANDATORY) Route53 registered domain or subdomain (e.g., sub.example.com)')
+        string(name: 'HOSTEDZONEID', defaultValue: 'Example: ZCLOUDERAPSEAPACTEAM1', description: '❗❗❗(MANDATORY) Route53 Hosted Zone Id for the above domain')
         string(name: 'DATALAKE_VERSION', defaultValue: '7.2.18', description: 'The Datalake runtime version to be used (e.g., 7.2.18)')
         choice(name: 'DELETE_WORKDIR', choices: ['false', 'true'], description: 'Choose whether to delete the work directory after the job completes')
         booleanParam(name: 'REFRESH_JENKINSFILE', defaultValue: false, description: 'Reload changes from Jenkinsfile and exit.')
@@ -88,76 +88,84 @@ pipeline {
         stage('Check Mandatory Parameters') {
             steps {
                 script {
+                    // ANSI escape code for bold red text
+                    def RED_BOLD = "\u001B[1;31m"
+                    def RESET = "\u001B[0m"
+
+                    def printError = { message ->
+                        error "${RED_BOLD}❗❗❗ ERROR: ${message} ❗❗❗${RESET}"
+                    }
+
                     // String and Password parameters check for mandatory value
                     if (!params.KEYCLOAK_ADMIN_PASSWORD) {
-                        error "ERROR: KEYCLOAK_ADMIN_PASSWORD is mandatory! Please provide a value."
+                        printError("KEYCLOAK_ADMIN_PASSWORD is mandatory! Please provide a value.")
                     }
                     if (!params.WORKSHOP_USER_DEFAULT_PASSWORD) {
-                        error "ERROR: WORKSHOP_USER_DEFAULT_PASSWORD is mandatory! Please provide a value."
+                        printError("WORKSHOP_USER_DEFAULT_PASSWORD is mandatory! Please provide a value.")
                     }
                     if (!params.AWS_REGION?.trim()) {
-                        error "ERROR: AWS_REGION is mandatory! Please provide a value."
+                        printError("AWS_REGION is mandatory! Please provide a value.")
                     }
                     if (!params.CDP_DEPLOYMENT_TYPE?.trim()) {
-                        error "ERROR: CDP_DEPLOYMENT_TYPE is mandatory! Please select a deployment type."
+                        printError("CDP_DEPLOYMENT_TYPE is mandatory! Please select a deployment type.")
                     }
                     if (!params.DOMAIN?.trim()) {
-                        error "ERROR: DOMAIN is mandatory! Please provide a value for domain."
+                        printError("DOMAIN is mandatory! Please provide a value for domain.")
                     }
                     if (!params.HOSTEDZONEID?.trim()) {
-                        error "ERROR: HOSTEDZONEID is mandatory! Please provide a value for HOSTEDZONEID."
-                    }   
+                        printError("HOSTEDZONEID is mandatory! Please provide a value for HOSTEDZONEID.")
+                    }
                     if (!params.WORKSHOP_NAME?.trim()) {
-                        error "ERROR: WORKSHOP_NAME is mandatory! Please provide a value."
+                        printError("WORKSHOP_NAME is mandatory! Please provide a value.")
                     }
                     if (!params.LOCAL_MACHINE_IP?.trim()) {
-                        error "ERROR: LOCAL_MACHINE_IP is mandatory! Please provide a value."
+                        printError("LOCAL_MACHINE_IP is mandatory! Please provide a value.")
                     }
-                    
+
                     // Domain and Hosted Zone validity checks with updated regex
                     def domainRegex = /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$|^(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+$/
                     def hostedZoneRegex = /^[a-zA-Z0-9_-]+$/
                     def versionRegex = /^\d+\.\d+\.\d+$/
-                    
+
                     if (!params.DOMAIN?.trim() || !params.DOMAIN.matches(domainRegex)) {
-                        error "ERROR: DOMAIN is invalid! Please provide a valid domain name or subdomain (e.g., sub.example.com)."
+                        printError("DOMAIN is invalid! Please provide a valid domain name or subdomain (e.g., sub.example.com).")
                     }
                     if (!params.HOSTEDZONEID?.trim() || !params.HOSTEDZONEID.matches(hostedZoneRegex)) {
-                        error "ERROR: HOSTEDZONEID is invalid! Please provide a valid hosted zone ID."
+                        printError("HOSTEDZONEID is invalid! Please provide a valid hosted zone ID.")
                     }
 
                     def starPattern = /\*{3,}/
                     if (params.KEYCLOAK_ADMIN_PASSWORD ==~ starPattern || params.WORKSHOP_USER_DEFAULT_PASSWORD ==~ starPattern) {
-                        error "ERROR: Updating the password field with correct values is mandatory."
+                        printError("Updating the password field with correct values is mandatory.")
                     }
 
                     if (!params.DATALAKE_VERSION?.matches(versionRegex)) {
-                        error "ERROR: DATALAKE_VERSION must follow the format X.Y.Z (e.g., 7.2.18)."
+                        printError("DATALAKE_VERSION must follow the format X.Y.Z (e.g., 7.2.18).")
                     }
 
                     // AWS Region Validation with Regex
                     def awsRegionRegex = /^(us|eu|ap|sa|ca|me)-[a-z]+-\d{1}$/
                     if (!params.AWS_REGION?.trim().matches(awsRegionRegex)) {
-                        error "ERROR: AWS_REGION '${params.AWS_REGION}' is not a valid AWS region format. Please provide a valid AWS region (e.g., ap-southeast-1)."
+                        printError("AWS_REGION '${params.AWS_REGION}' is not a valid AWS region format. Please provide a valid AWS region (e.g., ap-southeast-1).")
                     }
 
                     // Validate Workshop Name length and no underscores
                     if (params.WORKSHOP_NAME?.trim().length() < 5 || params.WORKSHOP_NAME?.trim().length() > 12) {
-                        error "ERROR: WORKSHOP_NAME must be between 5 and 12 characters."
+                        printError("WORKSHOP_NAME must be between 5 and 12 characters.")
                     }
                     if (params.WORKSHOP_NAME?.contains('_')) {
-                        error "ERROR: WORKSHOP_NAME should not contain underscores (_)."
+                        printError("WORKSHOP_NAME should not contain underscores (_).")
                     }
 
                     // Validate number fields (like limits)
                     if (!params.CDP_SAML_PROVIDER_LIMIT?.isNumber()) {
-                        error "ERROR: CDP_SAML_PROVIDER_LIMIT must be a number!"
+                        printError("CDP_SAML_PROVIDER_LIMIT must be a number!")
                     }
                     if (!params.CDP_USER_LIMIT?.isNumber()) {
-                        error "ERROR: CDP_USER_LIMIT must be a number!"
+                        printError("CDP_USER_LIMIT must be a number!")
                     }
                     if (!params.CDP_GROUP_LIMIT?.isNumber()) {
-                        error "ERROR: CDP_GROUP_LIMIT must be a number!"
+                        printError("CDP_GROUP_LIMIT must be a number!")
                     }
                 }
             }
