@@ -62,8 +62,6 @@
         - name: Set the user ID
           ansible.builtin.set_fact:
             __keycloak_user_id: "{{ __keycloak_user_exists.json[0].id }}"
-    
-
 #        - name: Update existing Keycloak User
 #          ansible.builtin.uri:
 #            url: "{{ keycloak__domain }}/admin/realms/{{ keycloak__user_to_create.realm_name }}/users/{{ __keycloak_user_id }}"

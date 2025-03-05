@@ -1,6 +1,4 @@
 = CDW Workshop Instructor's Guide
-Author : Manick Mehra
-Version : 0.1
 :toc: left
 :toclevels: 3
 :icons: font
@@ -17,7 +15,7 @@ This guide provides instructions for setting up, validating, and destroying the 
 
 For environment and Keycloak creation, use the following automation:
 
-link:https://github.com/cloudera/cloudera-partners/tree/main/ClouderaPublicCloudOnBoarding/AWS[GitHub Repository]
+link:https://github.com/cloudera/cloudera-partners/tree/main/ClouderaSetup/OnCloud/AWS[GitHub Repository]
 
 [NOTE]
 ====
@@ -29,41 +27,60 @@ Ensure you have all necessary permissions and configurations before proceeding w
 
 Once the environment and the Keycloak servers are created, upload the data to the object store. This data will be used to create tables during the workshop.
 
-The data can be found in this repo under the "data" directory
+Before executing workshop steps, first copy data from handsonworkshop bucket to current workshopbucket and Create Ranger Policy for RAZ-Enabled AWS Environment.
 
-Upload this data to S3 if working on AWS.
+== Copy data in workshop bucket
 
-Example:
+[.shell]
+----
 
-Bucket Name : workshopcdpenvbucket
+aws s3 cp s3://handsonworkshop/cdw/ s3://<bucketname>/cdw/ --recursive
+#aws s3 cp s3://handsonworkshop/cdw/ s3://testcmlgpu-buk-de067422/cdw/ --recursive
 
-Create a folder called "cdwworkshop" and upload the folder in the "data" directory to that s3 folder.
+----
 
 The final directory structure on S3 should look like
 
-s3://workshopcdpenvbucket/cdwworkshop/airlines-raw/airlines-csv
+s3://<bucketname>/cdw/airlines-raw/airlines-csv
+
+== Creating Ranger Policy for RAZ-Enabled AWS Environment
+
+After you register the RAZ-enabled AWS environment, you can log in to Ranger to create policies for granular access to the environment's cloud storage location. To create the Ranger policy, you must first create the required S3 policy and then a Hive URL authorization policy on an S3 path for the end user.
+
+=== Creating the Required S3 Policy
+
+To create the required S3 policy on an S3 path for an end user, perform the following steps:
+
+. Navigate to the Ranger UI.
+. On the `S3` tab, click `cm_s3`.
+. Click `Add New Policy` in the top right corner.
+. Provide the following policy details:
+  .. Enter _Policy Name_.
+  .. Enter an _S3 Bucket_ name.
+  .. Provide a _Path_ within the S3 bucket.
+  .. Select _Groups_ and _Permissions_ to assign to the end user.
++
+**Only Read and Write permissions can be assigned to the end user.**
++
+image::../../ClouderaDataEngineering/Guide/media/media/RangerS3.png[alt="Sample Create Policy Page in Ranger UI"]
+
+. Click `Add` to save the policy.
+
+=== Modifying the Hadoop SQL Policy
+
+To modify the Hadoop SQL Policy to allow access to databases for the end user, perform the following steps:
+
+. Navigate to the Ranger UI.  
+. On the `Hadoop SQL` tab, click `Hadoop SQL`.  
+
+. Search for policy number 10 (all - database, table) and 15 (all - url) one by one, click the pencil icon on the right to edit. 
+. In the **Allow Conditions** section, under `Select Groups`, search for and add the CDP group named <workshop_name>-aw-cdp-user-group.
++  
+image::./media/Ranger_SQL.png[alt="Sample Policy Details Page in Ranger UI",940,420] 
+
+. Click `Save` to save the policy.  
 
 [.underline]
-* Grant permission to user group
-
-Goto <YOUR ENVIRONMENT> -> ACTIONS -> MANAGE ACCESS -> IDBroker Mapping
-
-Click on "+" at the bottom right to add a new row.
-
-Under username or Group add the group name of the user group that the automation creates. <ENVIRONMENT NAME>-aw-env-user-group
-
-Under "Role" copy past the Data Access role from above click on "Save and Sync"
-
-++++
-<p align="center">
-  ER - Diagram of the data
-</p>
-++++
-++++
-<p align="center">
-  <img width="508" height="462" src="media/usermgmt.png">
-</p>
-++++
 
 == SETUP
 
@@ -85,7 +102,7 @@ Ensure that all users can log in successfully.
 * Lab Execution
 
 Execute the lab exercises to validate the setup.
-Find the student lab link:https://github.com/cloudera/cloudera-partners/tree/main/Workshops/CDW/Guide[guide] here
+Find the student lab link:https://github.com/cloudera/cloudera-partners/tree/main/DataServicesLabs/ClouderaDataWarehouse/Guide[guide] here
 
 == DESTROY
 

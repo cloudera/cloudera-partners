@@ -8,12 +8,16 @@ WORKSHOP_USER_PREFIX:<VALUE>
 WORKSHOP_USER_DEFAULT_PASSWORD:<VALUE>
 LOCAL_MACHINE_IP:<VALUE>/32
 ENABLE_DATA_SERVICES:[Comma Separated list of data services to be enabled. NONE if not required]
-
+DOMAIN:<VALUE>
+HOSTEDZONEID:<VALUE>
 #==================Optional Parameters===============#
 
 #AWS_KEY_PAIR:demo-keypair
 
-##Optional parameters for CDP Quota
+## Optional parameters for datalake_version
+#DATALAKE_VERSION:7.2.18
+
+## Optional parameters for CDP Quota
 #CDP_SAML_PROVIDER_LIMIT:10
 #CDP_USER_LIMIT:1000
 #CDP_GROUP_LIMIT:50
@@ -33,6 +37,7 @@ ENABLE_DATA_SERVICES:[Comma Separated list of data services to be enabled. NONE 
 
 ## CDE
 #CDE_SPARK_VERSION:SPARK3
+#CDE_VC_TIER:CORE
 #CDE_INSTANCE_TYPE:m5.2xlarge
 #CDE_INITIAL_INSTANCES:10
 #CDE_MIN_INSTANCES:10

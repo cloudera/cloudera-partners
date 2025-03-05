@@ -40,7 +40,6 @@ keycloak__client_authentication_flow_binding_overrides:
   browser: ""
   direct_grant: ""
 
-
 # Define SAML URLs by region
 saml_urls:
   us-west-1: "https://consoleauth.altus.cloudera.com/saml?samlProviderId={{ keycloak__cdp_saml_provider_id }}"
@@ -50,7 +49,7 @@ saml_urls:
 # Select the appropriate SAML URL based on cdp_region
 keycloak__saml_assertion_consumer_url_post: "{{ saml_urls[cdp_region] }}"
 
-keycloak__client_attributes: 
+keycloak__client_attributes:
   saml.assertion.signature: True
   saml.force.post.binding: True
   saml.multivalued.roles: False
@@ -111,4 +110,3 @@ keycloak__client_protocol_mappers:
       attribute.nameformat: "URI Reference"
       user.attribute: lastName
       friendly.name: "lastname-friendly-name"
-

@@ -4,16 +4,26 @@
   connection: local
   gather_facts: yes
   vars:
-    instance_type: 'm5.2xlarge'
+    instance_type: "m5.2xlarge"
     initial_instances: 10
     minimum_instances: 10
     maximum_instances: 40
-    spark_version: 'SPARK3'
+    spark_version: "SPARK3"
+    vc_tier: "CORE"  # Default value for vc-tier, can be "ALLP" or "CORE"
 
   tasks:
     - name: Check and print variable status
       debug:
-        msg: "instance_type: {{ instance_type }}, initial_instances: {{ initial_instances }}, minimum_instances: {{ minimum_instances }}, maximum_instances: {{ maximum_instances }}, spark_version: {{ spark_version }}, workshop_name: {{ workshop_name }}, cdp_env_name: {{ cdp_env_name }}, number_vc_to_create: {{ number_vc_to_create | default(1) }}"
+        msg:
+          - "instance_type: {{ instance_type }}"
+          - "initial_instances: {{ initial_instances }}"
+          - "minimum_instances: {{ minimum_instances }}"
+          - "maximum_instances: {{ maximum_instances }}"
+          - "spark_version: {{ spark_version }}"
+          - "vc_tier: {{ vc_tier }}"
+          - "workshop_name: {{ workshop_name }}"
+          - "cdp_env_name: {{ cdp_env_name }}"
+          - "number_vc_to_create: {{ number_vc_to_create | default(1) }}"
 
     - name: Check if CDE service exists and is running
       cloudera.cloud.de_info:
@@ -49,9 +59,8 @@
         name: "{{ workshop_name }}-cde"
       register: deservicestatus
       until: deservicestatus.services[0].status == "ClusterCreationCompleted"
-      retries: 35
+      retries: 40
       delay: 120
-      #when: not cde_service_exists
 
     - name: Print the status
       debug:
@@ -79,9 +88,9 @@
         --cluster-id "{{ deservicestatus.services[0].clusterId }}" \
         --spark-version "{{ spark_version }}" \
         --cpu-requests "{{ '20' }}" \
-        --memory-requests "{{ '80Gi' }}"
+        --memory-requests "{{ '80Gi' }}" \
+        --vc-tier "{{ vc_tier }}"
       with_sequence: start=1 end="{{ number_vc_to_create | default(1) }}" format=%02d
       loop_control:
         pause: 30
       when: "workshop_name + '-cde-vc-' + item not in existing_vcs.stdout_lines"
-

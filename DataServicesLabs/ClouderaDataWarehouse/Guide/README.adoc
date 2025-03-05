@@ -181,7 +181,7 @@ Below are the high-level steps for what we will be doing in the workshop.
 * {blank}
 +
 
-*[Lab 1 & 2]: General introduction to CDW* to get ourselves oriented for the workshop.
+*[Lab 1, 2 & 3]: General introduction to CDW* to get ourselves oriented for the workshop.
 ____
 ** {blank}
 +
@@ -198,37 +198,6 @@ ____
 
 ** {blank}
 +
-*As an Admin:* Monitor the VW and watch as it scales up and down, suspends, etc.
-
-** {blank}
-+
-
-*As a BI Analyst:* Start digging into the data - looking for “needle in a haystack” - running a complex query that will find which engines seem to be correlated to airplane delays for any reason.
-
-____
-
-* {blank}
-+
-*[Lab 3]: Set it up.*
-____
-** {blank}
-+
-
-*As an Admin:* Create and enable the BI analyst team with a Virtual Warehouse.
-
-** {blank}
-+
-
-*As a BI Analyst:* Get familiar with CDW on CDP, and set up our first VW to start working.
-
-** {blank}
-+
-
-*As a BI Analyst:* Wrangle our first set of data - sent to us as a series of .csv files exported from “somewhere else”.
-
-** {blank}
-+
-
 *As an Admin:* Monitor the VW and watch as it scales up and down, suspends, etc.
 
 ** {blank}
@@ -327,7 +296,7 @@ For this workshop you will use the following credentials and resources
 |===
 |*Workshop Login Username* |<Check with your instructor>
 |*Workshop Login Password* |<Check with your instructor>
-|*CDP Workload User (${user_id})* |<Check with your instructor>
+|*CDP Workload User (${user_id})* |<Same as Workshop Login Username>
 |*CDP Workload Password* |<Check with your instructor>
 |*Hive Virtual Warehouse Name* |<Check with your instructor>
 |*Impala Virtual Warehouse Name* |<Check with your instructor>
@@ -424,21 +393,6 @@ CREATE DATABASE ${user_id}_airlines_raw;
 CREATE DATABASE ${user_id}_airlines;
 ----
 
-Example Query
-
-[source,sql]
-----
-CREATE DATABASE apac01_airlines_raw;
-CREATE DATABASE apac01_airlines;
-----
-
-++++
-<p align="center">
-  <img width="293" height="259" src="cdw-media/media/image115.png">
-</p>
-++++
-
-
 Verify if the database is created using the following query. Do not forget to replace the ${user-id} with your actual username
 
 [source,sql]
@@ -466,7 +420,8 @@ ifdef::env-github[]
 endif::[]
 
 [IMPORTANT]
-Replace ${user_id} with the user name assigned to you
+Enter your assigned workshop username in place of **${user_id}** in the textbox below the query editor.
+Enter the provided S3 bucket name in place of **${bucket_name}** in the textbox below the query editor.
 
 **--FLIGHTS TABLE**
 
@@ -486,7 +441,7 @@ CREATE EXTERNAL TABLE ${user_id}_airlines_raw.flights_csv(
   diverted string, carrierdelay int, 
   weatherdelay int, nasdelay int, securitydelay int, 
   lateaircraftdelay int, year int
-) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://kpdayworkshop-buk-0ee1559b/cdw/airlines-raw/airlines-csv/flights' tblproperties("skip.header.line.count" = "1");
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://${bucket_name}/cdw/airlines-raw/airlines-csv/flights' tblproperties("skip.header.line.count" = "1");
 ----
 
 *--PLANES TABLE*
@@ -499,7 +454,7 @@ CREATE EXTERNAL TABLE ${user_id}_airlines_raw.planes_csv(
   manufacturer string, issue_date string, 
   model string, status string, aircraft_type string, 
   engine_type string, year int
-) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://kpdayworkshop-buk-0ee1559b/cdw/airlines-raw/airlines-csv/planes' tblproperties("skip.header.line.count" = "1");
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://${bucket_name}/cdw/airlines-raw/airlines-csv/planes' tblproperties("skip.header.line.count" = "1");
 
 ----
 
@@ -509,7 +464,7 @@ CREATE EXTERNAL TABLE ${user_id}_airlines_raw.planes_csv(
 ----
 drop table if exists ${user_id}_airlines_raw.airlines_csv;
 
-CREATE EXTERNAL TABLE ${user_id}_airlines_raw.airlines_csv(code string, description string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://kpdayworkshop-buk-0ee1559b/cdw/airlines-raw/airlines-csv/airlines' tblproperties("skip.header.line.count" = "1");
+CREATE EXTERNAL TABLE ${user_id}_airlines_raw.airlines_csv(code string, description string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://${bucket_name}/cdw/airlines-raw/airlines-csv/airlines' tblproperties("skip.header.line.count" = "1");
 ----
 
 *--AIRPORT TABLE*
@@ -521,7 +476,7 @@ CREATE EXTERNAL TABLE ${user_id}_airlines_raw.airports_csv(
   iata string, airport string, city string, 
   state DOUBLE, country string, lat DOUBLE, 
   lon DOUBLE
-) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://kpdayworkshop-buk-0ee1559b/cdw/airlines-raw/airlines-csv/airports' tblproperties("skip.header.line.count" = "1");
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE LOCATION 's3a://${bucket_name}/cdw/airlines-raw/airlines-csv/airports' tblproperties("skip.header.line.count" = "1");
 ----
 
 ++++
@@ -783,7 +738,7 @@ In the output look for the following.
 * {blank}
 +
 
-*Location:* s3a://handsonworkshop/my-data/warehouse/tablespace/external/hive/immiapac00_airlines.db/planes
+*Location:* s3a://<bucket_name>/data/warehouse/tablespace/external/hive/immiapac00_airlines.db/planes
 
 * {blank}
 +
@@ -1075,7 +1030,7 @@ Now, make sure that the following 5 tables are created up until this point as sh
 ++++
 
 
-As a final step here let’s run the same analytic query we ran against the Raw layer now in our Data Lakehouse DW, to see what happens with performance. From the cloudera console select the IMPALA virtual warehouse assigned to you
+As a final step here let’s run the same analytic query we ran against the Raw layer now in our Data Lakehouse DW, to see what happens with performance. From the cloudera console select the IMPALA virtual warehouse assigned to you, and open the HUE in the new tab.
 
 ++++
 <p align="center">
@@ -1083,29 +1038,7 @@ As a final step here let’s run the same analytic query we ran against the Raw 
 </p>
 ++++
 
-
-Make sure that 'Unified Analytics' is NOT selected.
-
-++++
-<p align="center">
-  <img width="527" height="271" src="cdw-media/media/image120.png">
-</p>
-++++
-
-Instead click on the Editor option in the left top corner and select Impala editor.
-
-++++
-<p align="center">
-  <img width="479" height="316" src="cdw-media/media/image22.png">
-</p>
-++++
-++++
-<p align="center">
-  <img width="624" height="294" src="cdw-media/media/image30.png">
-</p>
-++++
-
-Now run the following query again.
+Now run the following query again, inside the Impala editor.
 
 [source,sql]
 ----
@@ -1537,7 +1470,7 @@ ____
 * {blank}
 +
 ____
-Then click on Queries. This is where an Admin will go when he wants to investigate the queries. In our case for this lab, we’d like to look at the query we just executed to see how it ran and the steps taken to execute the query. Administrators would also be able to perform other monitoring and maintenance tasks for what is running (or has been run). Monitoring and maintenance tasks could include cancel (kill) queries, see what is running, analyze whether queries that have been executed are optimized, etc.
+Then click on Hive Queries. This is where an Admin will go when he wants to investigate the queries. In our case for this lab, we’d like to look at the query we just executed to see how it ran and the steps taken to execute the query. Administrators would also be able to perform other monitoring and maintenance tasks for what is running (or has been run). Monitoring and maintenance tasks could include cancel (kill) queries, see what is running, analyze whether queries that have been executed are optimized, etc.
 ____
 
 ++++
@@ -1699,7 +1632,7 @@ ____
 * {blank}
 +
 ____
-Filter for Assets we created - below the Data Lakes on the left of the screen under Filters, select TYPE to be Hive Table. The right side of the screen will update to reflect this selection.
+Filter for Assets we created - below the Data Lakes on the right of the Search bar Filter, select TYPE to be Hive Table and Database name as <username>_airlines. The below part of the screen will update to reflect this selection.
 
 ++++
 <p align="center">
@@ -1712,28 +1645,11 @@ ____
 * {blank}
 +
 ____
-Under DATABASE, click Add new Value. In the box that appears start typing your <user_id> when you see the <user_id>_airlines database pop up select it.
+You should now see the tables and materialized views that have been created in the <user_id>_airlines database. Now, select TYPE to be Iceberg Table and click on flights in the Name column to view more details on the table.
 
 ++++
 <p align="center">
-  <img width="468" height="378" src="cdw-media/media/image26.png">
-</p>
-++++
-++++
-<p align="center">
-  <img width="449" height="421" src="cdw-media/media/image87.png">
-</p>
-++++
-____
-
-* {blank}
-+
-____
-You should now see the tables and materialized views that have been created in the <user_id>_airlines database. Click on airlines in the Name column to view more details on the table.
-
-++++
-<p align="center">
-  <img width="465" height="286" src="cdw-media/media/image75.png">
+  <img width="600" height="400" src="cdw-media/media/image75.png">
 </p>
 ++++
 ____
@@ -1807,7 +1723,7 @@ Fill out the form as follows.
 ** Row Filtering Conditions:
 *** Select User: <user_id>
 
-*** Access Types: select
+*** Permissions: select
 *** Row Level Filter: uniquecarrier="UA"
 
 

@@ -262,6 +262,12 @@ docker pull clouderapartners/cdp-public-cloud-hol-provisioner:latest
 This `Docker` based provisioner requires values of mandatory parameters to provision the infrastructure. It reads the values of these parameters from a configuration file hosted on your local machine. This section walks you through all the steps which are required to create a configuration file. This is the most **important** part so please dont skip any
 step of this section.
 
+[NOTE]
+====
+To complete this setup, you must have a registered domain on `Route53` and a corresponding `Hosted Zone` linked to it.
+If you are unsure about the steps or don’t have a registered domain or hosted zone set up on `AWS Route53`, refer to the guide link:https://github.com/cloudera/cloudera-partners/blob/keycloak-ssl-le/ClouderaSetup/OnCloud/AWS/Route53.adoc[**here**] for detailed instructions.
+====
+
 ==== A): 
 Create a folder inside your user home directory on your local machine by name **userconfig**. This folder will store all the configuration file and output generated in further steps.
 
@@ -320,7 +326,7 @@ values of the parameters.
 Only from the provided values
 |WORKSHOP_NAME
 |Name for the workshop. Will used to create resources.
-|No quotes and underscore and should be between 5-18 characters, preffered lowercase (with integers)
+|No quotes and underscore and should be between 5-18 characters, preferred lowercase (with integers)
 
 |NUMBER_OF_WORKSHOP_USERS
 |Number of users required for the workshop
@@ -328,11 +334,19 @@ Only from the provided values
 
 |WORKSHOP_USER_PREFIX
 |Prefix for creating workshop users in Keycloak
-|No quotes, only string, preffered lowercase (with integers)
+|No quotes, only string, preferred lowercase (with integers)
 
 |WORKSHOP_USER_DEFAULT_PASSWORD
 |Default password for participants
 |No quotes
+
+|DOMAIN
+|Root Public Domain Name on Route53 for hosting Workshop keycloak
+|No quotes, only lowercase
+
+|HOSTEDZONEID
+|HostedZoneId of Root Public Domain Name on Route53 for hosting Workshop keycloak
+|No quotes, preferred uppercase
 
 |LOCAL_MACHINE_IP
 |Public IPV4 address of local machine
@@ -365,6 +379,19 @@ Only from the provided values
 |AWS_KEY_PAIR
 |If you want to utilize an already existing keypair, uncomment the corresponding entry in `configfile` and override the value with the keypair name. If AWS_KEY_PAIR is not defined, the automation will create a new keypair.
 |Only base name without .pem extension.
+|===
+
+==== Optional parameters for datalake_version
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|DATALAKE_VERSION
+|By default the DATALAKE_VERSION is selected as per default version on CDP tenant.
+|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value e.g **7.2.18**
 |===
 
 ==== Optional parameters for CDP Quota
@@ -423,6 +450,11 @@ No quotes, only string, only lowercase (with integers)
 |CDE_SPARK_VERSION
 |Possible values: **SPARK2, SPARK2_4, SPARK3, SPARK3_0, SPARK3_1, SPARK3_2, SPARK3_3, SPARK3_5**
 |Default value is **SPARK3**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
+
+No quotes, Only from the provided values
+|CDE_VC_TIER
+|Possible values: **CORE, ALLP**
+|Default value is **CORE**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
 
 No quotes, Only from the provided values
 |CDE_INSTANCE_TYPE
@@ -740,11 +772,11 @@ rm -rf /userconfig/<workshop_name>.txt
 
 **The Link for SSO to CDP Workshop Environment for External Workshop Users:**
 
-Keycloak URL: **http://<KeyCloak_Server_IP>/realms/master/protocol/saml/clients/cdp-sso**
+Keycloak URL: **https://<WorkshopName.Domain>/realms/master/protocol/saml/clients/cdp-sso**
 
 **The Link for SSO to `KeyCloak` Server WebUI for Workshop Owners (Admin User):**
 
-Keycloak URL: **http://<KeyCloak_Server_IP>/ **
+Keycloak URL: **https://<WorkshopName.Domain>/**
 
 The same details can be found in `<workshop_name>.txt` file present under `userconfig` directory on your local machine from where you executed the provisioner.
 
@@ -759,6 +791,7 @@ image::build/images/keycloak_login.png[keycloak_login,600,400]
 Admin URL: **http://<KeyCloak_Server_IP>:5000/admin**
 
 Participant URL: **http://<KeyCloak_Server_IP>:5000/participant**
+
 
 ====
 
