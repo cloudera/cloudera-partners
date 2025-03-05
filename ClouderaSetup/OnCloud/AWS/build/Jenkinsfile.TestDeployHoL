@@ -38,7 +38,7 @@ pipeline {
         string(name: 'CML_GPU_INSTANCE_TYPE', defaultValue: 'g4dn.xlarge', description: 'CML GPU instance type')
         string(name: 'CML_MIN_GPU_INSTANCES', defaultValue: '0', description: 'Minimum number of GPU instances for CML')
         string(name: 'CML_MAX_GPU_INSTANCES', defaultValue: '10', description: 'Maximum number of GPU instances for CML')
-        string(name: 'DOMAIN', defaultValue: 'example.com', description: '❗❗❗(MANDATORY) Route53 registered domain or subdomain (e.g., sub.example.com)')
+        string(name: 'DOMAIN', defaultValue: 'clouderapartners.click', description: '❗❗❗(MANDATORY) Route53 registered domain or subdomain (e.g., sub.example.com)')
         string(name: 'HOSTEDZONEID', defaultValue: 'Example: ZCLOUDERAPSEAPACTEAM1', description: '❗❗❗(MANDATORY) Route53 Hosted Zone Id for the above domain')
         string(name: 'DATALAKE_VERSION', defaultValue: '7.2.18', description: 'The Datalake runtime version to be used (e.g., 7.2.18)')
         choice(name: 'DELETE_WORKDIR', choices: ['false', 'true'], description: 'Choose whether to delete the work directory after the job completes')
@@ -404,7 +404,7 @@ sh """
 
                 // Send email
                 emailext(
-                    to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
+                    to: "${env.BUILD_USER_EMAIL ?: 'aktiwari@cloudera.com,ksahu@cloudera.com, ygulati@cloudera.com'}",
                     subject: "✅ Jenkins Build Success: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
                     body: """
                         <html>
@@ -471,7 +471,7 @@ sh """
             script {
                 def errorLog = currentBuild.description ?: "Unknown error occurred."
                 emailext(
-                    to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
+                    to: "${env.BUILD_USER_EMAIL ?: 'aktiwari@cloudera.com,ksahu@cloudera.com, ygulati@cloudera.com'}",
                     subject: "❌ Jenkins Build Failed: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
                     body: """
                         <html>
