@@ -68,6 +68,15 @@ You can follow the instructions [here](https://community.cloudera.com/t5/Communi
 
 ![Serper Key](./img/serper-key.png)
 
+## Successful Lab Tips
+
+1. Make sure to provision the required GPU for AI Inference at least 1 day in advance so that you are not stuck with GPU availability issues during autoscaling.
+2. Make sure to provision enough CPU worker nodes for the workspace and scale it up a couple of hours before the lab so that participants don't have latency issues.
+3. Test out the lab as a participant. Login via Keycloak, go through all the steps and ensure that lab users have the required access.
+
+**IMPORTATNT** 
+
+You need to check the AWS limits (Service Quota Dashabord) for the resource types you will be using. This includes total number of instances of each type that your AWS account is allowed to deploy in a given region, as well as quotas like _Running On-Demand G and VT instances_ that govern the total number of CPUs of a given instance type you can deploy at once.
 
 ## Teardown
 
