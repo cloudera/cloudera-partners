@@ -179,9 +179,6 @@ pipeline {
                     sh '''
                         mkdir -p ${CONFIG_DIR}
                         cd ${CONFIG_DIR} 
-                        pwd && ls -l
-                        echo "\n Printing configfile:\n"
-                        cat ${CONFIG_FILE}
                     '''
                 }
             }
@@ -241,7 +238,7 @@ HOSTEDZONEID:${params.HOSTEDZONEID}
 sh """
     pwd
     ls -l ${CONFIG_DIR}
-    echo 'Printing config file:'
+    echo 'Printing config file:\n'
     cat ${CONFIG_FILE}
 """
                 }
@@ -344,7 +341,7 @@ sh """
                 script{
                     sh '''
                     CDP_WORKLOAD_USERNAME="${BUILD_USER_ID//_/.}"
-		    echo "CDP_WORKLOAD_USERNAME: $CDP_WORKLOAD_USERNAME"
+		            echo "CDP_WORKLOAD_USERNAME: $CDP_WORKLOAD_USERNAME"
                     # Set your environment name
                     CDP_ENV_NAME="$(echo "$WORKSHOP_NAME" | tr '[:upper:]' '[:lower:]')-cdp-env"
                     echo "CDP_ENV_NAME: $CDP_ENV_NAME"
