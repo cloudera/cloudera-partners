@@ -10,8 +10,6 @@ litellm.set_verbose=False
 from chat_app.crew_agents import ecommerce_policies_agent, sales_agent, customer_service_manager, agent_task, order_issues_agent
 from chat_app.app_config import configuration
 
-llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
-
 # Task Definitions
 import datetime
 

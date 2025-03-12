@@ -6,8 +6,9 @@ litellm.set_verbose=False
 
 from chat_app.tools import TargetedPromosTool, RetrievePoliciesTool, FeedbackSubmissionTool
 
-
-llm = LLM(model=os.environ["AWS_BEDROCK_MODEL"])
+# LiteLLM Settings
+os.environ["AWS_REGION_NAME"] = os.environ["AWS_DEFAULT_REGION"]
+llm = LLM("bedrock/" + os.environ["AWS_BEDROCK_MODEL"])
 
 ecommerce_policies_agent = Agent(
     role=dedent((
