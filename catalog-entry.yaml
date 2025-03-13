@@ -17,4 +17,5 @@ entries:
       - Graph DB
       - Model Deployment
     git_url: "https://github.com/shreshtab/ai-agents-hol-cai/"
+    git_ref: "release/v1_1"
     is_prototype: true
