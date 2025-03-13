@@ -24,7 +24,7 @@ After login, you will be taken to the home screen of Cloudera Data Platform. Som
 > **0a.** Click on the "Cloudera AI" icon.
 ![Control Plane to CML](./assets/new-home-page.png)
 
-> **0b.** Then click on ML Workspace called _sko-ai-agent-cml-ws_.
+> **0b.** Then click on ML Workspace called _agentic-ai-cml-ws_.
 ![CML Home Page](./assets/ML_Workspaces_Home.png)
 
 If you are new to Cloudera AI, take a moment to explore the dashboard.
