@@ -292,9 +292,16 @@ sh """
                     // Check the container logs for failure strings
                     sh "docker logs hol-provisioner-${BUILD_NUMBER} > ${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log"
                     def logOutput = readFile("${WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log")
+                    // def logOutput = """
+                    // 17:37:24  fatal: [localhost]: FAILED! => {"changed": false, "error": "{'base_error': ClientError('An error occurred: failed to activate the environment (cause: unable to create cluster initial state: state validation error (cause: public load balancer selected. worker subnets should be exactly 3. got: 5)) [request-id: ] (Status Code: 500; Error Code: UNKNOWN; Service: dw; Operation: createCluster; Request ID: cbbf3c45-fb32-488c-adff-a44ac8702490;)')", "msg": "Client request error", "violations": "failed to activate the environment (cause: unable to create cluster initial state: state validation error (cause: public load balancer selected. worker subnets should be exactly 3. got: 5)) [request-id: ]"}
+                    // 03:04:32  fatal: [localhost]: FAILED! => {"changed": true, "cmd": ["cdp", "ml", "create-workspace", "--environment-name", "cicdworkshop-cdp-env", "--workspace-name", "cicdworkshop-cml-ws", "--use-public-load-balancer", "--enable-model-metrics", "--no-disable-tls", "--enable-monitoring", "--static-subdomain", "cicdworksho-cml", "--provision-k8s-request", "{\"environmentName\": \"cicdworkshop-cdp-env\", \"instanceGroups\": [{\"name\": \"default_settings\", \"instanceType\": \"m5.2xlarge\", \"rootVolume\": {\"size\": 256}, \"autoscaling\": {\"minInstances\": 1, \"maxInstances\": 1, \"enabled\": true}}]}"], "delta": "0:00:01.558565", "end": "2025-03-27 21:34:32.531632", "msg": "non-zero return code", "rc": 255, "start": "2025-03-27 21:34:30.973067", "stderr": "\\nAn error occurred: INTERNAL: Failed to create workbench: the workbench with name cicdworkshop-cml-ws in environment cicdworkshop-cdp-env already exists. Can not retry create workflow for the workbench because it is in : state (Status Code: 500; Error Code: UNKNOWN; Service: ml; Operation: createWorkspace; Request ID: 082fcc7e-dcf6-4f57-99ab-12bdfcd994e4;)", "stderr_lines": ["", "An error occurred: INTERNAL: Failed to create workbench: the workbench with name cicdworkshop-cml-ws in environment cicdworkshop-cdp-env already exists. Can not retry create workflow for the workbench because it is in : state (Status Code: 500; Error Code: UNKNOWN; Service: ml; Operation: createWorkspace; Request ID: 082fcc7e-dcf6-4f57-99ab-12bdfcd994e4;)"], "stdout": "", "stdout_lines": []}
+                    // """
                 
                     // Initialize a list to hold error messages
                     def errorMessages = []
+                    // Match multiple occurrences of error messages
+                    def fatalPattern = ~/fatal: .*?"(?:stderr|error)": ".*?(An error occurred: .*?)"/
+                    def matcher = fatalPattern.matcher(logOutput)
         
                     // Check for specific failure messages
                     if (logOutput.contains('Workspace Provisioning Got Failed.')) {
@@ -315,16 +322,26 @@ sh """
                     if (logOutput.toLowerCase().contains('fatal')) {
                         errorMessages.add("Job failed with error code 'fatal'.")
                     }
-        
-                    // If there are any error messages, fail the job with the collected messages
+
+                    while (matcher.find()) {
+                        def errorMessage = matcher.group(1).replaceAll("\\\\n", "\n").trim() // Replace escaped \n with actual newline
+                        errorMessages.add("\nJob failed: 'FATAL': \n${errorMessage}")
+                    }
+
+                    // Print all extracted errors
                     if (!errorMessages.isEmpty()) {
                         currentBuild.result = 'FAILURE'
+                        println errorMessages.join("\n") // Separate multiple errors with a newline
+                    // }
+
+                    // // If there are any error messages, fail the job with the collected messages
+                    // if (!errorMessages.isEmpty()) {
+                    //     currentBuild.result = 'FAILURE'
                         
                         // Save error messages in build variable for use in post section
                         currentBuild.description = errorMessages.join('\n')
         
                         // Send an email with the error logs
-                        
 
                          // Mark the build as failed with the error messages
                         
