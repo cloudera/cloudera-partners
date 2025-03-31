@@ -1,0 +1,98 @@
+= CDP Private Cloud Machine Learning (CML)
+
+For more details, review CDP Private Cloud Machine Learning documentation.
+
+== Prerequisites
+
+Ensure you meet the requirements for ECS and CML on Private Cloud:
+- https://docs.cloudera.com/machine-learning/1.5.4/private-cloud-requirements/topics/ml-pvc-intro.html
+- https://docs.cloudera.com/machine-learning/cloud/workspaces/topics/ml-provision-workspaces.html
+- https://docs.cloudera.com/machine-learning/1.5.4/workspaces-privatecloud/topics/ml-pvc-provision-ml-workspace.html
+
+== ML Workspace Creation
+
+. Navigate to the Cloudera Private Cloud Data Services console.
+. Click on *Cloudera Machine Learning*.
+. If no workspace exists, click *Provision Workspace*.
+. Enter the required details:
+    * *Workspace Name*: A suitable name for the workspace.
+    * *Environment*: Select the default environment.
+    * *Namespace*: Defaults to `cml`, but can be changed.
+    * *NFS Server*: Select *Internal*.
+. Under *Production Learning*, configure the following:
+    * Enable Governance: Advanced lineage and governance features (optional for demos/POCs).
+    * Enable Model Metrics: Keep enabled for tracking metrics.
+    * Enable TLS: Can be disabled.
+    * Enable Monitoring: Enable for resource usage tracking.
+    * CML Static Subdomain: Enter a short identifier.
+. Click *Provision Workspace*.
+. Once provisioning completes, status changes to *Ready*.
+
+== Managing Access
+
+. Click on *Manage Access*.
+. Search for a user or group.
+. Assign the appropriate *Resource Role*.
+. Click on the workspace name to access the Web UI.
+
+== Creating a Project in CML
+
+. Click *New Project*.
+. Enter project details:
+    * *Name*: Enter a suitable name.
+    * *Description*: Provide details.
+    * *Visibility*: Public for demos, Private for multi-tenant setups.
+. Choose the *Initial Setup* option:
+    * *Blank*: Start from scratch.
+    * *Template*: Use predefined examples in R, Python, PySpark, or Scala.
+    * *AMPs*: Applied ML Prototypes include jobs, models, and experiments.
+    * *Local Files*: Upload from a local folder or ZIP.
+    * *Git*: Import from a repository.
+. Select *Runtime Setup*:
+    * Choose *Basic*.
+    * Set the kernel to Python 3.9 (GPU variant not required).
+. Click *Create Project*.
+. Once created, access it from the *Projects* page.
+
+== Authenticating with Hadoop
+
+If the cluster is Kerberized:
+
+. Navigate to *User Settings > Hadoop Authentication*.
+. Enter Principal (e.g., `admin@CLDRSETUP.LOCAL`).
+. Provide credentials or keytab.
+. Click *Authenticate*.
+
+== Running a Session in CML
+
+. Open the *Projects* page and select the project.
+. Click *New Session*.
+. Configure session parameters:
+    * Editor (JupyterLab, Workbench, etc.).
+    * Kernel type.
+    * Number of GPUs (if applicable).
+. Click *Start A New Session*.
+
+== Using AMPs
+
+. Navigate to the *AMPs* tab.
+. Select an AMP.
+. Click *Configure Project*.
+. Adjust runtime settings.
+. Click *Launch Project*.
+
+== Accessing the Web UI
+
+. Open the created AMP project.
+. Click *Open* to access the Web UI.
+. Modify settings or use default configurations.
+
+== Accessing HDFS Data
+
+Use Jupyter Notebook sessions within CML to interact with HDFS data.
+
+== Further Documentation
+
+Refer to Cloudera Machine Learning documentation for more details:
+- https://docs.cloudera.com/machine-learning/cloud/product/topics/ml-product-overview.html
+

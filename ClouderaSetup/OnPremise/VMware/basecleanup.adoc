@@ -1,0 +1,58 @@
+= Cleanup CDP PvC Base Cluster
+
+Link: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-uninstallation.html
+
+== Uninstall and Cleanup Steps
+_If installation fails and issues cannot be resolved._
+
+=== Stop all Services
+
+=== Delete the Cluster
+On the Home page, click the drop-down list next to the cluster you want to delete and select *Delete*.
+
+=== Uninstall the Cloudera Manager Server
+
+==== Cleanup DB
+[source,sh]
+systemctl status cloudera-scm-server
+#cd /etc/yum.repos.d
+#rm -rvf cloudera-manager.repo
+date
+systemctl stop postgresql-14
+#dnf remove -y postgresql-contrib postgresql-14-contrib postgresql-server postgresql-14-server
+#userdel postgres
+
+systemctl stop cloudera-scm-server cloudera-scm-agent cloudera-scm-server-db cloudera-manager-server-db
+dnf remove -y cloudera-manager-daemons cloudera-manager-agent cloudera-manager-server cloudera-manager-server-db
+
+systemctl daemon-reload
+#rm -rvf /var/lib/pgsql/14/data/
+mv -v /var/lib/pgsql/14/data/ /var/lib/pgsql/14/data_bkp_$(date +%Y%m%d)
+
+=== Cleanup CDP-CM, Base Master, and Worker Nodes
+[source,sh]
+#/opt/cloudera/installer/uninstall-cloudera-manager.sh
+systemctl stop cloudera-scm-server cloudera-scm-agent cloudera-scm-server-db supervisord;
+dnf remove -y cloudera-manager-server cloudera-manager-server-db-2 cloudera-management-agent cloudera-management-daemon cloudera-manager-*; dnf clean all; systemctl daemon-reload;
+for u in cloudera-scm* flume hadoop hdfs hbase hive httpfs hue impala llama mapred oozie solr spark sqoop sqoop2 yarn zookeeper; do sudo kill $(ps -u $u -o pid=); done
+sudo umount cm_processes
+
+=== Remove Cloudera Files
+[source,sh]
+sudo rm -rvf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/cloudera* /var/log/cloudera* /var/run/cloudera* /etc/cloudera-scm-server /opt/cloudera /etc/cloudera-scm-agent /var/lib/cloudera-scm-agent/cm_guid* /tmp/.scm_prepare_node.lock
+sudo rm -rvf /tmp/kafka-logs
+sudo rm -rvf /var/lib/flume-ng /var/lib/hadoop* /var/lib/hue /var/lib/navigator /var/lib/oozie /var/lib/solr /var/lib/sqoop* /var/lib/zookeeper /hadoop-ozone /impala /hadoop-ozone /var/local/kafka/data/meta.properties
+
+sudo rm -rvf /hdfs/* /dfs* /hdfs/mapred/* /hdfs/yarn/* /var/lib/had*ozon* /yarn* /etc/{*atlas*,*hadoop*,ranger,hue,impala,knox,hbase,*hive*,hbase-solr,hadoop-kms,*ozone*,*kafka*,*zeppelin*,*spark*,sqoop*,schemaregistry,*solr*,hive-hcatalog,hive-webhcat,hue,*hbase*,*kudu*,*knox*,zookeeper,*tez*,streams*} /tmp/kafka-logs/* /var/local/kafka/data/meta.properties /var/lib/cloudera-scm-agent/cm_guid
+
+=== Cleanup Users and Groups
+[source,sh]
+for user in hdfs httpfs sqoop kafka yarn hbase streamsrepmgr streamsmsgmgr livy kms atlas schemaregistry hue zookeeper accumulo phoenix mapred druid ranger zeppelin oozie kudu knox superset solr hive cruisecontrol impala rangerraz ozone tez dpprofiler flume nifi nifiregistry nifitoolkit spark flink rangerrms omid hadoop kraft; do userdel -r "$user" 2>/dev/null; done
+
+for group in hdfs hue httpfs sqoop kafka yarn hbase streamsrepmgr streamsmsgmgr livy kms atlas schemaregistry hue zookeeper accumulo phoenix mapred druid ranger zeppelin oozie kudu knox superset solr hive cruisecontrol impala rangerraz ozone tez dpprofiler flume nifi nifiregistry nifitoolkit spark flink rangerrms omid hadoop kraft; do groupdel "$group" 2>/dev/null; done
+
+=== Verify Cleanup
+[source,sh]
+java -version
+python3 -V
+

@@ -1,0 +1,130 @@
+= Setup Private Cloud (PvC) Base Cluster
+
+== Install Cloudera Private Cloud Base using Cloudera Manager WebUI
+
+[.lead]
+*Navigation:* <<table-of-contents,Table of Contents>> | <<parent-section,Parent Section>>
+
+1. In Cloudera Manager, click **(+) Add > Add Cluster**.
+2. On the **Select Cluster Type** page, choose **Private Cloud Base Cluster**, enter a cluster name, and click **Continue**.
+3. Enter the cluster hostnames or IP addresses in the **Hostnames** field.
+    * Example patterns:
+      - `pvcbase-master.cldrsetup.local`
+      - `pvcbase-worker[1-5].cldrsetup.local`
+    * Ensure hostnames are in lowercase.
+4. Click **Search**, verify detected hosts, deselect unwanted entries, and click **Continue**.
+
+=== Select Repository
+1. Choose **Cloudera Repository**.
+2. Enter the repository URL: `http://13.251.65.11/cloudera-repos/cloudera-manager/`.
+3. Click **Continue**.
+
+=== Configure Parcels
+1. Select **Use Parcels (Recommended)**.
+2. In **Parcel Repository & Network Settings**, enter the URLs:
+    - `http://13.251.65.11/cloudera-repos/spark3/3.3.7191000.4/`
+    - `http://13.251.65.11/cloudera-repos/cdh7.1.9/`
+3. Click **Save and Verify Configuration**, then close the wizard.
+4. Select the parcels and click **Continue**.
+
+=== Configure JDK
+1. Select **Manually manage JDK** (OpenJDK11 installed manually).
+2. Click **Continue**.
+
+=== Enter Login Credentials
+[options="header"]
+|===
+| Component | Value 
+| SSH Username | root 
+| Authentication | Password or Private Key 
+| Password (if applicable) | `<password>` 
+| Private Key (if applicable) | Upload `id_rsa` 
+|===
+3. Click **Continue**.
+
+=== Install Agents
+1. Agents are installed on all cluster nodes.
+2. Click **Continue** after completion.
+
+=== Create Required Directories (Bug p1000 Handling)
+[source,shell]
+----
+ansible namenodes,datanodes -m shell -a "mkdir /var/lib/hadoop-hdfs"
+ansible namenodes,datanodes -m shell -a "ls -lart /var/lib/hadoop-hdfs"
+----
+
+=== Install Parcels
+1. Wait for parcels to be distributed and activated.
+2. Click **Continue**.
+
+=== Set Permissions (Bug p1000 Handling)
+[source,shell]
+----
+ansible namenodes,datanodes -m shell -a "chown hdfs:hadoop /var/lib/hadoop-hdfs"
+ansible namenodes,datanodes -m shell -a "ls -lart /var/lib/hadoop-hdfs"
+----
+
+=== Verify Ozone Filesystem JAR Links
+[source,shell]
+----
+ansible namenodes,datanodes -m shell -a "namei -om /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar"
+----
+If links are incorrect:
+[source,shell]
+----
+ansible namenodes,datanodes -m shell -a "unlink /etc/alternatives/ozone-filesystem-hadoop3.jar"
+ansible namenodes,datanodes -m shell -a "unlink /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar"
+----
+
+==== Notes from Product/Engineering Team
+- Ensure `/var/lib/hadoop-hdfs` exists on all nodes.
+- Check if `hdfs` user exists:
+  [source,shell]
+  ----
+  grep hdfs /etc/passwd; grep hdfs /etc/group
+  ----
+- Create the directory if missing.
+- Deactivate and activate the Cloudera Runtime parcel.
+- Ensure the directory has correct permissions:
+  [source,shell]
+  ----
+  alternatives --install /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar ozone-filesystem-hadoop3.jar /opt/cloudera/parcels/CDH-<path_to_active_parcel>/lib/hadoop-ozone/ozone-filesystem-hadoop3.jar 5
+  ----
+- If an Ozone parcel is installed:
+  [source,shell]
+  ----
+  alternatives --install /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar ozone-filesystem-hadoop3.jar /opt/cloudera/parcels/OZONE-<path_to_activated_Ozone_parcel>/lib/hadoop-ozone/ozone-filesystem-hadoop3.jar 10
+  ----
+
+=== Inspect Cluster
+1. Run **Inspect Network Performance**.
+2. Run **Inspect Hosts**.
+3. Address any issues and rerun tests.
+4. Click **Finish**.
+
+=== Fix Java Path Mismatch (if needed)
+1. Find the Java path on the host:
+   [source,shell]
+   ----
+   /usr/lib/jvm/java-17-openjdk-17.0.13.0.11-4.el9.x86_64/
+   ----
+2. Override **JAVA PATH** in Cloudera Manager.
+3. Save changes and restart **Cloudera-SCM-Server**.
+4. Re-run inspection tools.
+
+== Private Cloud Base Cluster (Data Lake/Control Plane) Creation
+1. After base cluster setup, proceed to **Add Cluster - Configuration**.
+2. Select **Custom Services**:
+    - Data Engineering
+    - Data Warehouse
+    - Operational Database
+    - Custom Control Plane services (HDFS, YARN, Hive, Ozone, Ranger, Atlas, Kafka, etc.)
+3. Assign roles to hosts based on intended service roles.
+
+For detailed information, refer to **Runtime Cluster Hosts and Role Assignments**.
+
+Click **Continue** after selecting the required services.
+
+[.lead]
+*Navigation:* <<table-of-contents,Table of Contents>> | <<parent-section,Parent Section>>
+

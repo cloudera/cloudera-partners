@@ -1,0 +1,156 @@
+== Perform the PvC Base Cluster Validation
+
+=== References
+- https://training-team.gitbook.io/setting-up-cloudera-data-platform-cdp/hive-validation
+- https://www.quora.com/How-do-you-load-data-into-a-Hive-external-table
+- https://stackoverflow.com/questions/17425492/hive-insert-query-like-sql
+- https://github.com/mionisation/BI_BigData_2_HiveDatasetAnalysis/blob/master/createMovieLensTables.hql
+- https://grouplens.org/datasets/movielens/20m/
+
+=== Validation Steps
+
+[source,shell]
+----
+# Install required utilities
+[root@pvcbase-master ~]# dnf install -y wget unzip
+
+# Download and extract the dataset
+[root@pvcbase-master ~]# wget https://files.grouplens.org/datasets/movielens/ml-20m.zip
+[root@pvcbase-master ~]# unzip ml-20m.zip
+[root@pvcbase-master ~]# cd ml-20m
+[root@pvcbase-master ml-20m]# sed -i 1d *
+----
+
+==== HDFS Access Verification
+
+[source,shell]
+----
+[root@pvcbase-master ml-20m]# hdfs dfs -ls /
+----
+
+*Possible Error:*
+
+```
+24/03/21 04:32:28 WARN ipc.Client: Exception encountered while connecting to the server : org.apache.hadoop.security.AccessControlException: Client cannot authenticate via:[TOKEN, KERBEROS]
+```
+
+If authentication issues arise, locate the keytab file:
+
+[source,shell]
+----
+[root@pvcbase-master ml-20m]# find / -name hdfs.keytab
+----
+
+Then, initialize Kerberos authentication:
+
+[source,shell]
+----
+[root@pvcbase-master ml-20m]# klist -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab
+[root@pvcbase-master ml-20m]# kinit -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab
+----
+
+Verify authentication:
+
+[source,shell]
+----
+[root@pvcbase-master ml-20m]# klist
+----
+
+==== Upload Data to HDFS
+
+[source,shell]
+----
+hdfs dfs -mkdir /tmp/movielens
+hdfs dfs -put * /tmp/movielens/
+hdfs dfs -chown -R hive:supergroup /tmp/movielens
+hdfs dfs -ls /tmp/movielens/
+----
+
+==== Hive Table Creation
+
+[source,hiveql]
+----
+CREATE DATABASE movielens;
+USE movielens;
+
+CREATE TABLE IF NOT EXISTS ratings (
+    userId int,
+    movieId int,
+    rating double,
+    ts bigint
+) COMMENT "Movie Ratings"
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE;
+
+LOAD DATA INPATH '/tmp/movielens/movies.csv' OVERWRITE INTO TABLE movies;
+LOAD DATA INPATH '/tmp/movielens/tags.csv' OVERWRITE INTO TABLE tags;
+LOAD DATA INPATH '/tmp/movielens/ratings.csv' OVERWRITE INTO TABLE ratings;
+LOAD DATA INPATH '/tmp/movielens/genome-tags.csv' OVERWRITE INTO TABLE genome_tags;
+LOAD DATA INPATH '/tmp/movielens/genome-scores.csv' OVERWRITE INTO TABLE genome_scores;
+----
+
+==== Validation Using HUE
+- Execute database and table creation queries in HUE.
+- Upload data using Hive CLI.
+- Run `SELECT` queries in HUE to verify data.
+
+**************************************************************************************************************
+
+== OZONE Validation
+
+==== Verify OZONE Access
+
+[source,shell]
+----
+[root@pvcbase-master ~]# ozone sh bucket list ozone11
+----
+
+*Possible Error:*
+
+```
+org.apache.hadoop.security.AccessControlException: Client cannot authenticate via:[TOKEN, KERBEROS]
+```
+
+Verify Kerberos authentication:
+
+[source,shell]
+----
+[root@pvcbase-master ~]# klist -e
+----
+
+Locate the Ozone keytab file:
+
+[source,shell]
+----
+[root@pvcbase-master ~]# find / -name ozone.keytab
+[root@pvcbase-master ~]# kinit -kt /run/cloudera-scm-agent/process/1546344038-ozone-S3_GATEWAY/ozone.keytab s3g/pvcbase-master.cldrsetup.local@CLDRSETUP.LOCAL
+----
+
+Verify authentication:
+
+[source,shell]
+----
+[root@pvcbase-master ~]# klist
+----
+
+==== OZONE Operations
+
+Create and list volumes:
+
+[source,shell]
+----
+[root@pvcbase-master ~]# ozone sh volume create ozone11
+[root@pvcbase-master ~]# ozone sh volume list
+----
+
+Create and list buckets:
+
+[source,shell]
+----
+[root@pvcbase-master ~]# ozone sh bucket create ozone11/testkdbkt1
+[root@pvcbase-master ~]# ozone sh bucket list ozone11
+----
+
+**************************************************************************************************************

@@ -1,0 +1,100 @@
+= Cleanup CDP PvC Data Services - ECS Cluster
+
+Reference: https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs/topics/cdppvc-installation-ecs-uninstall-pvc.html
+
+== CLEANUP ECS
+
+=== On each host in the cluster:
+
+[source,shell]
+----
+/opt/cloudera/parcels/ECS/docker/docker container stop registry
+/opt/cloudera/parcels/ECS/docker/docker container rm -v registry
+/opt/cloudera/parcels/ECS/docker/docker image rm registry:2
+----
+
+=== Stop the ECS cluster in Cloudera Manager
+
+On each host:
+
+[source,shell]
+----
+cd /opt/cloudera/parcels/ECS/bin
+./rke2-killall.sh # usually 2 times is sufficient
+----
+
+=== Unmount NFS disks (not needed in our case)
+
+[source,shell]
+----
+# umount /docker /lhdata /cdwdata  # not needed in our case
+----
+
+=== Uninstall ECS
+
+[source,shell]
+----
+./rke2-uninstall.sh
+systemctl daemon-reload
+rm -rvf /ecs/* # assumes the default defaultDataPath and lsoDataPath
+rm -rvf /var/lib/docker_server/* # deletes the auth and certs
+rm -rvf /etc/docker/certs.d/ /etc/docker/* # delete the ca.crt
+rm -rvf /var/lib/docker/*
+rm -rvf /etc/rancher /var/lib/rancher /var/log/rancher /var/lib/rancher/k3s/server/node-token
+rm -rvf /run/k3s /opt/containerd /opt/cni
+rm -rvf /docker/* /lhdata/* /cdwdata/*
+rm -rvf ~/.kube ~/.cache
+systemctl daemon-reload
+----
+
+=== Delete the ECS cluster in Cloudera Manager
+
+In Cloudera Manager:
+
+1. Navigate to **CDP Private Cloud Data Services**.
+2. Click **Uninstall**.
+3. The **Delete Cluster** wizard appears. Click **Delete**.
+
+=== Clean IPtables on each host
+
+[source,shell]
+----
+echo "Reset iptables to ACCEPT all, then flush and delete all other chains";
+declare -A chains=( [filter]=INPUT:FORWARD:OUTPUT [raw]=PREROUTING:OUTPUT [mangle]=PREROUTING:INPUT:FORWARD:OUTPUT:POSTROUTING [security]=INPUT:FORWARD:OUTPUT [nat]=PREROUTING:INPUT:OUTPUT:POSTROUTING );
+for table in "${!chains[@]}";
+do
+	echo "${chains[$table]}" | tr : $"\n" | while IFS= read -r;
+	do
+		sudo iptables -t "$table" -P "$REPLY" ACCEPT
+	done
+	sudo iptables -t "$table" -F
+	sudo iptables -t "$table" -X
+
+done
+rm -rvf /etc/rancher /var/lib/rancher /var/log/rancher
+----
+
+=== Remove agents from all hosts in CM UI
+
+[source,shell]
+----
+systemctl stop cloudera-scm-agent
+dnf remove -y cloudera-manager-agent cloudera-manager-daemons
+rm -rvf /opt/cloudera/cm-agent/
+rm -rf /opt/cloudera/ /var/lib/cloudera-scm-agent
+----
+
+=== Remove the hosts from CM UI
+
+Alternatively, an experimental script is available that combines steps three through five.
+The script is available here: https://github.com/cloudera-labs/snippets/blob/main/private-cloud/kill-2-rke.sh
+
+=== Reboot the host(s)
+
+Before reinstalling ECS, ensure that the IP tables list is empty by executing the following command:
+
+[source,shell]
+----
+iptables -L
+----
+

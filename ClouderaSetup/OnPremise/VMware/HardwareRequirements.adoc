@@ -1,0 +1,93 @@
+= Hardware Requirements
+
+[NOTE]
+====
+Hardware specs (CPU, memory, disk, etc.) should be analyzed and re-determined based on the setup requirement, e.g., POC, demo, HA, DR, etc. The current setup is for POC/Demo purposes only.
+====
+
+Refer to the official Cloudera documentation for hardware requirements: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-requirements-supported-versions.html
+
+== FreeIPA/Kerberos & Private DNS Server
+[NOTE]
+====
+If FreeIPA is not used, an external Kerberos/KDC is required.
+====
+
+[options="header"]
+|===
+| Role | HostName | CPU | RAM | Disk | Partitions
+| ipaserver+ansible-controller | ipaserver | 16 | 32GB | OS disk (250GB) | large root partition
+| cldr-mngr, postgres db, bits | cldr-mngr | 32 | 64GB | 1.5TB | large root partition, /var=600GB, /opt=600GB
+|===
+
+== PvC Base Cluster (6-node cluster on VMs)
+[NOTE]
+====
+BaseMaster Node will also host Gateway and Utility hosts’ services as per Cloudera documentation: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-runtime-cluster-hosts-role-assignments.html
+
+Role assignment strategy for Control Plane Services (e.g., HDFS, YARN, Spark, etc.) is discussed in later steps.
+====
+
+[options="header"]
+|===
+| Role | HostName | CPU | RAM | Disk | Partitions
+| Base-Master | pvcbase-master | 32 | 64GB | root partition (1TB) | /hdfs /opt /var /yarn
+| Base-Worker | pvcbase-worker1 | 32 | 64GB | root partition (1TB) | /hdfs /opt /var /yarn
+| Base-Worker | pvcbase-worker2 | 32 | 64GB | root partition (1TB) | /hdfs /opt /var /yarn
+| Base-Worker | pvcbase-worker3 | 32 | 64GB | root partition (1TB) | /hdfs /opt /var /yarn
+| Base-Worker | pvcbase-worker4 | 32 | 64GB | root partition (1TB) | /hdfs /opt /var /yarn
+| Base-Worker | pvcbase-worker5 | 32 | 64GB | root partition (1TB) | /hdfs /opt /var /yarn
+|===
+
+== PvC Data Service (ECS) Cluster with CDW (6-node cluster on VMs)
+[NOTE]
+====
+Specs upgraded for concurrent tests and higher data volume tests. Assumes only CDW services will be deployed.
+====
+
+[options="header"]
+|===
+| Role | HostName | CPU | RAM | Disk | Partitions
+| ECS-Master | pvcecs-master | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+| ECS-Worker | pvcecs-worker1 | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+| ECS-Worker | pvcecs-worker2 | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+| ECS-Worker | pvcecs-worker3 | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+| ECS-Worker | pvcecs-worker4 | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+| ECS-Worker | pvcecs-worker5 | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+| ECS-Worker | pvcecs-worker6 | 32 | 128GB | root partition + 2.3TB | /cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|===
+
+== PvC Data Service (ECS) Cluster with CML (4-node cluster on VMs)
+[NOTE]
+====
+Specs upgraded for concurrent tests and higher data volume tests. Assumes only CML services will be deployed.
+====
+
+[options="header"]
+|===
+| Role | HostName | CPU | RAM | Disk | Partitions
+| ECS-Master | pvcecs-master | 32 | 128GB | root partition + 2.6TB | /docker 400GB, /lhdata 1.5TB, /var 400GB + 1000GB NFS
+| ECS-Worker | pvcecs-worker1 | 32 | 128GB | root partition + 2.6TB | /docker 400GB, /lhdata 1.5TB, /var 400GB
+| ECS-Worker | pvcecs-worker2 | 32 | 128GB | root partition + 2.6TB | /docker 400GB, /lhdata 1.5TB, /var 400GB
+| ECS-Worker | pvcecs-worker3 | 32 | 128GB | root partition + 2.6TB | /docker 400GB, /lhdata 1.5TB, /var 400GB
+|===
+
+== PvC Data Service (ECS) Cluster with CDW+CDE+CML (11-node cluster on VMs)
+[NOTE]
+====
+Specs upgraded for concurrent tests and higher data volume tests. Assumes all three services (CDW, CDE, CML) will be deployed.
+====
+
+[options="header"]
+|===
+| Role | HostName | CPU | RAM | Disk | Partitions
+| ECS-Master | pvcecs-master | 32 | 128GB | root partition + 2TB | /cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+| ECS-Worker | pvcecs-worker1 | 32 | 128GB | root partition + 2TB | /cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+| ECS-Worker | pvcecs-worker2 | 32 | 128GB | root partition + 2TB | /cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+| ECS-Worker | pvcecs-worker3 | 32 | 128GB | root partition + 2TB | /cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+| ECS-Worker | pvcecs-worker4 | 32 | 128GB | root partition + 2TB | /cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+| ECS-Worker | pvcecs-worker5 | 32 | 128GB | root partition + 2TB | /cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|===
+
+link:table-of-contents.adoc[Back to Table of Contents]
+
