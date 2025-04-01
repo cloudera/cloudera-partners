@@ -109,7 +109,7 @@ pipeline {
                     <h2>✅ Build Completed Successfully!</h2>
                     <p>The build has succeeded.</p>
                     <p>Primary Tag: ${params.PRIMARY_TAG}</p>
-                    <p>Secondary Tag: ${params.ENABLE_SECONDARY_TAG ? params.SECONDARY_TAG : 'N/A'}</p>
+                    <p>Secondary Tag: ${params.PUSH_SECONDARY_TAG ? params.SECONDARY_TAG : 'N/A'}</p>
                     <p><a href='${env.BUILD_URL}'>View Build Details</a></p>
                 </div>
                 """,
