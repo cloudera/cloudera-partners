@@ -1,10 +1,8 @@
-CDP Private Cloud (PvC)
+= CDP Private Cloud (PvC) :: Deployment Guide
 
-Installation & Setup on VMWare
+**Installation & Setup on VMWare Infrastructure**
 
-*:: Deployment Guide ::*
-
-Published: February 2025
+**Published: April 2025**
 
 image:extracted-media/media/image117.png[extracted-media/media/image117,width=350,height=79]
 
@@ -14,6 +12,8 @@ image:extracted-media/media/image144.png[A close up of a logo Description automa
 
 By: *Kuldeep Sahu*, Partner Solutions Engineer, Cloudera Inc.
 
+---
+
 *Audience*
 
 The intended audience for this document includes, but is not limited to, sales engineers, field consultants, professional services, IT managers, IT engineers, partners, and customers who are interested in learning about and deploying the Cloudera Data Platform Private Cloud (CDP Private Cloud) on the VMware Platform for digital transformation through cloud-native modern data analytics and AI/ML.
@@ -21,6 +21,8 @@ The intended audience for this document includes, but is not limited to, sales e
 *Purpose of this Document*
 
 This document describes the architecture, installation, configuration, and validated use cases for the VMware Platform using Cloudera Data Platform Private Cloud Base on VMware servers. A reference architecture is provided to configure the Cloudera Data Platform on VMware.
+
+---
 
 ++**************************************************************************************************************++
 
@@ -36,7 +38,7 @@ link:#important-urls[[.underline]#Important URLs:#]
 
 link:#introduction[[.underline]#Introduction:#]
 
-link:#cdp-pvc-setup-consists-of-the-following-three-parts.[[.underline]#CDP PVC setup consists of the following three parts.#]
+link:#cdp-pvc-setup-consists-of-the-following-three-parts[[.underline]#CDP PVC setup consists of the following three parts.#]
 
 link:#solution-summary[[.underline]#Solution Summary#]
 
@@ -44,7 +46,7 @@ link:#reference-architecture[[.underline]#Prerequisites:#]
 
 link:#hardware-requirements[[.underline]#Hardware Requirements#]
 
-link:#freeipakerberos-private-dns-server-in-case-we-are-not-going-with-freeipa-external-kerberoskdc-reqd.[[.underline]#FreeIPA/Kerberos & Private DNS Server: (In case we are not going with FreeIPA: External Kerberos/KDC Reqd.)#]
+link:#freeipakerberos-private-dns-server-in-case-we-are-not-going-with-freeipa-external-kerberoskdc-reqd[[.underline]#FreeIPA/Kerberos & Private DNS Server: (In case we are not going with FreeIPA: External Kerberos/KDC Reqd.)#]
 
 link:#pvc-base-cluster-we-will-be-installing-a-6-node-cluster-on-vms[[.underline]#PvC Base Cluster we will be installing a 6-node cluster on VMs:#]
 
@@ -178,6 +180,8 @@ link:#kubernetes-command-reference[[.underline]#Kubernetes Command Reference:#]
 
 link:#acknowledgements[[.underline]#Acknowledgements#]
 
+---
+
 ++**************************************************************************************************************++
 
 == Author History
@@ -214,13 +218,11 @@ ____
 23-May-2024
 ____
 
-| | |
-| | |
-| | |
-| | |
 |===
 
 ++**************************************************************************************************************++
+
+---
 
 == CDP PvC Installation and Configuration on VMware Infrastructure Platform:
 
@@ -951,107 +953,54 @@ Choose one of the nodes of the cluster or a separate node as the Ansible Admin/C
 
 [arabic]
 . Setup the hostname *_for each individual node_* by logging in using the IP addresses provided by the VMware team, so we can refer to them with names instead of IP addresses for simplicity and ease of identification. While you are configuring the hostname, also follow *Step 2* while logging in to each host. *Replace your ORG DOMAIN*
+[source,shell]
+----
+[root@ipaserver ~]# sudo hostnamectl set-hostname --static ipaserver.cldrsetup.local
 
-*++[++root@ipaserver ~++]++#* sudo hostnamectl set-hostname --static *_ipaserver.cldrsetup.local_*
+[root@cldr-mngr ~]# sudo hostnamectl set-hostname --static cldr-mngr.cldrsetup.local
 
-*++[++root@cldr-mngr ~++]++#* sudo hostnamectl set-hostname --static *cldr-mngr__.cldrsetup.local__*
+[root@pvcbase-master ~]# sudo hostnamectl set-hostname --static pvcbase-master.cldrsetup.local
 
-*++[++root@pvcbase-master ~++]++#* sudo hostnamectl set-hostname --static *pvcbase-master__.cldrsetup.local__*
+[root@pvcbase-worker1 ~]# sudo hostnamectl set-hostname --static pvcbase-worker1.cldrsetup.local
 
-*++[++root@pvcbase-worker1 ~++]++#* sudo hostnamectl set-hostname --static *pvcbase-worker1__.cldrsetup.local__*
+[root@pvcbase-worker2 ~]# sudo hostnamectl set-hostname --static pvcbase-worker2.cldrsetup.local
 
-*++[++root@pvcbase-worker2 ~++]++#* sudo hostnamectl set-hostname --static *pvcbase-worker2__.cldrsetup.local__*
+[root@pvcbase-worker3 ~]# sudo hostnamectl set-hostname --static pvcbase-worker3.cldrsetup.local
 
-*++[++root@pvcbase-worker3 ~++]++#* sudo hostnamectl set-hostname --static *pvcbase-worker3__.cldrsetup.local__*
+[root@pvcbase-worker4 ~]# sudo hostnamectl set-hostname --static pvcbase-worker4.cldrsetup.local
 
-*++[++root@pvcbase-worker4 ~++]++#* sudo hostnamectl set-hostname --static *pvcbase-worker4__.cldrsetup.local__*
+[root@pvcbase-worker5 ~]# sudo hostnamectl set-hostname --static pvcbase-worker5.cldrsetup.local
 
-*++[++root@pvcbase-worker5 ~++]++#* sudo hostnamectl set-hostname --static *pvcbase-worker5__.cldrsetup.local__*
+[root@pvcecs-master ~]# sudo hostnamectl set-hostname --static pvcecs-master.cldrsetup.local
 
-*++[++root@pvcecs-master ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-master__.cldrsetup.local__*
+[root@pvcecs-worker1 ~]# sudo hostnamectl set-hostname --static pvcecs-worker1.cldrsetup.local
 
-*++[++root@pvcecs-worker1 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker1__.cldrsetup.local__*
+[root@pvcecs-worker2 ~]# sudo hostnamectl set-hostname --static pvcecs-worker2.cldrsetup.local
 
-*++[++root@pvcecs-worker2 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker2__.cldrsetup.local__*
+[root@pvcecs-worker3 ~]# sudo hostnamectl set-hostname --static pvcecs-worker3.cldrsetup.local
 
-*++[++root@pvcecs-worker3 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker3__.cldrsetup.local__*
+[root@pvcecs-worker4 ~]# sudo hostnamectl set-hostname --static pvcecs-worker4.cldrsetup.local
 
-*++[++root@pvcecs-worker4 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker4__.cldrsetup.local__*
+[root@pvcecs-worker5 ~]# sudo hostnamectl set-hostname --static pvcecs-worker5.cldrsetup.local
 
-*++[++root@pvcecs-worker5 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker5__.cldrsetup.local__*
+[root@pvcecs-worker6 ~]# sudo hostnamectl set-hostname --static pvcecs-worker6.cldrsetup.local
 
-*++[++root@pvcecs-worker6 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker6__.cldrsetup.local__*
+[root@pvcecs-worker7 ~]# sudo hostnamectl set-hostname --static pvcecs-worker7.cldrsetup.local
 
-*++[++root@pvcecs-worker7 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker7__.cldrsetup.local__*
+[root@pvcecs-worker8 ~]# sudo hostnamectl set-hostname --static pvcecs-worker8.cldrsetup.local
 
-*++[++root@pvcecs-worker8 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker8__.cldrsetup.local__*
+[root@pvcecs-worker9 ~]# sudo hostnamectl set-hostname --static pvcecs-worker9.cldrsetup.local
 
-*++[++root@pvcecs-worker9 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker9__.cldrsetup.local__*
+[root@pvcecs-worker10 ~]# sudo hostnamectl set-hostname --static pvcecs-worker10.cldrsetup.local
+----
 
-*++[++root@pvcecs-worker10 ~++]++#* sudo hostnamectl set-hostname --static *pvcecs-worker10__.cldrsetup.local__*
 
 [arabic, start=2]
 . While you set the hostnames by logging in to each individual hosts, make sure to run the dnf update and install python3 dependencies as well, since these are fresh nodes:
 
 ++**++ Python3 can be installed manually on bare minimum (ipaserver/ansible admin) and can be later installed using ansible on the rest of the nodes. (Only, If you don't want it to install on each individual node)
 
-*++[++root@ipaserver ~++]++# sudo dnf -y update*
 
-*++[++root@ipaserver ~++]++# sudo dnf -y install wget telnet net-tools bind-utils iproute traceroute nc*
-
-*##### Verify If Python3 and Pip3 are already installed.*
-
-*++[++root@ipaserver ~++]++# python3 --version*
-
-*++[++root@ipaserver ~++]++# pip3 --version*
-
-*##### Install python3.9 - ON ALL NODES (if not Present already):*
-
-*##### Check if Python could be installed using dnf command directly:*
-
-*++[++root@ipaserver ~++]++# sudo dnf -y install python39 python3-pip*
-
-*##### If Python could not be installed using dnf command directly:*
-
-*++[++root@ipaserver ~++]++# sudo dnf -y groupinstall "Development Tools"*
-
-*++[++root@ipaserver ~++]++# sudo dnf -y install epel-release openssl-devel bzip2-devel libffi-devel xz-devel*
-
-*++[++root@ipaserver ~++]++# VERSION=3.9.18*
-
-*++[++root@ipaserver ~++]++# wget https://www.python.org/ftp/python/$VERSION/Python-$VERSION.tgz*
-
-*++[++root@ipaserver ~++]++# tar xvf Python-$VERSION.tgz*
-
-*++[++root@ipaserver ~++]++# cd Python-$VERSION/*
-
-*++[++root@ipaserver ~++]++# ./configure --enable-optimizations*
-
-*++[++root@ipaserver ~++]++# sudo make altinstall*
-
-*++[++root@ipaserver ~++]++# python3 --version*
-
-*++[++root@ipaserver ~++]++# cd -*
-
-*++[++root@ipaserver ~++]++# rm -rvf Python-$VERSION/ Python-$VERSION.tgz*
-
-*##### Install pip3 - ON ALL NODES (if not Present already):*
-
-*++[++root@ipaserver ~++]++# dnf install -y python3-pip*
-
-*++[++root@ipaserver ~++]++# pip3 install --upgrade pip*
-
-*++[++root@ipaserver ~++]++# pip3 --version*
-
-*++[++root@ipaserver ~++]++# pip3 install psycopg2-binary*
-
-*##### Verify Python and Pip Versions*
-
-*++[++root@ipaserver ~++]++# python3 -V*
-
-*Python 3.9.18*
-
-*++[++root@ipaserver ~++]++# pip3 --version*
 
 [arabic, start=3]
 . Log into the ipaserver Node using IP provided previously by the VMware team.
