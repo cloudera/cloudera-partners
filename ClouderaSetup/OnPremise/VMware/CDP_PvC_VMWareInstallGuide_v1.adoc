@@ -24,7 +24,7 @@ This document describes the architecture, installation, configuration, and valid
 
 ---
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 == Table of Contents
 
@@ -182,7 +182,7 @@ link:#acknowledgements[[.underline]#Acknowledgements#]
 
 ---
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 == Author History
 
@@ -220,7 +220,7 @@ ____
 
 |===
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ---
 
@@ -303,7 +303,7 @@ image:extracted-media/media/image133.png[extracted-media/media/image133,width=50
 
 Let’s have a look at the prerequisites before proceeding with the actual setup**.**
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 == Solution Summary
 
@@ -415,7 +415,7 @@ _This document covers the CDP Private Cloud setup and testing of the Data Servic
 |image:extracted-media/media/image38.png[extracted-media/media/image38,width=281,height=210] |image:extracted-media/media/image86.png[extracted-media/media/image86,width=269,height=202]
 |===
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 == Hardware Requirements
 
@@ -938,7 +938,7 @@ ____
 
 *Once you have familiarized yourself with all the information mentioned above, you can start with the preliminary work for CDP Base Cluster setup.*
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 == Post OS Installation
 
@@ -3622,7 +3622,7 @@ ServerName cldr-mngr.cldrsetup.local:80
 
 *[root@cldr-mngr ~]#* systemctl is-enabled httpd
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === Install Cloudera Data Platform Private Cloud (CDP PvC)
 
@@ -3707,7 +3707,7 @@ Please review CDP Private Cloud Base requirements and supported versions for inf
 
 https://docs.cloudera.com/cdp-private-cloud-upgrade/latest/upgrade/topics/cdpdc-requirements-supported-versions.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-upgrade/latest/upgrade/topics/cdpdc-requirements-supported-versions.html#]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ==== CDP PvC Cloudera Manager Server Setup
 
@@ -5380,7 +5380,7 @@ image:extracted-media/media/image179.png[extracted-media/media/image179,width=58
 
 image:extracted-media/media/image82.png[extracted-media/media/image82,width=621,height=351]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ==== Configure Cloudera Manager for external authentication using LDAP (LDAP integration):
 
@@ -5611,7 +5611,7 @@ image:extracted-media/media/image190.png[extracted-media/media/image190,width=67
 
 image:extracted-media/media/image202.png[extracted-media/media/image202,width=667,height=142]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ==== [.underline]#Setup Private Cloud (PvC) Base Cluster#
 
@@ -6483,7 +6483,7 @@ image:extracted-media/media/image125.png[extracted-media/media/image125,width=66
 
 https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre-Install_Check[[.underline]#https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre-Install_Check#]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 =====  +
 
@@ -6728,7 +6728,7 @@ Let *APPDOMAIN* be the base app domain for the ECS cluster. For example, if your
 
 • viz-VWHNAME.apps.APPDOMAIN
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== 
 
@@ -6865,7 +6865,7 @@ ____
 
 image:extracted-media/media/image72.png[extracted-media/media/image72,width=691,height=446]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Configure Hive metastore with SSL/TLS enabled PostgreSQL Database (Mandatory Step for CDW)
 
@@ -6885,7 +6885,7 @@ image:extracted-media/media/image88.png[extracted-media/media/image88,width=666,
 . Restart required for Hive Metastore Server and HiveServer2 after updating Hive configuration.
 . Click on *_Actions -> Restart_* under *_Hive_* and *_Hive-on-Tez_* Services.
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Scale the Cluster (Optional– Skip this step)
 
@@ -6918,7 +6918,7 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/latest/installation/to
 
 image:extracted-media/media/image154.png[A screenshot of a computer Description automatically generated,width=446,height=265]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Configure Ranger authentication for LDAP (Optional– Skip this Step)
 
@@ -7296,7 +7296,7 @@ ____
 
 For more details: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/security-ranger-authentication-unix-ldap-ad/topics/security-ranger-authentication-ldap-settings.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/security-ranger-authentication-unix-ldap-ad/topics/security-ranger-authentication-ldap-settings.html#]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Configure Hue for LDAP Authentication (Optional– Skip this Step)
 
@@ -7470,7 +7470,7 @@ image:extracted-media/media/image195.png[A screenshot of a computer Description 
 
 For more details: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/securing-hue/topics/hue-authenticate-users-with-ldap.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/securing-hue/topics/hue-authenticate-users-with-ldap.html#]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Configure Atlas for LDAP authentication (Optional– Skip this Step)
 
@@ -7657,7 +7657,7 @@ ____
 
 *For more details:* https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/atlas-securing/topics/atlas-configure-ldap-authentication.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/atlas-securing/topics/atlas-configure-ldap-authentication.html#]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Configure Hive for LDAP Authentication (Optional– Skip this Step)
 
@@ -7760,7 +7760,7 @@ ____
 
 |===
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===== Configure HDFS properties to optimize log collection (Optional– Skip this Step)
 
@@ -7783,7 +7783,7 @@ image:extracted-media/media/image172.png[A screenshot of a computer Description 
 . Restart the HDFS service.
 . Restart CDP Private Cloud Base cluster.
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === CDP Private Cloud (PvC) Data Services (DS) Installation
 
@@ -8115,7 +8115,7 @@ In CM7.10.1, CM generated "local to auth" krb5 rules include embedded "\Q" and "
 |*SELinux Support* |SELinux is now supported for ECS clusters. See https://docs.cloudera.com/cdp-private-cloud-data-services/1.3.4/managing-ecs/topics/mc-ecs-selinux.html[[.underline]#SELinux Documentation#].
 |===
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ====  +
 
@@ -8136,7 +8136,7 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/index.html[[.und
 
 *##### Latest ECS Supported Version Of Cloudera-Manager is _[.underline]#7.11.3 CHF11#_*
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ====  +
 
@@ -9246,7 +9246,7 @@ Defaulted container "cdp-cde-embedded-db" out of: cdp-cde-embedded-db, k8tz (ini
 
 image:extracted-media/media/image6.png[extracted-media/media/image6,width=635,height=543]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ==== Additional Steps for ECS Cluster Setup: _(Optional, Skip this step)_
 
@@ -9274,7 +9274,7 @@ image:extracted-media/media/image46.png[A screenshot of a computer Description a
 [arabic, start=4]
 . Click on *_Add_* and click *_Save Changes_*.
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ====  +
 
@@ -9312,7 +9312,7 @@ image:extracted-media/media/image100.png[extracted-media/media/image100,width=49
 
 image:extracted-media/media/image100.png[extracted-media/media/image100,width=487,height=294]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===  +
 
@@ -9535,7 +9535,7 @@ image:extracted-media/media/image19.png[A screenshot of a computer Description a
 * https://docs.cloudera.com/machine-learning/1.5.4/workspaces-privatecloud/topics/ml-pvc-provision-ml-workspace.html[Provision an ML Workspace in the CML Data Service]
 * https://docs.cloudera.com/data-engineering/1.5.4/enable-data-engineering/topics/cde-private-cloud-add-cde-service.html[Add a CDE service in the CDE Data Service]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===  +
 
@@ -9734,7 +9734,7 @@ image:extracted-media/media/image131.png[A screenshot of a computer Description 
 
 https://docs.cloudera.com/machine-learning/cloud/product/topics/ml-product-overview.html[[.underline]#https://docs.cloudera.com/machine-learning/cloud/product/topics/ml-product-overview.html#]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === [.underline]#CDP Private Cloud Data Warehouse (CDW)#
 
@@ -9779,7 +9779,7 @@ image:extracted-media/media/image118.png[crt wh,width=370,height=531]
 
 image:extracted-media/media/image164.png[vw hue,width=512,height=176]
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === [.underline]#CDP Private Cloud Data Engineering (CDE)#
 
@@ -9953,7 +9953,7 @@ For the above example, the command would be below.
 
 * Repeat these steps for all users that need to submit jobs to the virtual cluster.
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === Appendix
 
@@ -10259,7 +10259,7 @@ Cloudera Data Platform Private Cloud Base Requirements and Supported Versions, g
 
 Cloudera Data Platform Private Cloud Data Services installation on Embedded Container Service requirements and supported versions, go to: [.underline]#https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/index.html#
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === FreeIPA Reference
 
@@ -10499,7 +10499,7 @@ Number of entries returned 12
 
 -----------------------------
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === Perform the PvC Base Cluster Validation:
 
@@ -10612,7 +10612,7 @@ LOAD DATA INPATH '/tmp/movielens/genome-scores.csv' overwrite INTO TABLE genome_
 
 *Run select query to fetch operations from HUE.*
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 *[.underline]#OZONE Validation:#*
 
@@ -10794,7 +10794,7 @@ renew until 06/02/2024 07:36:13
 
 *[root@pvcbase-master ~]#*
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === Cleanup CDP PvC Base Cluster:
 
@@ -10868,7 +10868,7 @@ java -version
 
 python3 -V
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===  +
 
@@ -10974,7 +10974,7 @@ https://github.com/cloudera-labs/snippets/blob/main/private-cloud/kill-2-rke.sh[
 
 *iptables -L*
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === CDP PvC Base Cluster Error Handling
 
@@ -11312,7 +11312,7 @@ stop atlas> initialize atlas> start atlas
 
 *logfile=/var/log/cloudera-scm-agent/supervisord.log*
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === CDP PvC Data Services ECS Cluster Error Handling:
 
@@ -11524,7 +11524,7 @@ Map docker dependency if localhost:6443 apiserver error come in ECS
 
 Cleanup not done properly.
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 === Kubernetes Command Reference:
 
@@ -11590,7 +11590,7 @@ cp /etc/rancher/rke2/rke2.yaml .kube/config
 
 envsubst
 
-**************************************************************************************************************
+++**************************************************************************************************************++
 
 ===  +
 Acknowledgements
@@ -11601,4 +11601,4 @@ For their support and contribution to the design, validation, and creation of th
 * Kuldeep Sahu, Partner Solutions Engineer, Cloudera Inc.
 * Venkatesh Sellappa, Director, Partner Solutions Engineering, Cloudera Inc.
 
-**************************************************************************************************************
+++**************************************************************************************************************++
