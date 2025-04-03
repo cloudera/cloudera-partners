@@ -953,7 +953,8 @@ Choose one of the nodes of the cluster or a separate node as the Ansible Admin/C
 
 [arabic]
 . Setup the hostname *_for each individual node_* by logging in using the IP addresses provided by the VMware team, so we can refer to them with names instead of IP addresses for simplicity and ease of identification. While you are configuring the hostname, also follow *Step 2* while logging in to each host. *Replace your ORG DOMAIN*
-[source,shell]
+
+[source,bash]
 ----
 [root@ipaserver ~]# sudo hostnamectl set-hostname --static ipaserver.cldrsetup.local
 
@@ -1317,6 +1318,9 @@ Please keep the same password for both Directory manager and IPA admin so that t
 
 *++[++root@ipaserver ~++]++# update-alternatives --config java*
 
+
+[source,bash]
+----
 # Configure ipa-server and DNS by using command: ipa-server-install --setup-dns
 
 *++[++root@ipaserver ~++]++# ipa-server-install --setup-dns*
@@ -1582,6 +1586,8 @@ files is the Directory Manager password
 The ipa-server-install command was successful
 
 *++[++root@ipaserver ~++]++#*
+
+----
 
 *##### Disable the firewall on ipaserver to be able to connect from rest of hosts*
 
