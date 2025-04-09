@@ -1441,8 +1441,8 @@ Removed "/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service".
 [root@ipaserver ~]# ipa-server-install --setup-dns (again)
 
 ##### Disable the firewall on ipaserver to be able to connect from rest of hosts
-[root@ipaserver ~]#* systemctl stop firewalld
-[root@ipaserver ~]#* systemctl disable firewalld
+[root@ipaserver ~]# systemctl stop firewalld
+[root@ipaserver ~]# systemctl disable firewalld
 Removed "/etc/systemd/system/multi-user.target.wants/firewalld.service".
 Removed "/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service".
 [root@ipaserver ~]#
@@ -1495,7 +1495,7 @@ image:extracted-media/media/image23.png[klist verify,width=624,height=184]
 [arabic, start=3]
 . *(Optional)* Enable WebUI for IPAServer Administration:
 
-*##### Add IPAserver IP address mapping to your local system’s (Laptop) /etc/hosts file, similar to as below.
+##### Add IPAserver IP address mapping to your local system’s (Laptop) /etc/hosts file, similar to as below.
 
 [source,bash]
 ----
@@ -1503,8 +1503,8 @@ image:extracted-media/media/image23.png[klist verify,width=624,height=184]
 35.83.155.109 ipaserver.cldrsetup.local ipaserver
 ----
 
-*##### Access the below URL on browser, and the IPA Admin console will open.
-https://ipaserver.cdppvcds.com/ipa/ui/[[.underline]#https://ipaserver.cldrsetup.local/ipa/ui/#*]
+##### Access the below URL on browser, and the IPA Admin console will open.
+https://ipaserver.cdppvcds.com/ipa/ui/[[.underline]#https://ipaserver.cldrsetup.local/ipa/ui/#]
 
 [arabic, start=4]
 . You will see below WebUI for IPAServer Administration. Enter the same admin credentials used for CLI authentication: *_(i.e. admin/vmware123)_
@@ -1762,16 +1762,16 @@ image:extracted-media/media/image55.png[sysconfig network,width=213,height=79]
 
 [source,bash]
 ----
-*# Extract DNS entries
-[root@ipaserver ~]#* grep '^nameserver' /etc/resolv.conf | awk '{print "DNS" NR "=" $2}' > /tmp/dns_entries.txt
+# Extract DNS entries
+[root@ipaserver ~]# grep '^nameserver' /etc/resolv.conf | awk '{print "DNS" NR "=" $2}' > /tmp/dns_entries.txt
 
-*# Update ifcfg-eth0 with DNS entries
-[root@ipaserver ~]#* while IFS= read -r line; do
+# Update ifcfg-eth0 with DNS entries
+[root@ipaserver ~]# while IFS= read -r line; do
 ansible all -m lineinfile -a "path=/etc/sysconfig/network-scripts/ifcfg-eth0 line='${line}' state=present backup=true" --become
 done < /tmp/dns_entries.txt
 
-*# Clean up
-[root@ipaserver ~]#* rm -vf /tmp/dns_entries.txt
+# Clean up
+[root@ipaserver ~]# rm -vf /tmp/dns_entries.txt
 ----
 
 [arabic, start=6]
@@ -1803,7 +1803,7 @@ Zone name [31.172.in-addr.arpa.]:
 ##### Once you execute the above command, accept the default value by hitting the enter key. It will create a reverse DNS zone by name 16.172.in-addr.arpa. (with a trailing dot)
 ----
 
-*##### Once you execute the above command, accept the default value by hitting the enter key. It will create a reverse DNS zone by name 16.172.in-addr.arpa. (with a trailing dot)
+##### Once you execute the above command, accept the default value by hitting the enter key. It will create a reverse DNS zone by name 16.172.in-addr.arpa. (with a trailing dot)
 
 image:extracted-media/media/image79.png[ipa dns zone add,width=624,height=241]
 
@@ -2020,11 +2020,11 @@ https://docs.cloudera.com/cdp-private-cloud-upgrade/latest/release-guide/topics/
 
 [source,bash]
 ----
-[root@ipaserver ~]#* ansible all -m shell -a "sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms && sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms && sudo dnf install -y java-17-openjdk java-17-openjdk-devel python3-pip wget telnet mlocate tar traceroute net-tools bind-utils traceroute nc && java -version && python3 -V && pip3 install --upgrade pip && pip3 -V && pip3 install psycopg2-binary && pip3 list |grep psy"
+[root@ipaserver ~]# ansible all -m shell -a "sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms && sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms && sudo dnf install -y java-17-openjdk java-17-openjdk-devel python3-pip wget telnet mlocate tar traceroute net-tools bind-utils traceroute nc && java -version && python3 -V && pip3 install --upgrade pip && pip3 -V && pip3 install psycopg2-binary && pip3 list |grep psy"
 
-[root@ipaserver ~]#* ansible all -m shell -a "sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm && sudo dnf install -y postgresql14"
+[root@ipaserver ~]# ansible all -m shell -a "sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm && sudo dnf install -y postgresql14"
 
-[root@ipaserver ~]#* ansible all -m shell -a "sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms && sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms && sudo dnf install -y freeipa-client openldap-clients krb5-workstation krb5-libs && chronyc tracking && chronyc sources" -l 'all:!admin'
+[root@ipaserver ~]# ansible all -m shell -a "sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms && sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms && sudo dnf install -y freeipa-client openldap-clients krb5-workstation krb5-libs && chronyc tracking && chronyc sources" -l 'all:!admin'
 ----
 
 *Step 2:* Install and Setup IPA services by configuring the free-ipa client on all machines (except ipaserver) and add all the machines to the DNS server, by running the command “*_ipa-client-install_*” to set up the IPA client.
@@ -2997,7 +2997,7 @@ https://supportmatrix.cloudera.com/[[.underline]#https://supportmatrix.cloudera.
 
 *Step 3:* Edit cloudera-manager.repo file baseurl and GPG key with username and password provided by Cloudera and edit URL to match repository location *(OR)* Verify, if username and password are already present, so no action needed.
 
-*##### Verify if username and password are already present, so no action needed.
+##### Verify if username and password are already present, so no action needed.
 
 [source,bash]
 ----
@@ -3282,7 +3282,7 @@ Value: [***CUSTOM-INSTALL-PATH***]:/usr/local/sbin:/usr/local/bin:/usr/sbin:
 
 [source,bash]
 ----
-[root@ipaserver ~]#* ansible all -m command -a "python3 --version"
+[root@ipaserver ~]# ansible all -m command -a "python3 --version"
 pvcbase-worker2.cldrsetup.local | CHANGED | rc=0 >>
 Python 3.9.18
 pvcbase-worker3.cldrsetup.local | CHANGED | rc=0 >>
@@ -3309,25 +3309,25 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 [arabic]
 . Login on *_cldr-mngr server_* and Install PostgreSQL as shown in the steps below.
 
-*##### Install and configure POSTGRESQL DB on cldr-mngr server :
+##### Install and configure POSTGRESQL DB on cldr-mngr server :
 
 **** When you restart any process in future, the configuration for each of the services is redeployed using information saved in the Cloudera Manager database. If this information is not available, your cluster cannot start or function correctly. So, you must schedule and maintain regular backups of the Cloudera Manager database to recover the cluster in the event of the loss of this database.
 
-*##### Install the repository RPM:
+##### Install the repository RPM:
 
 [source,bash]
 ----
 [root@cldr-mngr ~]# sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 ----
 
-*##### Disable the built-in PostgreSQL module:
+##### Disable the built-in PostgreSQL module:
 
 [source,bash]
 ----
 [root@cldr-mngr ~]# sudo dnf -qy module disable postgresql
 ----
 
-*##### Install PostgreSQL:
+##### Install PostgreSQL:
 
 [source,bash]
 ----
@@ -3370,7 +3370,7 @@ ipaserver.cldrsetup.local | CHANGED | rc=0 >>
 [source,bash]
 ----
 ##### Install the psycopg2-binary package as follows:
-[root@ipaserver ~]#* ansible all -m shell -a "pip3 install psycopg2-binary && pip3 list | grep psyc"
+[root@ipaserver ~]# ansible all -m shell -a "pip3 install psycopg2-binary && pip3 list | grep psyc"
 
 ipaserver.cldrsetup.local | CHANGED | rc=0 >>
 Requirement already satisfied: psycopg2-binary in /usr/local/lib64/python3.9/site-packages (2.9.9)
@@ -3385,85 +3385,70 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 
 [source,bash]
 ----
-*# Initialize the DB
+# Initialize the DB
 [root@cldr-mngr ~]# sudo /usr/pgsql-14/bin/postgresql-14-setup initdb
 
-*# Verify PG Version
+# Verify PG Version
 [root@cldr-mngr ~]# cat /var/lib/pgsql/14/data/PG_VERSION
 14
 
-*# Verify Psycopg Version
+# Verify Psycopg Version
 [root@cldr-mngr ~]# pip3 list |grep psycopg
 psycopg2-binary 2.9.9
 
-*# data directory is very critical, if you want to cleanup postgres simply rename or remove /var/lib/pgsql/14/data directory
+# data directory is very critical, if you want to cleanup postgres simply rename or remove /var/lib/pgsql/14/data directory
 ----
 
 *Step 8.* Make sure that LC_ALL is set to C.UTF-8 to enable UTF-8 CHARSET and initialize the database as follows:
 
+[source,bash]
+----
 [root@cldr-mngr ~]# echo 'LC_ALL="C.UTF-8"' >> /etc/locale.conf
+----
 
 *Step 9.* To enable MD5 authentication, edit /var/lib/pgsql/14/data/pg_hba.conf by adding the following lines, to enable connection from all outside hosts:
 
 (Enable md5 auth to serve password authentication and TLS/SSL encryption from outside world)
 
+[source,bash]
+----
 [root@cldr-mngr ~]# vi /var/lib/pgsql/14/data/pg_hba.conf
-
-host all all 0.0.0.0/0 md5 # Enable md5 authentication
-
-host ranger rangeradmin 0.0.0.0/0 md5 # Allow ranger database connection from any host
-
-hostssl all all 0.0.0.0/0 md5 # Allow SSL connection from client(s)
-
-# replace 127.0.0.1 with host IP if PostgreSQL access from a different host is required.
-
+host    all             all             0.0.0.0/0               md5 # Enable md5 authentication
+host    ranger          rangeradmin     0.0.0.0/0               md5 # Allow ranger database connection from any host
+hostssl all             all             0.0.0.0/0               md5 # Allow SSL connection from client(s)
+# replace 127.0.0.1 with host IP if PostgreSQL access from a different host is required. 
 # Edit section for replication privilege. HA not documented in this solution.
 
-*##### Backup the config so you can use it in case of re-setup.
+##### Backup the config so you can use it in case of re-setup.
+[root@cldr-mngr ~]# cp /var/lib/pgsql/14/data/pg_hba.conf ~
 
-[root@cldr-mngr ~]#* cp /var/lib/pgsql/14/data/pg_hba.conf ~
-
-*##### If you have the file backed up, copy it
-
-[root@cldr-mngr ~]#* cp /var/lib/pgsql/14/data/pg_hba.conf /var/lib/pgsql/14/data/pg_hba.conf_orig
-
-[root@cldr-mngr ~]#* cp ~/pg_hba.conf /var/lib/pgsql/14/data/pg_hba.conf
+##### If you have the file backed up, copy it
+[root@cldr-mngr ~]# cp /var/lib/pgsql/14/data/pg_hba.conf /var/lib/pgsql/14/data/pg_hba.conf_orig
+[root@cldr-mngr ~]# cp ~/pg_hba.conf /var/lib/pgsql/14/data/pg_hba.conf
+----
 
 *Step 10.* Configure settings to ensure your system performs as expected. Update these settings in the /var/lib/pgsql/14/data/postgresql.conf file. Settings vary based on cluster size and resources as follows:
 
 [source,bash]
 ----
 [root@cldr-mngr ~]# vi /var/lib/pgsql/14/data/postgresql.conf
-
-port = 5432 # (change requires restart) #### uncomment
-
-listen_addresses = '*' # what IP address(es) to listen on;
-
-max_connections = 1000 # (change requires restart)
-
-shared_buffers = 1024MB # min 128kB
-
-wal_buffers = 16MB # min 32kB, -1 sets based on shared_buffers
-
+port = 5432                             # (change requires restart)    #### uncomment
+listen_addresses = '*'                  # what IP address(es) to listen on;
+max_connections = 1000                  # (change requires restart)
+shared_buffers = 1024MB                 # min 128kB
+wal_buffers = 16MB                      # min 32kB, -1 sets based on shared_buffers
 max_wal_size = 6GB
-
 min_wal_size = 512MB
-
-checkpoint_completion_target = 0.9 # checkpoint target duration, 0.0 - 1.0 #### uncomment
-
+checkpoint_completion_target = 0.9      # checkpoint target duration, 0.0 - 1.0 #### uncomment
 standard_conforming_strings = off
-
 jit = off
 
-*##### Backup the config so you can use it in case of re-setup.
+##### Backup the config so you can use it in case of re-setup.
+[root@cldr-mngr ~]# cp /var/lib/pgsql/14/data/postgresql.conf ~
 
-[root@cldr-mngr ~]#* cp /var/lib/pgsql/14/data/postgresql.conf ~
-
-*##### If you have the file backed up, copy it
-
-[root@cldr-mngr ~]#* cp /var/lib/pgsql/14/data/postgresql.conf /var/lib/pgsql/14/data/postgresql.conf_orig
-
-[root@cldr-mngr ~]#* cp ~/postgresql.conf /var/lib/pgsql/14/data/postgresql.conf
+##### If you have the file backed up, copy it
+[root@cldr-mngr ~]# cp /var/lib/pgsql/14/data/postgresql.conf /var/lib/pgsql/14/data/postgresql.conf_orig
+[root@cldr-mngr ~]# cp ~/postgresql.conf /var/lib/pgsql/14/data/postgresql.conf
 ----
 
 [arabic, start=22]
@@ -3774,95 +3759,68 @@ postgres=# \q
 . The databases must be configured to support the PostgreSQL UTF8 character set encoding.
 . Record the values you enter for database names, usernames, and passwords. The Cloudera Manager installation wizard requires this information to correctly connect to these databases.
 
-*##### Create CM DB and USERS
-
+[source,bash]
+----
+##### Create CM DB and USERS 
 [root@cldr-mngr data]# sudo -u postgres psql
 
 CREATE ROLE scm LOGIN PASSWORD 'scm';
-
 CREATE DATABASE scm OWNER scm ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE scm TO scm;
 
 CREATE ROLE rman LOGIN PASSWORD 'rman';
-
 CREATE DATABASE rman OWNER rman ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE rman TO rman;
 
 CREATE ROLE hue LOGIN PASSWORD 'hue';
-
 CREATE DATABASE hue OWNER hue ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE hue TO hue;
 
 CREATE ROLE hive LOGIN PASSWORD 'hive';
-
 CREATE DATABASE hive OWNER hive ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE hive TO hive;
 
 CREATE ROLE oozie LOGIN PASSWORD 'oozie';
-
 CREATE DATABASE oozie OWNER oozie ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE oozie TO oozie;
 
 CREATE ROLE rangeradmin LOGIN PASSWORD 'rangeradmin';
-
 CREATE DATABASE ranger OWNER rangeradmin ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE ranger TO rangeradmin;
 
 /*For Ranger KMS, use rangerkms rather than rangeradmin user.*/
-
 CREATE ROLE rangerkms LOGIN PASSWORD 'rangerkms';
-
 CREATE DATABASE rangerkms OWNER rangerkms ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE rangerkms TO rangerkms;
 
 CREATE ROLE schemaregistry LOGIN PASSWORD 'schemaregistry';
-
 CREATE DATABASE schemaregistry OWNER schemaregistry ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE schemaregistry TO schemaregistry;
 
 CREATE ROLE yqm LOGIN PASSWORD 'yqm';
-
 CREATE DATABASE yqm OWNER yqm ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE yqm TO yqm;
 
 /*For the SMM metadata store, create a database called smm with the password smm:*/
-
 CREATE ROLE smm LOGIN PASSWORD 'smm';
-
 CREATE DATABASE smm OWNER smm ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE smm TO smm;
 
 CREATE ROLE das LOGIN PASSWORD 'das';
-
 CREATE DATABASE das OWNER das ENCODING 'UTF8';
-
 GRANT ALL PRIVILEGES ON DATABASE das TO das;
 
 ALTER DATABASE hive SET standard_conforming_strings=off;
-
 ALTER DATABASE oozie SET standard_conforming_strings=off;
-
 SELECT 1;
-
 SHOW ssl;
-
 \q
 
-*# Alternate commands
+--- Alternate commands
+--- CREATE USER registry WITH PASSWORD 'registry';
+--- GRANT ALL PRIVILEGES ON DATABASE "registry" to registry;
 
-#CREATE USER registry WITH PASSWORD 'registry';
-
-#GRANT ALL PRIVILEGES ON DATABASE "registry" to registry;
+----
 
 [arabic, start=25]
 . If you plan to use Apache Ranger, please visit https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-configuring-postgresql-db-for-ranger.html[[.underline]#Configuring a PostgreSQL Database for Ranger or Ranger KMS#] for instructions on creating and configuring the Ranger database. *included above- install JDBC driver, create DB for ranger etc.
@@ -3888,11 +3846,14 @@ Cloudera Manager, an end-to-end management application, is used to install and c
 [arabic]
 . Install the Cloudera Manager Server packages by running following command:
 
+[source,bash]
+----
 [root@cldr-mngr data]# dnf install -y cloudera-manager-agent cloudera-manager-daemons cloudera-manager-server
 
 # Recommendation: Always install agents via CM-UI only. Never install manually as it generates agent config as localhost and leads to heartbeat error. If HeartBeat error comes up, then run below command to update agent config (before start scm-server)
 
 [root@cldr-mngr data]# sed -i 's/server_host=localhost/server_host=cldr-mngr.cldrsetup.local/g' /etc/cloudera-scm-agent/config.ini
+----
 
 [arabic, start=2]
 . Enable TLS 1.2 on Cloudera Manager Server. https://docs.cloudera.com/cloudera-manager/7.11.3/installation/topics/cdpdc-enable-tls-12-cm-server.html[[.underline]#https://docs.cloudera.com/cloudera-manager/7.11.3/installation/topics/cdpdc-enable-tls-12-cm-server.html#]
@@ -3900,118 +3861,92 @@ Cloudera Manager, an end-to-end management application, is used to install and c
 . If the Database host and Cloudera Manager Server host are located on the same machine, then perform the following steps to import the PostgreSQL database root certificate, as mentioned below in Step 5:
 . Go to the path where root certificates are stored. By default it is /var/lib/pgsql/14/data/.
 
-*##### Configure CDP to use SSL Enabled DB
+[source,bash]
+----
+##### Configure CDP to use SSL Enabled DB 
 
-*# Create a new directory in the following path by running the following command:
+# Create a new directory in the following path by running the following command:
+[root@cldr-mngr data]# mkdir -p /var/lib/cloudera-scm-server/.postgresql
+[root@cldr-mngr data]# chmod 755 /var/lib/cloudera-scm-server/.postgresql
+[root@cldr-mngr data]# cd /var/lib/cloudera-scm-server/.postgresql
 
-[root@cldr-mngr data]#* mkdir -p /var/lib/cloudera-scm-server/.postgresql
+# Copy the PostgreSQL root certificate to the new directory on the Cloudera Manager server host by running the following command:
+[root@cldr-mngr data]# cp /var/lib/pgsql/14/data/root.crt root.crt
 
-[root@cldr-mngr data]#* chmod 755 /var/lib/cloudera-scm-server/.postgresql
-
-[root@cldr-mngr data]#* cd /var/lib/cloudera-scm-server/.postgresql
-
-*# Copy the PostgreSQL root certificate to the new directory on the Cloudera Manager server host by running the following command:
-
-[root@cldr-mngr data]#* cp /var/lib/pgsql/14/data/root.crt root.crt
-
-*# Change the ownership of the root certificate by running the following command:
-
-[root@cldr-mngr data]#* chown cloudera-scm: root.crt
-
-[root@cldr-mngr data]#* ls -lt
-
+# Change the ownership of the root certificate by running the following command:
+[root@cldr-mngr data]# chown cloudera-scm: root.crt
+[root@cldr-mngr data]# ls -lt
 total 8
+-rw-r--r-- 1 cloudera-scm cloudera-scm 4639 Mar  5 16:59 root.crt
 
--rw-r--r-- 1 cloudera-scm cloudera-scm 4639 Mar 5 16:59 root.crt
-
-*# Include this root certificate path in the JDBC URL as follows:
-
+# Include this root certificate path in the JDBC URL as follows:
 # jdbc:postgresql://<DB HOSTNAME>:<DB-PORT>/<DB NAME>?ssl=true&sslmode=verify-ca&sslrootcert=<PATH_TO_ROOT_CERTIFICATE>
+# jdbc:postgresql://cldr-mngr.cldrsetup.local:5432/scm?ssl=true&sslmode=verify-ca&sslrootcert=/var/lib/cloudera-scm-server/.postgresql/root.crt
 
-# *jdbc:postgresql://cldr-mngr.cldrsetup.local:5432/scm?ssl=true&sslmode=verify-ca&sslrootcert=/var/lib/cloudera-scm-server/.postgresql/root.crt
+##### Changes required for Ranger SSL
 
-*##### Changes required for Ranger SSL
-
-[root@cldr-mngr data]#* cp /usr/share/java/postgresql-connector-java.jar /opt/cloudera/cm/lib/postgresql-connector.jar
-
-[root@cldr-mngr data]#* unlink /opt/cloudera/cm/lib/postgresql-42.*.jar
-
-[root@cldr-mngr data]#* ls -ltr /opt/cloudera/cm/lib/*postgres
-
-[root@cldr-mngr data]#* chmod 755 /var/lib/cloudera-scm-server/
-
-[root@cldr-mngr data]#* ls -ltr /var/lib/cloudera-scm-server/.postgresql/*.crt
-
-[root@cldr-mngr data]#
+[root@cldr-mngr data]# cp /usr/share/java/postgresql-connector-java.jar /opt/cloudera/cm/lib/postgresql-connector.jar
+[root@cldr-mngr data]# unlink /opt/cloudera/cm/lib/postgresql-42.*.jar
+[root@cldr-mngr data]# ls -ltr /opt/cloudera/cm/lib/*postgres*
+[root@cldr-mngr data]# chmod 755 /var/lib/cloudera-scm-server/
+[root@cldr-mngr data]# ls -ltr /var/lib/cloudera-scm-server/.postgresql/*.crt
+[root@cldr-mngr data]# 
+----
 
 [arabic, start=6]
 . Run the scm_prepare_database.sh script to check and generate database configuration file for cloudera-manager i.e. db.properties and test the database connection between cloudera-manager and database server:
 
+[source,bash]
+----
 # Run the script to configure PostgreSQL with TLS 1.2 enabled
-
 ###### sudo /opt/cloudera/cm/schema/scm_prepare_database.sh -h<DB HOSTNAME> --jdbc-url "jdbc:postgresql://db_server_host:db_port/db_name?ssl=true&sslmode=verify-ca&sslrootcert=<PATH_TO_DB_ROOT_CERTIFICATE>" <db_type:postgresql> <db_name> <db_role_user> <dn_user_password> --ssl
 
 [root@cldr-mngr ~]# sudo /opt/cloudera/cm/schema/scm_prepare_database.sh -hcldr-mngr.cldrsetup.local --jdbc-url "jdbc:postgresql://cldr-mngr.cldrsetup.local:5432/scm?ssl=true&sslmode=verify-ca&sslrootcert=/var/lib/cloudera-scm-server/.postgresql/root.crt" postgresql scm scm scm --ssl
 
 JAVA_HOME=/usr/lib/jvm/java-17-openjdk-11.0.24.0.8-2.el9.x86_64
-
 Verifying that we can write to /etc/cloudera-scm-server
-
 Creating SCM configuration file in /etc/cloudera-scm-server
+Executing:  /usr/lib/jvm/java-17-openjdk-17.0.13.0.11-4.el9.x86_64/bin/java -cp /usr/share/java/mysql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/opt/cloudera/cm/schema/../lib/* com.cloudera.enterprise.dbutil.DbCommandExecutor /etc/cloudera-scm-server/db.properties com.cloudera.cmf.db.
+[main] DbCommandExecutor              INFO  A JDBC URL override was specified. Using this as the URL to connect to the database and overriding all other values.
+[main] DbCommandExecutor              INFO  Successfully connected to database.
+All done, your SCM database is configured correctly!
 
-Executing: /usr/lib/jvm/java-17-openjdk-17.0.13.0.11-4.el9.x86_64/bin/java -cp /usr/share/java/mysql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/opt/cloudera/cm/schema/../lib/* com.cloudera.enterprise.dbutil.DbCommandExecutor /etc/cloudera-scm-server/db.properties com.cloudera.cmf.db.
-
-[main] DbCommandExecutor INFO A JDBC URL override was specified. Using this as the URL to connect to the database and overriding all other values.
-
-[main] DbCommandExecutor INFO Successfully connected to database.
-
-*All done, your SCM database is configured correctly!
-
-[root@cldr-mngr ~]#
+[root@cldr-mngr ~]# 
+----
 
 [arabic, start=7]
 . Upon successful connection, the scm_prepare_database.sh script writes the content of /etc/cloudera-scm-server/db.properties file as shown below, verify the content, should look like below:
 
+[source,bash]
+----
 [root@cldr-mngr ~]# cat /etc/cloudera-scm-server/db.properties
-
-# Auto-generated by scm_prepare_database.sh on Tue Mar 5 08:02:56 PM PST 2024
-
+# Auto-generated by scm_prepare_database.sh on Tue Mar  5 08:02:56 PM PST 2024
 #
-
 # For information describing how to configure the Cloudera Manager Server
-
 # to connect to databases, see the "Cloudera Manager Installation Guide."
-
 #
-
 com.cloudera.cmf.db.type=postgresql
-
 com.cloudera.cmf.db.host=cldr-mngr.cldrsetup.local
-
 com.cloudera.cmf.db.name=scm
-
 com.cloudera.cmf.db.user=scm
-
 com.cloudera.cmf.db.setupType=EXTERNAL
-
 com.cloudera.cmf.db.password=scm
-
 com.cloudera.cmf.orm.hibernate.connection.url=jdbc:postgresql://cldr-mngr.cldrsetup.local:5432/scm?ssl=true&sslmode=verify-ca&sslrootcert=/var/lib/cloudera-scm-server/.postgresql/root.crt
-
 [root@cldr-mngr ~]#
+----
 
 [arabic, start=8]
 . Start the Cloudera Manager Server:
 
+[source,bash]
+----
 [root@cldr-mngr ~]# systemctl start cloudera-scm-server cloudera-scm-agent
-
 [root@cldr-mngr ~]# systemctl enable cloudera-scm-server cloudera-scm-agent
-
 [root@cldr-mngr ~]# systemctl status cloudera-scm-server cloudera-scm-agent -l
 
 ##### Run the below command to check the logs of cloudera-scm-server starting up. Wait until you see the Started Jetty server message on the screen.
-
 [root@cldr-mngr ~]# sudo tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
+----
 
 [arabic, start=9]
 . The Cloudera Manager should show the below logs before the UI actually comes up.
@@ -4019,7 +3954,7 @@ com.cloudera.cmf.orm.hibernate.connection.url=jdbc:postgresql://cldr-mngr.cldrse
 image:extracted-media/media/image111.png[jetty started,width=635,height=66]
 
 [arabic, start=10]
-. Once the Cloudera-Manager(CM) installation is completed, open the endpoint URL [.underline]#http://<cldr-mgr_ip_addr>:7180/#* of the Cloudera Manager WebUI and login to the CM using default credentials. (Username: admin, Password: admin)image:extracted-media/media/image170.png[extracted-media/media/image170,width=695,height=444]
+. Once the Cloudera-Manager(CM) installation is completed, open the endpoint URL [.underline]#http://<cldr-mgr_ip_addr>:7180/# of the Cloudera Manager WebUI and login to the CM using default credentials. (Username: admin, Password: admin)image:extracted-media/media/image170.png[extracted-media/media/image170,width=695,height=444]
 
 [arabic, start=28]
 . Default username and password for Cloudera Manager is admin/admin.
@@ -4027,9 +3962,12 @@ image:extracted-media/media/image111.png[jetty started,width=635,height=66]
 [arabic, start=11]
 . After logging in to Cloudera-Manager WebUI using the above credentials and uploading the Licence Key, open a new tab of CM-UI on browser and search for JAVA PATH in search bar present at left hand side:
 
-*# Override JAVA PATH in CM-UI>* Search JAVA> Override the value> Save Changes> Restart Cloudera-SCM-Server
+# Override JAVA PATH in CM-UI>* Search JAVA> Override the value> Save Changes> Restart Cloudera-SCM-Server
 
-*_/usr/lib/jvm/java-17-openjdk-17.0.13.0.11-4.el9.x86_64 (Take the correct Java Path from your system, where java is installed)_
+[source,bash]
+----
+/usr/lib/jvm/java-17-openjdk-17.0.13.0.11-4.el9.x86_64 (Take the correct Java Path from your system, where java is installed)_
+----
 
 [arabic, start=12]
 . The Welcome to Cloudera Manager page appears. Since you would have received the CDP license before, select *_Upload Cloudera Data Platform License_* and upload the downloaded .txt or .zip file with the license information.
@@ -4041,11 +3979,13 @@ image:extracted-media/media/image85.png[A screenshot of a cloud computing softwa
 . The Add Private Cloud Base Cluster page appears. Next, we will enable AutoTLS for CM.
 . As a prerequisite step to *_enabling_* *_AutoTLS_*, login to the cldr-mngr node as user root, and verify *_cloudera-manager-agent_* software is installed and running successfully. Verify the logs in below file:
 
+[source,bash]
+----
 [root@cldr-mngr ~]# tail -f /var/log/cloudera-scm-agent/cloudera-scm-agent.log
 
-*#####* Verify the same by running the below command. This should return the output stating the service is active and in running state.
-
+##### Verify the same by running the below command. This should return the output stating the service is active and in running state.
 [root@cldr-mngr ~]# systemctl status cloudera-scm-agent -l
+----
 
 image:extracted-media/media/image180.png[extracted-media/media/image180,width=693,height=101]
 
@@ -4157,9 +4097,9 @@ image:extracted-media/media/image107.png[A screenshot of a computer Description 
 . Click on Finish.
 . After enabling the AutoTLS for the CM-UI through the browser, login to cldr-mngr node at backend as user root and restart Cloudera Manager Server, suggested in the previous screenshot.
 
-[root@cldr-mngr ~]#* systemctl restart cloudera-scm-server
+[root@cldr-mngr ~]# systemctl restart cloudera-scm-server
 
-[root@cldr-mngr ~]#* systemctl status cloudera-scm-server -l
+[root@cldr-mngr ~]# systemctl status cloudera-scm-server -l
 
 ##### Run the below command to check the logs of cloudera-scm-server starting up. Wait until you see the *_Started Jetty server_* message on the screen.
 
@@ -4191,7 +4131,7 @@ Cloudera Manager provides a wizard for integrating your organization’s Kerbero
 
 [root@ipaserver ~]# sudo vi /etc/krb5.conf
 
-*#default_ccache_name = KEYRING:persistent:%{uid}
+#default_ccache_name = KEYRING:persistent:%{uid}
 
 image:extracted-media/media/image48.png[ipa kerb keyring,width=398,height=155]
 
@@ -4599,9 +4539,9 @@ ____
 [arabic, start=6]
 . Click *_Save_*. Once you click on the Save button, it will tell you to restart the CM Server, in order to bring the changes in effect. When you restart the CM Server from Backend. You will see the below entries in the logs.
 
-[root@cldr-mngr ~]#* systemctl restart cloudera-scm-server
+[root@cldr-mngr ~]# systemctl restart cloudera-scm-server
 
-[root@cldr-mngr ~]#* systemctl status cloudera-scm-server -l
+[root@cldr-mngr ~]# systemctl status cloudera-scm-server -l
 
 ##### Run the below command to check the logs of cloudera-scm-server starting up. Wait until you see the *_Started Jetty server_* message on the screen.
 
@@ -4634,11 +4574,11 @@ image:extracted-media/media/image190.png[extracted-media/media/image190,width=67
 [arabic, start=11]
 . Login to the cldr-mngr server at backend and restart the Cloudera Manager Server.
 
-[root@cldr-mngr ~]#* *systemctl restart cloudera-scm-server
+[root@cldr-mngr ~]# *systemctl restart cloudera-scm-server
 
-[root@cldr-mngr ~]#* *systemctl status cloudera-scm-server -l
+[root@cldr-mngr ~]# *systemctl status cloudera-scm-server -l
 
-[root@cldr-mngr ~]#* *sudo tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
+[root@cldr-mngr ~]# *sudo tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
 
 2024-03-19 00:56:15,620 INFO pool-7-thread-1:com.cloudera.server.cmf.components.CmServerStateSynchronizer: (30 skipped) Synced up
 
@@ -4706,7 +4646,7 @@ image:extracted-media/media/image10.png[extracted-media/media/image10,width=433,
 
 i.e. *http://13.251.65.11/cloudera-repos/spark3/3.3.7190.4/[[.underline]#http://13.251.65.11/cloudera-repos/spark3/3.3.7191000.4/#]
 
-http://13.251.65.11/cloudera-repos/cdh7.1.9/[[.underline]#http://13.251.65.11/cloudera-repos/cdh7.1.9/#*]
+http://13.251.65.11/cloudera-repos/cdh7.1.9/[[.underline]#http://13.251.65.11/cloudera-repos/cdh7.1.9/#]
 
 image:extracted-media/media/image80.png[extracted-media/media/image80,width=626,height=312]
 
@@ -4822,9 +4762,9 @@ image:extracted-media/media/image4.png[extracted-media/media/image4,width=617,he
 [arabic, start=13]
 . Stop at this stage. Create a directory on base cluster nodes (for handling of a bug associated with p1000)
 
-[root@cldr-mngr ~]#* *ansible namenodes,datanodes -m shell -a "mkdir /var/lib/hadoop-hdfs"
+[root@cldr-mngr ~]# *ansible namenodes,datanodes -m shell -a "mkdir /var/lib/hadoop-hdfs"
 
-[root@cldr-mngr ~]#* *ansible namenodes,datanodes -m shell -a "ls -lart /var/lib/hadoop-hdfs"
+[root@cldr-mngr ~]# *ansible namenodes,datanodes -m shell -a "ls -lart /var/lib/hadoop-hdfs"
 
 [arabic, start=14]
 . After the agents are installed, the *_Install Parcels_* section appears showing the progress of the parcels distribution, activation and installation on all hosts part of the cluster creation. Once the parcels are installed successfully for all hosts, click on *_Continue_*.
@@ -4834,17 +4774,17 @@ image:extracted-media/media/image17.png[extracted-media/media/image17,width=611,
 [arabic, start=15]
 . Stop at this stage. On base cluster nodes (for handling of a bug associated with p1000). Once Parcels are activated, follow below steps:
 
-[root@cldr-mngr ~]#* *ansible namenodes,datanodes -m shell -a "chown hdfs:hadoop /var/lib/hadoop-hdfs"
+[root@cldr-mngr ~]# *ansible namenodes,datanodes -m shell -a "chown hdfs:hadoop /var/lib/hadoop-hdfs"
 
-[root@cldr-mngr ~]#* *ansible namenodes,datanodes -m shell -a "ls -lart /var/lib/hadoop-hdfs"
+[root@cldr-mngr ~]# *ansible namenodes,datanodes -m shell -a "ls -lart /var/lib/hadoop-hdfs"
 
-*##### Verify if links are good for the CM version for hadoop-hdfs filesystem JAR.
+##### Verify if links are good for the CM version for hadoop-hdfs filesystem JAR.
 
-[root@cldr-mngr ~]#* *ansible namenodes,datanodes -m shell -a "namei -om /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar"
+[root@cldr-mngr ~]# *ansible namenodes,datanodes -m shell -a "namei -om /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar"
 
 *If links are not working fine, deactivate and activate the parcel from CM Parcel Manager. Then Perform Below steps:
 
-[root@cldr-mngr ~]#* *ansible namenodes,datanodes -m shell -a "unlink /etc/alternatives/ozone-filesystem-hadoop3.jar; unlink /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar"
+[root@cldr-mngr ~]# *ansible namenodes,datanodes -m shell -a "unlink /etc/alternatives/ozone-filesystem-hadoop3.jar; unlink /var/lib/hadoop-hdfs/ozone-filesystem-hadoop3.jar"
 
 [Notes]
 
@@ -4922,7 +4862,7 @@ image:extracted-media/media/image188.png[A screenshot of a computer Description 
 
 *open a new tab of CM-UI on browser and search for JAVA PATH in search bar present at left hand side:
 
-*# Override JAVA PATH in CM-UI> Search JAVA PATH> Override the value> Save Changes> Restart Cloudera-SCM-Server
+# Override JAVA PATH in CM-UI> Search JAVA PATH> Override the value> Save Changes> Restart Cloudera-SCM-Server
 
 *Re-run the inspect tools, this time all checks should be green.
 
@@ -5040,15 +4980,15 @@ ____
 
 a|
 ____
-[line-through]#*Service Monitor :* cldr-mngr#
+[line-through]#Service Monitor :* cldr-mngr#
 
-[line-through]#*Host Monitor :* cldr-mngr#
+[line-through]#Host Monitor :* cldr-mngr#
 
-[line-through]#*Reports Manager :* cldr-mngr#
+[line-through]#Reports Manager :* cldr-mngr#
 
-[line-through]#*Event Server :* cldr-mngr#
+[line-through]#Event Server :* cldr-mngr#
 
-[line-through]#*Alert Publisher :* cldr-mngr#
+[line-through]#Alert Publisher :* cldr-mngr#
 ____
 
 a|
@@ -5553,23 +5493,23 @@ https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre
 
 *YARN RM UI:* https://pvcbase-master.cdppvcds.com:8090/ui2/#/cluster-overview[[.underline]#https://pvcbase-master.cldrsetup.local:8090/ui2/#/cluster-overview#]
 
-{empty}[.underline]#*Ranger*:# https://pvcbase-master.cdppvcds.com:6182/index.html#/policymanager/resource[[.underline]#https://pvcbase-master.cldrsetup.local:6182/index.html#/policymanager/resource#]
+{empty}[.underline]#Ranger*:# https://pvcbase-master.cdppvcds.com:6182/index.html#/policymanager/resource[[.underline]#https://pvcbase-master.cldrsetup.local:6182/index.html#/policymanager/resource#]
 
-{empty}[.underline]#*Atlas*:# https://pvcbase-master.cdppvcds.com:31443/login.jsp[[.underline]#https://pvcbase-master.cldrsetup.local:31443/login.jsp#]
-
-*_(Login works with PAM-Linux Server Local User Credentials)_
-
-{empty}[.underline]#*Knox*:# https://pvcbase-master.cdppvcds.com:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cdppvcds.com:8443/gateway/homepage/home/?profile=token[[.underline]#https://pvcbase-master.cldrsetup.local:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cldrsetup.local:8443/gateway/homepage/home/?profile=token#]
+{empty}[.underline]#Atlas*:# https://pvcbase-master.cdppvcds.com:31443/login.jsp[[.underline]#https://pvcbase-master.cldrsetup.local:31443/login.jsp#]
 
 *_(Login works with PAM-Linux Server Local User Credentials)_
 
-{empty}[.underline]#*HiveServer2 UI*:# https://pvcbase-master.cdppvcds.com:10002/[[.underline]#https://pvcbase-master.cldrsetup.local:10002/#]
+{empty}[.underline]#Knox*:# https://pvcbase-master.cdppvcds.com:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cdppvcds.com:8443/gateway/homepage/home/?profile=token[[.underline]#https://pvcbase-master.cldrsetup.local:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cldrsetup.local:8443/gateway/homepage/home/?profile=token#]
 
-[.underline]#HUE#*: https://pvcbase-master.cdppvcds.com:8889/hue/editor/?type=hive[[.underline]#https://pvcbase-master.cldrsetup.local:8889/hue/editor/?type=hive#]
+*_(Login works with PAM-Linux Server Local User Credentials)_
 
-[.underline]#HBASE#*: https://pvcbase-master.cdppvcds.com:16010/master-status[[.underline]#https://pvcbase-master.cldrsetup.local:16010/master-status#]
+{empty}[.underline]#HiveServer2 UI*:# https://pvcbase-master.cdppvcds.com:10002/[[.underline]#https://pvcbase-master.cldrsetup.local:10002/#]
 
-[.underline]#Ozone#*:
+[.underline]#HUE#: https://pvcbase-master.cdppvcds.com:8889/hue/editor/?type=hive[[.underline]#https://pvcbase-master.cldrsetup.local:8889/hue/editor/?type=hive#]
+
+[.underline]#HBASE#: https://pvcbase-master.cdppvcds.com:16010/master-status[[.underline]#https://pvcbase-master.cldrsetup.local:16010/master-status#]
+
+[.underline]#Ozone#:
 
 *Ozone Recon:* https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:9889/#/Overview#]
 
@@ -5583,19 +5523,19 @@ https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre
 
 *OzoneDataNode:* https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-worker1.cldrsetup.local:#]
 
-[.underline]#*Spark JobHistory Server:*#
+[.underline]#Spark JobHistory Server:#
 
 *Spark2:* https://pvcbase-master.cdppvcds.com:18488/[[.underline]#https://pvcbase-master.cldrsetup.local:18488/#]
 
 *Spark3:* https://pvcbase-master.cdppvcds.com:18489/[[.underline]#https://pvcbase-master.cldrsetup.local:18489/#]
 
-[.underline]#*Impala*:#
+[.underline]#Impala*:#
 
 *Impala Catalog:* https://pvcbase-master.cdppvcds.com:25020/[[.underline]#https://pvcbase-master.cldrsetup.local:25020/#]
 
 *Impala Statestore:* https://pvcbase-master.cdppvcds.com:25010/[[.underline]#https://pvcbase-master.cldrsetup.local:25010/#]
 
-##### [.underline]#Job History Server:#* https://pvcbase-master.cdppvcds.com:9991/[[.underline]#https://pvcbase-master.cldrsetup.local:9991/#]
+##### [.underline]#Job History Server:# https://pvcbase-master.cdppvcds.com:9991/[[.underline]#https://pvcbase-master.cldrsetup.local:9991/#]
 
 [arabic]
 . *Port requirements for different services on PvC Base Cluster/Data Services (ECS) Cluster:
@@ -5646,7 +5586,7 @@ DataNode Data Transfer Protection (dfs.data.transfer.protection) – Authenticat
 
 *4. Install Ranger Plugin for services, add service dependency* *i.e. Hive etc. and restart the cluster.
 
-Ensure that the Ranger Solr and Ranger HDFS plugins are enabled. See https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-additional-steps-ranger.html[[.underline]#Additional Steps for Apache Ranger#*] for more details on Configuration Steps.
+Ensure that the Ranger Solr and Ranger HDFS plugins are enabled. See https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-additional-steps-ranger.html[[.underline]#Additional Steps for Apache Ranger#] for more details on Configuration Steps.
 
 *5. Make Sure HDFS, Ozone services are Installed and Running Successfully* (critical services – if not working properly, then no other service will work properly)
 
@@ -5693,11 +5633,11 @@ Open *_C:\Windows\System32\drivers\etc_* (on Windows) or *_/etc/hosts_* (on MAC/
 
 13.251.65.11 cldr-mngr.cldrsetup.local
 
-*# ECS Links
+# ECS Links
 
 52.221.202.246 console-cdp.apps.cldrsetup.local prometheus-cp.apps.cldrsetup.local infra-prometheus.apps.cldrsetup.local validation-cdp.apps.cldrsetup.local kube-dashboard.apps.cldrsetup.local longhorn.apps.cldrsetup.local fluent-console-cdp.apps.cldrsetup.local vault.localhost.localdomain
 
-*# PvC Base Cluster Nodes
+# PvC Base Cluster Nodes
 
 18.139.222.78 pvcbase-master.cldrsetup.local pvcbase-master
 
@@ -5707,7 +5647,7 @@ Open *_C:\Windows\System32\drivers\etc_* (on Windows) or *_/etc/hosts_* (on MAC/
 
 18.141.13.157 pvcbase-worker3.cldrsetup.local pvcbase-worker3
 
-*# PvC Data Services Cluster Nodes
+# PvC Data Services Cluster Nodes
 
 172.31.30.239 pvcecs-master.cldrsetup.local pvcecs-master
 
@@ -5796,7 +5736,7 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 
 Copy the database server certificate to *_/var/lib/ranger/_* path, or use any custom path.
 
-[root@pvcbase-master ~]#* *cp -rv /root/.postgresql/root.crt /var/lib/ranger/root.crt
+[root@pvcbase-master ~]# *cp -rv /root/.postgresql/root.crt /var/lib/ranger/root.crt
 
 * *In Review Config, search for SSL and update the following configurations:
 
@@ -5895,9 +5835,9 @@ ____
 
 a|
 ____
-http://<ranger_host>:6080 http://pvcbase-master.cdppvcds.com:6080[[.underline]#http://pvcbase-master.cldrsetup.local:6080#*]
+http://<ranger_host>:6080 http://pvcbase-master.cdppvcds.com:6080[[.underline]#http://pvcbase-master.cldrsetup.local:6080#]
 
-https://<ranger_host>:6182 https://pvcbase-master.cdppvcds.com:6182[[.underline]#https://pvcbase-master.cldrsetup.local:6182#*]
+https://<ranger_host>:6182 https://pvcbase-master.cdppvcds.com:6182[[.underline]#https://pvcbase-master.cldrsetup.local:6182#]
 ____
 
 |===
@@ -5907,7 +5847,7 @@ ____
 * Click on *_Actions -> Restart_* under Ranger Service.
 * Run below command on pvcbase-master node to check the Ranger logs, during restart.
 
-[root@pvcbase-master ~]#* tail -f /var/log/ranger/admin/catalina.out
+[root@pvcbase-master ~]# tail -f /var/log/ranger/admin/catalina.out
 
 image:extracted-media/media/image72.png[extracted-media/media/image72,width=691,height=446]
 
@@ -5919,7 +5859,7 @@ In the Cloudera Manager Web console; go to *_Hive > Configuration > Hive Metasto
 
 Copy the database server certificate to *_/var/lib/hive/_* path, or use any custom path.
 
-[root@pvcbase-master ~]#* *cp -rv /root/.postgresql/root.crt /var/lib/hive/root.crt
+[root@pvcbase-master ~]# *cp -rv /root/.postgresql/root.crt /var/lib/hive/root.crt
 
 *Edit value as:* jdbc:postgresql://<db_host>:<db_port>/<db_name>?sslmode=verify-full&sslrootcert=<server_certificate_path>
 
@@ -6878,127 +6818,127 @@ image:extracted-media/media/image63.png[extracted-media/media/image63,width=660,
 # In RHEL 9 cgroup-v2 is enabled by default, follow steps below to enable cgroup v1:
 
 # Check if the cgroup-v2 is mounted currently as default. +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "mount | grep cgroup" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "mount | grep cgroup" +
  +
 # Add the kernel command line parameter systemd.unified_cgroup_hierarchy=0 & systemd.legacy_systemd_cgroup_controller.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a 'grubby --update-kernel=/boot/vmlinuz-$(uname -r) --args="systemd.unified_cgroup_hierarchy=0 systemd.legacy_systemd_cgroup_controller"' +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a 'grubby --update-kernel=/boot/vmlinuz-$(uname -r) --args="systemd.unified_cgroup_hierarchy=0 systemd.legacy_systemd_cgroup_controller"' +
  +
 # Reboot the system for changes to take effect.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "systemctl reboot"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "systemctl reboot"
 
 # Verify the changes after reboot:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "cat /proc/cmdline"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "cat /proc/cmdline"
 
 BOOT_IMAGE=(hd0,gpt2)/vmlinuz-5.14.0-162.23.1.el9_1.x86_64 root=/dev/mapper/rhel-root ro crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M resume=/dev/mapper/rhel-swap rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap rhgb quiet systemd.unified_cgroup_hierarchy=0 systemd.legacy_systemd_cgroup_controller
 
 # Mount shows legacy cgroup-v1 mounted now.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "mount | grep cgroup" +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "ll /sys/fs/cgroup"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "mount | grep cgroup" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "ll /sys/fs/cgroup"
 
 [arabic, start=12]
 . For CML, you must install *_nfs-utils_* in order to mount longhorn-nfs provisioned mounts. The *_nfs-utils_* package is required on every node of the ECS cluster. Run this command *_“dnf install nfs-utils”_* to install *_nfs-utils_*.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "dnf install -y nfs-utils iscsi-initiator-utils"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "dnf install -y nfs-utils iscsi-initiator-utils"
 
 [arabic, start=13]
 . Check *_iptables_* is installed and working fine.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "iptables -L"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "iptables -L"
 
 [arabic, start=14]
 . If *_iptables_* is not working as expected or giving command not found error then remove the package on all ecs nodes and re-install.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "dnf remove -y iptables && dnf install -y iptables && iptables -L"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "dnf remove -y iptables && dnf install -y iptables && iptables -L"
 
 [arabic, start=15]
 . If *_iptables_* is not present on ecs cluster nodes, then Install *_iptables_*, and verify if it is working as expected.
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "dnf install -y iptables && iptables -L"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "dnf install -y iptables && iptables -L"
 
 [arabic, start=16]
 . For nodes with NVIDIA GPU *_(if applicable)_*, ensure that the GPU hosts have nVidia Drivers and *_nvidia-container-runtime_* installed. You must confirm that drivers are properly loaded on the host by executing the command nvidia-smi. You must also install the nvidia-container-toolkit package. *_(skip this step)_
 . You must install *_nvidia-container-toolkit_* *_(if applicable)_*. (*_nvidia-container-runtime_* is migrated to *_nvidia-container-toolkit_*, see Migration Notice.) The steps for this are shown in the https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-yum-or-dnf[[.underline]#NVIDIA Installation Guide#]. If using Red Hat Enterprise Linux (RHEL), use dnf to install the package. See Installing the https://docs.nvidia.com/datacenter/cloud-native/edge/latest/nvidia-gpu-with-device-edge.html#installing-the-nvidia-container-toolkit[[.underline]#NVIDIA Container Toolkit#]. *_(skip this step)_
 
-*##### Verify linux version:
+##### Verify linux version:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "uname -m && cat /etc/*release"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "uname -m && cat /etc/*release"
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "uname -a"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "uname -a"
 
 * +
 ##### Verify GCC installation and version
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "gcc --version"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "gcc --version"
 
-*##### Verify nodes with NVIDIA GPU installed:
+##### Verify nodes with NVIDIA GPU installed:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "lspci -nnv | grep -i nvidia"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "lspci -nnv | grep -i nvidia"
 
-*##### Set subscription to RHEL9.x
+##### Set subscription to RHEL9.x
 
-[root@ipaserver ~]#* ansible all -m shell -a "subscription-manager release --set=9.4"
+[root@ipaserver ~]# ansible all -m shell -a "subscription-manager release --set=9.4"
 
-[root@ipaserver ~]#* ansible all -m shell -a "subscription-manager release --show" +
-[root@ipaserver ~]#* ansible all -m shell -a "sudo dnf clean all"
+[root@ipaserver ~]# ansible all -m shell -a "subscription-manager release --show" +
+[root@ipaserver ~]# ansible all -m shell -a "sudo dnf clean all"
 
-[root@ipaserver ~]#* ansible all -m shell -a "sudo rm -rvf /var/cache/dnf" +
+[root@ipaserver ~]# ansible all -m shell -a "sudo rm -rvf /var/cache/dnf" +
  +
-*##### _(Optional if not completed prior)_ Enable optional repos - On RHEL 9 Linux only
+##### _(Optional if not completed prior)_ Enable optional repos - On RHEL 9 Linux only
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms"
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms"
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms"
 
-*##### Install kernel headers and development packages for the currently running kernel* +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf install kernel-devel-$(uname -r) kernel-headers-$(uname -r)"
+##### Install kernel headers and development packages for the currently running kernel* +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf install kernel-devel-$(uname -r) kernel-headers-$(uname -r)"
 
-*##### Remove outdated Signing Key:
+##### Remove outdated Signing Key:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo rpm --erase gpg-pubkey-7fa2af80*"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo rpm --erase gpg-pubkey-7fa2af80*"
 
-*##### Download and Install NVIDIA CUDA Toolkit [This exercise documented with CUDA 12.3.2 for RHEL 9 rpm(local) installation]
+##### Download and Install NVIDIA CUDA Toolkit [This exercise documented with CUDA 12.3.2 for RHEL 9 rpm(local) installation]
 
-[root@ipaserver ~]#* wget https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm[[.underline]#https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm#] +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m copy -a "src=/root/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm dest=/root/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm" +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo rpm --install cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm"
+[root@ipaserver ~]# wget https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm[[.underline]#https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm#] +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m copy -a "src=/root/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm dest=/root/cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo rpm --install cuda-repo-rhel9-12-2-local-12.2.2_535.104.05-1.x86_64.rpm"
 
-*##### From the NVIDIA Driver Downloads page, download NVIDIA Driver https://www.nvidia.com/download/index.aspx[[.underline]#https://www.nvidia.com/download/index.aspx#] as per the GPU, OS and NVIDIA CUDA version.* +
-[root@ipaserver ~]#* wget https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo[[.underline]#https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo#]
+##### From the NVIDIA Driver Downloads page, download NVIDIA Driver https://www.nvidia.com/download/index.aspx[[.underline]#https://www.nvidia.com/download/index.aspx#] as per the GPU, OS and NVIDIA CUDA version.* +
+[root@ipaserver ~]# wget https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo[[.underline]#https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo#]
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m copy -a "src=/root/nvidia-driver-local-repo-rhel9-535.161.07-1.0-1.x86_64.rpm dest=/root/nvidia-driver-local-repo-rhel9-535.161.07-1.0-1.x86_64.rpm" +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo rpm --install nvidia-driver-local-repo-rhel9-535.161.07-1.0-1.x86_64.rpm” +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m copy -a "src=/root/nvidia-driver-local-repo-rhel9-535.161.07-1.0-1.x86_64.rpm dest=/root/nvidia-driver-local-repo-rhel9-535.161.07-1.0-1.x86_64.rpm" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo rpm --install nvidia-driver-local-repo-rhel9-535.161.07-1.0-1.x86_64.rpm” +
  +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf clean all"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf clean all"
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf -y module install nvidia-driver:latest-dkms" +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf -y install cuda"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf -y module install nvidia-driver:latest-dkms" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf -y install cuda"
 
-*##### Enable nvidia-persistenced services:
+##### Enable nvidia-persistenced services:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo systemctl enable nvidia-persistenced.service"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo systemctl enable nvidia-persistenced.service"
 
 * +
 ##### Reboot the machine:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo reboot"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo reboot"
 
-*##### After the machine boots, verify that the NVIDIA drivers are installed properly:
+##### After the machine boots, verify that the NVIDIA drivers are installed properly:
 
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo nvidia-smi"
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo nvidia-smi"
 
 * +
 ##### Installing with dnf
 
-*##### Configure the production repository:* +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m copy -a "src=/root/nvidia-container-toolkit.repo dest=/etc/yum.repos.d/nvidia-container-toolkit.repo" +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf config-manager --enable nvidia-container-toolkit-experimental" +
-[root@ipaserver ~]#* ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf install -y nvidia-container-toolkit"
+##### Configure the production repository:* +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m copy -a "src=/root/nvidia-container-toolkit.repo dest=/etc/yum.repos.d/nvidia-container-toolkit.repo" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf config-manager --enable nvidia-container-toolkit-experimental" +
+[root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo dnf install -y nvidia-container-toolkit"
 
 *If you are installing ECS on RHEL 8 or RHEL 9: _(Not Required for Cloud Based Servers, perform only on Datacenter/Bare-metal environments for RKE Based ECS clusters)_
 
@@ -7180,7 +7120,7 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/index.html[[.und
 . For more details on dedicating ECS node for specific workload type please visit: https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/managing-ecs/topics/cm-managing-ecs-dedicating-nodes-for-workloads.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/managing-ecs/topics/cm-managing-ecs-dedicating-nodes-for-workloads.html#]
 . If you do not have entitlements to access https://archive.cloudera.com/p/cdp-pvc-ds/latest/[[.underline]#https://archive.cloudera.com/p/cdp-pvc-ds/latest/#], contact your Cloudera account team to get the necessary entitlements.
 
-*##### Latest ECS Supported Version Of Cloudera-Manager is _[.underline]#7.11.3 CHF11#_
+##### Latest ECS Supported Version Of Cloudera-Manager is _[.underline]#7.11.3 CHF11#_
 
 ++**************************************************************************************************************++
 
@@ -7957,17 +7897,17 @@ image:extracted-media/media/image84.png[extracted-media/media/image84,width=665,
 [arabic, start=24]
 . Login to the pvcecs-master node and create kubeconfig file by copying the rke2.yaml file on ecs master node, in order to be able to run the kubectl commands from master node:
 
-[root@pvcecs-master ~]#* rm -rvf ~/.kube && mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
+[root@pvcecs-master ~]# rm -rvf ~/.kube && mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
 
 ##### The kubectl binary path may vary, do whereis kubectl or use find or locate commands to find the exact path of the kubectl binary on the node.
 
-[root@pvcecs-master ~]#* export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH
+[root@pvcecs-master ~]# export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH
 
-[root@pvcecs-master ~]#* kubectl get pods
+[root@pvcecs-master ~]# kubectl get pods
 
 No resources found in the default namespace.
 
-[root@pvcecs-master ~]#* kubectl get all
+[root@pvcecs-master ~]# kubectl get all
 
 NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
 
@@ -7977,9 +7917,9 @@ service/kubernetes ClusterIP 10.43.0.1 <none> 443/TCP 13h
 
 ##### Create alias on node, to run the kubectl command
 
-[root@pvcecs-master ~]#* echo "export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH" >> ~/.bashrc && source ~/.bashrc
+[root@pvcecs-master ~]# echo "export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH" >> ~/.bashrc && source ~/.bashrc
 
-[root@pvcecs-master ~]#* echo "alias k=kubectl" >> ~/.bashrc && source ~/.bashrc
+[root@pvcecs-master ~]# echo "alias k=kubectl" >> ~/.bashrc && source ~/.bashrc
 
 #### You can copy the config file and set the above ~/.bashrc paths on any of ECS nodes to run kubectl commands from there.
 
@@ -7990,17 +7930,17 @@ service/kubernetes ClusterIP 10.43.0.1 <none> 443/TCP 13h
 [arabic, start=25]
 . After the *RKE2 installation step is completed*, *keep the remaining steps running but immediately log in* to *_pvcecs-master_* node and *_update the config for coredns to point to private DNS_* (ipaserver). The coredns config should look like similar to below one:
 
-*##### Test the nslookup and dig from ubuntu image if it is able to resolve the IP from Private DNS
+##### Test the nslookup and dig from ubuntu image if it is able to resolve the IP from Private DNS
 
-[root@pvcecs-master ~]#* kubectl run -it ubuntu1 --image=ubuntu bash
+[root@pvcecs-master ~]# kubectl run -it ubuntu1 --image=ubuntu bash
 
-*##### If not able to resolve the IP from Private DNS, we need to point coredns to PrivateDNS/ FreeIPA server
+##### If not able to resolve the IP from Private DNS, we need to point coredns to PrivateDNS/ FreeIPA server
 
-[root@pvcecs-master ~]#* kubectl run -it ubuntu1 --image=ubuntu bash
+[root@pvcecs-master ~]# kubectl run -it ubuntu1 --image=ubuntu bash
 
-[root@pvcecs-master ~]#* kubectl get configmap -n kube-system | grep coredns
+[root@pvcecs-master ~]# kubectl get configmap -n kube-system | grep coredns
 
-[root@pvcecs-master ~]#* kubectl edit configmap rke2-coredns-rke2-coredns -n kube-system
+[root@pvcecs-master ~]# kubectl edit configmap rke2-coredns-rke2-coredns -n kube-system
 
 # Please edit the object below. Lines beginning with a '#' will be ignored,
 
@@ -8092,15 +8032,15 @@ resourceVersion: "39715"
 
 uid: dcb8f600-e107-4c1b-9db7-701060fe063a
 
-[root@pvcecs-master ~]#* kubectl rollout restart deployment rke2-coredns-rke2-coredns -n kube-system
+[root@pvcecs-master ~]# kubectl rollout restart deployment rke2-coredns-rke2-coredns -n kube-system
 
-*##### Verify the status that deployment of coredns is updated with configmap changes
+##### Verify the status that deployment of coredns is updated with configmap changes
 
-[root@pvcecs-master ~]#* k get pod -A |grep dns
+[root@pvcecs-master ~]# k get pod -A |grep dns
 
-*##### Test the nslookup and dig from ubuntu image if it is actually able to resolve the IP from Private DNS
+##### Test the nslookup and dig from ubuntu image if it is actually able to resolve the IP from Private DNS
 
-[root@pvcecs-master ~]#* k run -it ubuntu1 --image=ubuntu bash
+[root@pvcecs-master ~]# k run -it ubuntu1 --image=ubuntu bash
 
 [arabic, start=26]
 . *_Install Data Services_* step will run a set of first run commands and report status on Data Services installation. The installation progress is displayed on the *_Install Data Services_* page. This step will take *_nearly an hour to complete_*. When the installation is complete, click *_Continue_*.
@@ -8237,7 +8177,7 @@ https://community.cloudera.com/t5/Support-Questions/Unable-to-create-Data-Engine
 
 *Other:
 
-https://repost.aws/knowledge-center/create-lv-on-ebs-partition[[.underline]#https://repost.aws/knowledge-center/create-lv-on-ebs-partition#*]
+https://repost.aws/knowledge-center/create-lv-on-ebs-partition[[.underline]#https://repost.aws/knowledge-center/create-lv-on-ebs-partition#]
 
 *==========================================================================================================
 
@@ -8298,7 +8238,7 @@ image:extracted-media/media/image6.png[extracted-media/media/image6,width=635,he
 
 *Note:* If nvgfd-gpu-feature-discovery-xxxx pods remain in crashlookbackoff please apply patch to fix the issue.
 
-[root@pvcecs-master ~]#* kubectl patch clusterrolebinding gpu-feature-discovery -p '{"subjects":[{"kind":"ServiceAccount","name":"gpu-feature-discovery","namespace":"kube-system"}]}'
+[root@pvcecs-master ~]# kubectl patch clusterrolebinding gpu-feature-discovery -p '{"subjects":[{"kind":"ServiceAccount","name":"gpu-feature-discovery","namespace":"kube-system"}]}'
 
 image:extracted-media/media/image26.png[A screenshot of a computer Description automatically generated,width=572,height=274]
 
@@ -8621,9 +8561,9 @@ image:extracted-media/media/image145.png[A screenshot of a computer Description 
 
 #### *nfs://172.31.30.239:/lhdata/nfs_storage/kuldeep-test-cml-w1
 
-[root@pvcecs-master ~]#* mkdir -p /lhdata/nfs_storage/kuldeep-test-cml-w1
+[root@pvcecs-master ~]# mkdir -p /lhdata/nfs_storage/kuldeep-test-cml-w1
 
-[root@pvcecs-master ~]#* chown 8536:8536 /lhdata/nfs_storage/kuldeep-test-cml-w1
+[root@pvcecs-master ~]# chown 8536:8536 /lhdata/nfs_storage/kuldeep-test-cml-w1
 
 * Under Production Learning, the below parameters need to be updated.
 ** *Enable Governance*: This provided advanced lineage and governance features. For simple demos or POCs, you may choose to disable it.
@@ -9309,7 +9249,7 @@ Cloudera Data Platform Private Cloud Data Services installation on Embedded Cont
 
 === FreeIPA Reference
 
-https://www.devopszones.com/2020/03/how-to-add-freeipa-user-in-cli-and-web.html[[.underline]#https://www.devopszones.com/2020/03/how-to-add-freeipa-user-in-cli-and-web.html#*]
+https://www.devopszones.com/2020/03/how-to-add-freeipa-user-in-cli-and-web.html[[.underline]#https://www.devopszones.com/2020/03/how-to-add-freeipa-user-in-cli-and-web.html#]
 
 ==== Add users on FreeIPA
 
@@ -9559,17 +9499,17 @@ https://github.com/mionisation/BI_BigData_2_HiveDatasetAnalysis/blob/master/crea
 
 https://grouplens.org/datasets/movielens/20m/[[.underline]#https://grouplens.org/datasets/movielens/20m/#]
 
-*##### Validation:
+##### Validation:
 
-[root@pvcbase-master ~]#* dnf install -y wget unzip
+[root@pvcbase-master ~]# dnf install -y wget unzip
 
-[root@pvcbase-master ~]#* wget https://files.grouplens.org/datasets/movielens/ml-20m.zip
+[root@pvcbase-master ~]# wget https://files.grouplens.org/datasets/movielens/ml-20m.zip
 
-[root@pvcbase-master ~]#* unzip ml-20m.zip
+[root@pvcbase-master ~]# unzip ml-20m.zip
 
-[root@pvcbase-master ~]#* cd ml-20m
+[root@pvcbase-master ~]# cd ml-20m
 
-[root@pvcbase-master ml-20m]#* sed -i 1d 
+[root@pvcbase-master ml-20m]# sed -i 1d 
 
 [root@pvcbase-master ml-20m]#
 
@@ -9581,18 +9521,18 @@ ls: DestHost:destPort pvcbasemaster.cldrsetup.local:8020 , LocalHost:localPort p
 
 [root@pvcbase-master ml-20m]#
 
-[root@pvcbase-master ml-20m]#* find / -name hdfs.keytab
+[root@pvcbase-master ml-20m]# find / -name hdfs.keytab
 
 [root@pvcbase-master ml-20m]#
 
-[root@pvcbase-master ml-20m]#* klist -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab +
+[root@pvcbase-master ml-20m]# klist -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab +
 kinit -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab
 
 [root@pvcbase-master ml-20m]#
 
-[root@pvcbase-master ml-20m]#* hdfs/pvcbasemaster.cldrsetup.local@CLDRSETUP.LOCAL
+[root@pvcbase-master ml-20m]# hdfs/pvcbasemaster.cldrsetup.local@CLDRSETUP.LOCAL
 
-[root@pvcbase-master ml-20m]#* klist -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab
+[root@pvcbase-master ml-20m]# klist -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab
 
 Keytab name: FILE:/run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab
 
@@ -9604,7 +9544,7 @@ KVNO Timestamp Principal
 
 3 03/17/2024 12:33:40 hdfs/pvcbasemaster.cldrsetup.local@CLDRSETUP.LOCAL
 
-[root@pvcbase-master ml-20m]#* klist
+[root@pvcbase-master ml-20m]# klist
 
 Ticket cache: FILE:/tmp/krb5cc_0
 
@@ -9616,15 +9556,15 @@ Valid starting Expires Service principal
 
 renew until 03/28/2024 22:50:18
 
-[root@pvcbase-master ml-20m]#* hdfs dfs -mkdir /tmp/movielens
+[root@pvcbase-master ml-20m]# hdfs dfs -mkdir /tmp/movielens
 
-[root@pvcbase-master ml-20m]#* hdfs dfs -put * /tmp/movielens/
+[root@pvcbase-master ml-20m]# hdfs dfs -put * /tmp/movielens/
 
-[root@pvcbase-master ml-20m]#* hdfs dfs -chown -R hive:supergroup /tmp/movielens
+[root@pvcbase-master ml-20m]# hdfs dfs -chown -R hive:supergroup /tmp/movielens
 
-[root@pvcbase-master ml-20m]#* hdfs dfs -ls /tmp/movielens/
+[root@pvcbase-master ml-20m]# hdfs dfs -ls /tmp/movielens/
 
-[root@pvcbase-master ml-20m]#* hive
+[root@pvcbase-master ml-20m]# hive
 
 CREATE DATABASE movielens;
 
@@ -9859,7 +9799,7 @@ On the Home page, Click the drop-down list next to the cluster you want to delet
 [source,bash]
 ----
 
-*#### Cleanup DB
+#### Cleanup DB
 
 systemctl status cloudera-scm-server
 
@@ -9885,7 +9825,7 @@ systemctl daemon-reload
 
 mv -v /var/lib/pgsql/14/data/ /var/lib/pgsql/14/data_bkp_$(date {plus}%Y%m%d)
 
-*##### Cleanup CDP-CM, Base Master and Worker nodes
+##### Cleanup CDP-CM, Base Master and Worker nodes
 
 #/opt/cloudera/installer/uninstall-cloudera-manager.sh
 
@@ -9897,7 +9837,7 @@ for u in cloudera-scm* flume hadoop hdfs hbase hive httpfs hue impala llama mapr
 
 sudo umount cm_processes
 
-*##### Cleanup CDP-CM, Base Master and Worker nodes
+##### Cleanup CDP-CM, Base Master and Worker nodes
 
 sudo rm -rvf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/cloudera* /var/log/cloudera* /var/run/cloudera* /etc/cloudera-scm-server /opt/cloudera /etc/cloudera-scm-agent /var/lib/cloudera-scm-agent/cm_guid* /tmp/.scm_prepare_node.lock
 
@@ -9907,7 +9847,7 @@ sudo rm -rvf /var/lib/flume-ng /var/lib/hadoop* /var/lib/hue /var/lib/navigator 
 
 sudo rm -rvf /hdfs/* /dfs* /hdfs/mapred/* /hdfs/yarn/* /var/lib/had*ozon* /yarn* /etc/{*atlas*,*hadoop*,ranger,hue,impala,knox,hbase,*hive*,hbase-solr,hadoop-kms,*ozone*,*kafka*,*zeppelin*,*spark*,sqoop*,schemaregistry,*solr*,hive-hcatalog,hive-webhcat,hue,*hbase*,*kudu*,*knox*,zookeeper,*tez*,streams*} /tmp/kafka-logs/* /var/local/kafka/data/meta.properties /var/lib/cloudera-scm-agent/cm_guid
 
-*##### Only If you are doing end-to-end cleanup, including cloudera-manager and postgres DB, run on all
+##### Only If you are doing end-to-end cleanup, including cloudera-manager and postgres DB, run on all
 
 for user in hdfs httpfs sqoop kafka yarn hbase streamsrepmgr streamsmsgmgr livy kms atlas schemaregistry hue zookeeper accumulo phoenix mapred druid ranger zeppelin oozie kudu knox superset solr hive cruisecontrol impala rangerraz ozone tez dpprofiler flume nifi nifiregistry nifitoolkit spark flink rangerrms omid hadoop kraft; do userdel -r "$user" 2>/dev/null; done
 
@@ -9924,11 +9864,11 @@ python3 -V
 
 https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs/topics/cdppvc-installation-ecs-uninstall-pvc.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs/topics/cdppvc-installation-ecs-uninstall-pvc.html#]
 
-*##### CLEANUP ECS
+##### CLEANUP ECS
 [source,bash]
 ----
 
-*# On each host in the cluster:
+# On each host in the cluster:
 
 /opt/cloudera/parcels/ECS/docker/docker container stop registry
 
@@ -9936,27 +9876,27 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs
 
 /opt/cloudera/parcels/ECS/docker/docker image rm registry:2
 
-*# Stop the ECS cluster in Cloudera Manager
+# Stop the ECS cluster in Cloudera Manager
 
-*# On each host:
+# On each host:
 
 cd /opt/cloudera/parcels/ECS/bin
 
-./rke2-killall.sh *# usually 2 times is sufficient
+./rke2-killall.sh # usually 2 times is sufficient
 
-*# Use umount to unmount all NFS disks.
+# Use umount to unmount all NFS disks.
 
-# umount /docker /lhdata /cdwdata *#not needed in our case
+# umount /docker /lhdata /cdwdata #not needed in our case
 
 ./rke2-uninstall.sh
 
 systemctl daemon-reload
 
-rm -rvf /ecs/* *# assumes the default defaultDataPath and lsoDataPath
+rm -rvf /ecs/* # assumes the default defaultDataPath and lsoDataPath
 
-rm -rvf /var/lib/docker_server/* *# deletes the auth and certs
+rm -rvf /var/lib/docker_server/* # deletes the auth and certs
 
-rm -rvf /etc/docker/certs.d/ /etc/docker/* *# delete the ca.crt
+rm -rvf /etc/docker/certs.d/ /etc/docker/* # delete the ca.crt
 
 rm -rvf /var/lib/docker/
 
@@ -9970,13 +9910,13 @@ rm -rvf ~/.kube ~/.cache
 
 systemctl daemon-reload
 
-*# Delete the ECS cluster in Cloudera Manager.
+# Delete the ECS cluster in Cloudera Manager.
 
-*# In Cloudera Manager, navigate to CDP Private Cloud Data Services and click . Click Uninstall.
+# In Cloudera Manager, navigate to CDP Private Cloud Data Services and click . Click Uninstall.
 
-*# The Delete Cluster wizard appears. Click Delete.
+# The Delete Cluster wizard appears. Click Delete.
 
-*#Clean IPtables on each host:
+#Clean IPtables on each host:
 
 echo "Reset iptables to ACCEPT all, then flush and delete all other chains";
 
@@ -10002,7 +9942,7 @@ done
 
 rm -rvf /etc/rancher /var/lib/rancher /var/log/rancher
 
-*# remove agents from all hosts in CM UI
+# remove agents from all hosts in CM UI
 
 systemctl stop cloudera-scm-agent
 
@@ -10012,15 +9952,15 @@ rm -rvf /opt/cloudera/cm-agent/
 
 rm -rf /opt/cloudera/ /var/lib/cloudera-scm-agent
 
-*# Remove the hosts from CM-UI
+# Remove the hosts from CM-UI
 
 *Alternatively, an experimental script is available. This script combines steps three through five. The script is available here:
 
 https://github.com/cloudera-labs/snippets/blob/main/private-cloud/kill-2-rke.sh[[.underline]#https://github.com/cloudera-labs/snippets/blob/main/private-cloud/kill-2-rke.sh#]
 
-*# Reboot the host(s).
+# Reboot the host(s).
 
-*# Before you install ECS again, ensure that the IP tables list is empty by executing the following command:
+# Before you install ECS again, ensure that the IP tables list is empty by executing the following command:
 
 *iptables -L
 
@@ -10100,7 +10040,7 @@ pvcecs[1-5].cldrsetup.local; pvcecsmaster.cldrsetup.local: IOException thrown wh
 
 openssl s_client -connect pvcbasemaster.cldrsetup.local:7183
 
-[root@pvcbasemaster cloudera-scm-agent]#* cat /etc/cloudera-scm-agent/config.ini|grep server
+[root@pvcbasemaster cloudera-scm-agent]# cat /etc/cloudera-scm-agent/config.ini|grep server
 
 change hostname to dnsname in place of localhost and restart all agents (heartbeat issue resolved)
 
@@ -10130,25 +10070,25 @@ It appears that you might have a proxy setup for the Administration Console. Spe
 
 ++**************************************************************************************************************++
 
-*##### Ranger, Atlas not running
+##### Ranger, Atlas not running
 
 Due to kafka issue and SOLR issue
 
 ++**************************************************************************************************************++
 
-*##### SOLR error:
+##### SOLR error:
 
 Initialize SOLR and create HDFS home dir from actions and start service will fix issue
 
 ++**************************************************************************************************************++
 
-*##### Kafka error:
+##### Kafka error:
 
 Kafka and SOLR depends on Ozone, (SOLR depends on Kafka as well) install this first
 
 ++**************************************************************************************************************++
 
-*##### Tez error
+##### Tez error
 
 tez -> action -> upload tez file to hdfs
 
@@ -10156,35 +10096,35 @@ CM > Hive > Action > Create hive dir
 
 ++**************************************************************************************************************++
 
-*##### YARN queue manager error:
+##### YARN queue manager error:
 
-[root@pvcbase-master ~]#* sudo mkdir /var/lib/hadoop-yarn/
+[root@pvcbase-master ~]# sudo mkdir /var/lib/hadoop-yarn/
 
-[root@pvcbase-master ~]#* sudo chmod {plus}077 /var/lib/hadoop-yarn/
+[root@pvcbase-master ~]# sudo chmod {plus}077 /var/lib/hadoop-yarn/
 
-[root@pvcbase-master ~]#* sudo chown yarn:hadoop /var/lib/hadoop-yarn/
+[root@pvcbase-master ~]# sudo chown yarn:hadoop /var/lib/hadoop-yarn/
 
 ++**************************************************************************************************************++
 
-*##### Kafka error:
+##### Kafka error:
 
 *Solution:* delete /var/local/kafka/data/meta.properties
 
 ++**************************************************************************************************************++
 
-*##### Enable thrift server for hbase-hue
+##### Enable thrift server for hbase-hue
 
 *set wal property codec-hbase
 
 ++**************************************************************************************************************++
 
-*##### HBASE master bad health:
+##### HBASE master bad health:
 
 The problem lies in Cloudera Management Monitor Service, not in Hbase itself. What I did is to restart Cloudera Management Monitor Service, and then restart HBase. After that everything seems to be fine.
 
 ++**************************************************************************************************************++
 
-*#### Ozone error - Could not find or is not a file
+#### Ozone error - Could not find or is not a file
 
 Make sure that hdfs_service is enabled in the Ozone configuration. By having this enabled, the CM agent will put the core-site.xml into the process directory and that error will be gone.
 
@@ -10194,7 +10134,7 @@ Cleanup ozone directories before redeployment.
 
 *HDDS error Ozone
 
-[root@pvcbase-master ~]#* systemctl restart cloudera-scm-supervisord
+[root@pvcbase-master ~]# systemctl restart cloudera-scm-supervisord
 
 ++**************************************************************************************************************++
 
@@ -10202,7 +10142,7 @@ Cleanup ozone directories before redeployment.
 
 *Solution:* Perform Proper Cleanup on namenode and datanodes.
 
-[root@pvcbase-master ~]#* rm -rvf /hdfs/*had*oz* /var/lib/had*oz* /etc/had*oz
+[root@pvcbase-master ~]# rm -rvf /hdfs/*had*oz* /var/lib/had*oz* /etc/had*oz
 
 ++**************************************************************************************************************++
 
@@ -10282,7 +10222,7 @@ ranger=> \q
 
 ++**************************************************************************************************************++
 
-[root@pvcbase-master ~]#* tail -f /var/log/ranger/admin/access_log-pvcbasemaster.cldrsetup.local-2024-03-21.log
+[root@pvcbase-master ~]# tail -f /var/log/ranger/admin/access_log-pvcbasemaster.cldrsetup.local-2024-03-21.log
 
 ++**************************************************************************************************************++
 
@@ -10338,7 +10278,7 @@ at org.postgresql.core.v3.ConnectionFactoryImpl.doAuthentication(ConnectionFacto
 
 ++**************************************************************************************************************++
 
-*## standard_conforming_strings=off
+## standard_conforming_strings=off
 
 2024-03-19 23:16:26.279 PDT [26314] WARNING: nonstandard use of escape in a string literal at character 261
 
@@ -10360,11 +10300,11 @@ stop atlas> initialize atlas> start atlas
 
 ++**************************************************************************************************************++
 
-[root@pvcbase-master ~]#* klist -kt /run/cloudera-scm-agent/process/1546342867-SolrServerGracefulShutDown/solr.keytab
+[root@pvcbase-master ~]# klist -kt /run/cloudera-scm-agent/process/1546342867-SolrServerGracefulShutDown/solr.keytab
 
-[root@pvcbase-master ~]#* kinit -kt /run/cloudera-scm-agent/process/1546342867-SolrServerGracefulShutDown/solr.keytab solr/pvcbasemaster.cldrsetup.local@CLDRSETUP.LOCAL
+[root@pvcbase-master ~]# kinit -kt /run/cloudera-scm-agent/process/1546342867-SolrServerGracefulShutDown/solr.keytab solr/pvcbasemaster.cldrsetup.local@CLDRSETUP.LOCAL
 
-[root@pvcbase-master ~]#* /opt/cloudera/parcels/CDH/bin/zookeeper-client
+[root@pvcbase-master ~]# /opt/cloudera/parcels/CDH/bin/zookeeper-client
 
 ++**************************************************************************************************************++
 
@@ -10395,23 +10335,23 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.0/upgrade-ecs/cdpp
 [source, bash]
 ----
 
-[root@pvcecs-master ~]#* journalctl -xeu kubelet
+[root@pvcecs-master ~]# journalctl -xeu kubelet
 
-[root@pvcecs-master ~]#* mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
+[root@pvcecs-master ~]# mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
 
-[root@pvcecs-master ~]#* mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
+[root@pvcecs-master ~]# mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
 
-[root@pvcecs-master ~]#* kubectl get pods
+[root@pvcecs-master ~]# kubectl get pods
 
 -bash: kubectl: command not found
 
-[root@pvcecs-master ~]#* export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH
+[root@pvcecs-master ~]# export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH
 
-[root@pvcecs-master ~]#* kubectl get pods
+[root@pvcecs-master ~]# kubectl get pods
 
 No resources found in the default namespace.
 
-[root@pvcecs-master ~]#* kubectl get all
+[root@pvcecs-master ~]# kubectl get all
 
 NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
 
@@ -10422,7 +10362,7 @@ service/kubernetes ClusterIP 10.43.0.1 <none> 443/TCP 13h
 
 ++**************************************************************************************************************++
 
-*##### Error in commands
+##### Error in commands
 
 kubectl -n kubernetes-dashboard get sa/admin-user -o 'jsonpath={.secrets[0].name}'
 
@@ -10476,19 +10416,19 @@ Unable to connect to the server: tls: failed to verify certificate: x509: certif
 
 After proper cleanup and reinstall issue will solved.
 
-[root@pvcecs-master ~]#* mkdir -p ~/.kube
+[root@pvcecs-master ~]# mkdir -p ~/.kube
 
 [root@pvcecsmaster opt]# cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
 
 cp: overwrite ‘/root/.kube/config’? Yes
 
-[root@pvcecsmaster opt]#* /var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/kubectl get nodes
+[root@pvcecsmaster opt]# /var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/kubectl get nodes
 
 NAME STATUS ROLES AGE VERSION
 
 pvcecsmaster.cldrsetup.local Ready control-plane,etcd,master 61s v1.26.10{plus}rke2r1
 
-[root@pvcecsmaster opt]#* cp /tmp/ecs_util.sh /opt/cloudera/cm-agent/service/ecs/ecs_util.sh
+[root@pvcecsmaster opt]# cp /tmp/ecs_util.sh /opt/cloudera/cm-agent/service/ecs/ecs_util.sh
 
 *Solution*: cleanup was not done properly,after proper cleanup by script, it started running
 
@@ -10504,21 +10444,21 @@ pvcecsmaster.cldrsetup.local Ready control-plane,etcd,master 61s v1.26.10{plus}r
 [source, bash]
 ----
 
-[root@pvcecs-master ~]#* k get pods -A|grep dashboard
+[root@pvcecs-master ~]# k get pods -A|grep dashboard
 
 kubernetes-dashboard kubernetes-dashboard-68876b7cb8-fl58c 1/1 Running 0 4m13s
 
-[root@pvcecsmaster ~]#* k delete pod kubernetes-dashboard
+[root@pvcecsmaster ~]# k delete pod kubernetes-dashboard
 
 Error from server (NotFound): pods "kubernetes-dashboard" not found
 
-[root@pvcecsmaster ~]#* k delete pod kubernetes-dashboard-68876b7cb8-fl58c -n kubernetes-dashboard
+[root@pvcecsmaster ~]# k delete pod kubernetes-dashboard-68876b7cb8-fl58c -n kubernetes-dashboard
 
 pod "kubernetes-dashboard-68876b7cb8-fl58c" deleted
 
 [root@pvcecsmaster ~]#
 
-[root@pvcecsmaster ~]#* k delete ns kubernetes-dashboard
+[root@pvcecsmaster ~]# k delete ns kubernetes-dashboard
 ----
 
 ++**************************************************************************************************************++
