@@ -2204,17 +2204,15 @@ image:extracted-media/media/image23.png[klist verify,width=582,height=171]
 
 https://docs.cloudera.com/data-warehouse/1.5.4/release-notes/topics/dw-private-cloud-known-issues-ecs-environments.html[[.underline]#https://docs.cloudera.com/data-warehouse/1.5.4/release-notes/topics/dw-private-cloud-known-issues-ecs-environments.html#]
 
+[source,bash]
+----
 [root@ipaserver ~]# cat /etc/resolv.conf
-
 search ap-southeast-1.compute.internal cldrsetup.local
-
-nameserver 172.31.24.240 # PrivateIP of FreeIPA Server must be first nameserver entry after search
-
-nameserver 172.31.0.2 # DNS of AWS i.e. in case of PvC Configured on EC2
-
+nameserver 172.31.24.240  # PrivateIP of FreeIPA Server must be first nameserver entry after search
+nameserver 172.31.0.2     # DNS of AWS i.e. in case of PvC Configured on EC2
 nameserver 127.0.0.1
-
 [root@ipaserver ~]#
+----
 
 image:extracted-media/media/image32.png[resolv conf,width=428,height=59]
 
@@ -2222,149 +2220,130 @@ image:extracted-media/media/image32.png[resolv conf,width=428,height=59]
 
 (The changes in *_/etc/resolv.conf_* above are temporary and would get overwritten if the machine is rebooted. In order to keep the nameserver entry persistent, open the file *_/etc/sysconfig/network_* in edit mode and verify the entries below.)
 
+[source,bash]
+----
 [root@ipaserver ~]# cat /etc/sysconfig/network
-
 NETWORKING=yes
-
-NISDOMAIN=cldrsetup.local # our DNS DOMAIN
-
-DNS1=172.31.24.240 # PRIVATE_IP_OF_IPASERVER
-
+NISDOMAIN=cldrsetup.local  # our DNS DOMAIN
+DNS1=172.31.24.240         # PRIVATE_IP_OF_IPASERVER
 NOZEROCONF=yes
-
 [root@ipaserver ~]#
+----
 
 image:extracted-media/media/image55.png[sysconfig network,width=213,height=79]
 
 *Step 6:* Copy */etc/resolv.conf* file to each node again, to make them able to resolve FQDNs across the cluster:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/resolv.conf dest=/etc/resolv.conf"
+----
 
 *Step 7:* Copy */etc/sysconfig/network* file again, to each node to make them able to resolve FQDNs across the cluster: (/etc/resolv.conf changes may vanished after the reboot, so to persist those changes, we need the below configuration)
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/sysconfig/network dest=/etc/sysconfig/network"
+----
 
 *Step 8:* Enable permissions for HDFS and for PAM Authentication:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "chmod 1777 /tmp && chmod 444 /etc/shadow"
+----
 
 *Step 9:* Login to IPAServer node and verify forward and reverse DNS lookup is working fine from each machine:
 
+[source,bash]
+----
 [root@ipaserver ~]# nslookup cldr-mngr.cldrsetup.local
+Server:         172.31.24.240
+Address:        172.31.24.240#53
 
-Server: 172.31.24.240
-
-Address: 172.31.24.240#53
-
-Name: cldr-mngr.cldrsetup.local
-
+Name:   cldr-mngr.cldrsetup.local
 Address: 172.31.27.139
 
-*#(forward lookup)Running the below command should return the IPV4 of the machine in the Answer Section.
+#(forward lookup)Running the below command should return the IPV4 of the machine in the Answer Section.
 
-*# dig <FQDN of the SERVER> A
-
-*# dig $(hostname) A | grep -A2 ANSWER
-
-*# Ex:- dig ipaserver.cldrsetup.local A
+# dig <FQDN of the SERVER> A
+# dig $(hostname) A | grep -A2 ANSWER
+# Ex:- dig ipaserver.cldrsetup.local A
 
 [root@ipaserver ~]# dig $(hostname -f) A | grep -A2 ANSWER
-
 ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
-
 --
-
 ;; ANSWER SECTION:
+ipaserver.cldrsetup.local. 1200    IN      A       172.31.24.240
 
-ipaserver.cldrsetup.local. 1200 IN A *172.31.24.240
+#(reverse lookup) Running the below command should return the hostname of the machine in the Answer Section.
 
-*#(reverse lookup) Running the below command should return the hostname of the machine in the Answer Section.
-
-*# dig -x <Private_IP_of_SERVER>
-
-*# dig -x $(hostname -i)|grep -A2 ANSWER
-
-*# Ex:- dig -x 172.31.40.119
+# dig -x <Private_IP_of_SERVER>
+# dig -x $(hostname -i)|grep -A2 ANSWER
+# Ex:- dig -x 172.31.40.119
 
 [root@ipaserver ~]# dig -x $(hostname -i) | grep -A2 ANSWER
-
 ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
-
 --
-
 ;; ANSWER SECTION:
+240.24.31.172.in-addr.arpa. 86400 IN    PTR     ipaserver.cldrsetup.local.
 
-240.24.31.172.in-addr.arpa. 86400 IN PTR *ipaserver.cldrsetup.local.
-
-[root@ipaserver ~]$
+[root@ipaserver ~]$ 
+----
 
 *Step 10:* Login on ipaserver, configure and validate wildcard DNS record is working fine and resolvable, which is required later for the ECS data service cluster (if not set properly, chances of ECS installation getting corrupt):
 
-[root@ipaserver ~]# ipa dnsrecord-add cldrsetup.local *.apps
-
+[source,bash]
+----
+[root@ipaserver ~]#  ipa dnsrecord-add cldrsetup.local *.apps
 Please choose a type of DNS resource record to be added
-
 The most common types for this type of zone are: A, AAAA
 
 DNS resource record type: A
-
-A IP Address: 172.31.30.239 *#Provide the IP address of ecs-master node
-
-Record name: *.apps
-
-A record: 172.31.30.239
+A IP Address: 172.31.30.239       #Provide the IP address of ecs-master node
+  Record name: *.apps
+  A record: 172.31.30.239
 
 [root@ipaserver ~]# nslookup console-cdp.apps.cldrsetup.local
+Server:         172.31.24.240
+Address:        172.31.24.240#53
 
-Server: 172.31.24.240
-
-Address: 172.31.24.240#53
-
-Name: console-cdp.apps.cldrsetup.local
-
+Name:   console-cdp.apps.cldrsetup.local
 Address: 172.31.30.239
 
 [root@ipaserver ~]# dig console-cdp.apps.cldrsetup.local A | grep -A2 ANSWER
-
 ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
-
 --
-
 ;; ANSWER SECTION:
-
-console-cdp.apps.cldrsetup.local. 86400 IN A 172.31.30.239
+console-cdp.apps.cldrsetup.local. 86400 IN A       172.31.30.239
 
 [root@ipaserver ~]# dig -x 172.31.30.239 | grep -A2 ANSWER
-
 ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
-
 --
-
 ;; ANSWER SECTION:
+239.30.31.172.in-addr.arpa. 86400 IN    PTR     pvcecs-master.cldrsetup.local.
 
-239.30.31.172.in-addr.arpa. 86400 IN PTR pvcecs-master.cldrsetup.local.
-
-[root@ipaserver ~]#
+[root@ipaserver ~]# 
+----
 
 *Step 11:* Download and copy postgresql-jdbc driver to all hosts:
 
-[root@ipaserver ~]#* wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar[[.underline]#https://jdbc.postgresql.org/download/postgresql-42.7.3.jar#]
-
-[root@ipaserver ~]#* chmod 644 postgresql-42.7.3.jar
-
-[root@ipaserver ~]#* ansible all -m copy -a "src=postgresql-42.7.3.jar dest=/usr/share/java/postgresql-connector-java.jar"
-
-[root@ipaserver ~]#* ansible all -m shell -a "sudo ls -l /usr/share/java/postgresql-connector-java.jar"
-
+[source,bash]
+----
+[root@ipaserver ~]# wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
+[root@ipaserver ~]# chmod 644 postgresql-42.7.3.jar
+[root@ipaserver ~]# ansible all -m copy -a "src=postgresql-42.7.3.jar dest=/usr/share/java/postgresql-connector-java.jar"
+[root@ipaserver ~]# ansible all -m shell -a "sudo ls -l /usr/share/java/postgresql-connector-java.jar"
 [root@ipaserver ~]#
+----
 
 [arabic, start=7]
 . Disable the Linux Firewall
@@ -2372,17 +2351,15 @@ console-cdp.apps.cldrsetup.local. 86400 IN A 172.31.30.239
 [arabic, start=5]
 . The default Linux firewall settings are too restrictive for any Hadoop deployment. Since the CDP PvC deployment will be in its own isolated network in the VMware environment, there is no need for that additional firewall. *(NA in AWS EC2)
 
-*##### Either disable the firewall or update the rules: (ON ALL HOSTS)
-
-[root@ipaserver ~]#* ansible all -m command -a "firewall-cmd --zone=public --add-port=80/tcp --permanent"
-
-[root@ipaserver ~]#* ansible all -m command -a "firewall-cmd --zone=public --add-port=443/tcp --permanent"
-
-[root@ipaserver ~]#* ansible all -m command -a "firewall-cmd --reload"
-
-[root@ipaserver ~]#* ansible all -m command -a "systemctl disable firewalld && systemctl stop firewalld && systemctl status firewalld | grep -e disabled -e inactive"
-
+[source,bash]
+----
+##### Either disable the firewall or update the rules: (ON ALL HOSTS) 
+[root@ipaserver ~]# ansible all -m command -a "firewall-cmd --zone=public --add-port=80/tcp --permanent"
+[root@ipaserver ~]# ansible all -m command -a "firewall-cmd --zone=public --add-port=443/tcp --permanent"
+[root@ipaserver ~]# ansible all -m command -a "firewall-cmd --reload"
+[root@ipaserver ~]# ansible all -m command -a "systemctl disable firewalld && systemctl stop firewalld && systemctl status firewalld | grep -e disabled -e inactive"
 [root@ipaserver ~]
+----
 
 [arabic, start=8]
 . Disable SELinux
@@ -2392,17 +2369,21 @@ console-cdp.apps.cldrsetup.local. 86400 IN A 172.31.30.239
 
 *Step 1:* SELinux can be disabled by editing *_/etc/selinux/config_* (in some systems it would be *_/etc/sysconfig/selinux_*) To disable SELinux, change SELINUX=enforcing to SELINUX=disabled or SELINUX=permissive. follow these steps:
 
-[root@ipaserver ~]#* ansible all -m shell -a "sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config"
-
-[root@ipaserver ~]#* ansible all -m shell -a "setenforce 0"
-
-[root@ipaserver ~]#* ansible all -m shell -a "getenforce"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config"
+[root@ipaserver ~]# ansible all -m shell -a "setenforce 0"
+[root@ipaserver ~]# ansible all -m shell -a "getenforce"
+----
 
 [arabic, start=7]
 . This command may fail if SELinux is already disabled. This requires reboot to take effect.
 . While the suggested configuration is to disable SELinux as shown below, if for any reason SELinux needs to be enabled on the cluster, run the following command to make sure that the httpd can read the *_Yum_* profiles.
 
-[root@ipaserver ~]#* chcon -R -t httpd_sys_content_t /var/www/html/
+[source,bash]
+----
+[root@ipaserver ~]# chcon -R -t httpd_sys_content_t /var/www/html/
+----
 
 image:extracted-media/media/image155.png[selinux,width=577,height=172]
 
@@ -2414,9 +2395,11 @@ Syslog must be enabled on each node to preserve logs regarding killed processes 
 [arabic]
 . Use one of the following commands to confirm that the service is properly configured:
 
-[root@ipaserver ~]#* ansible all -m command -a "rsyslogd -v"
-
-[root@ipaserver ~]#* ansible all -m command -a "service rsyslog status"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m command -a "rsyslogd -v"
+[root@ipaserver ~]# ansible all -m command -a "service rsyslog status"
+----
 
 [arabic, start=10]
 . Set ulimit
@@ -2426,56 +2409,51 @@ On each node, ulimit -n specifies the number of inodes that can be opened simult
 [arabic]
 . For setting the ulimit on RedHat, edit */etc/security/limits.conf* on admin node and add the following lines:
 
+[source,bash]
+----
 [root@ipaserver ~]# vi /etc/security/limits.conf
-
 * soft nofile 1048576
-
 * hard nofile 1048576
+----
 
 [arabic, start=2]
 . Copy the /etc/security/limits.conf file from admin node (ipaserver) to all the nodes using the following command:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/security/limits.conf dest=/etc/security/limits.conf"
+----
 
 [arabic, start=3]
 . Make sure that the /etc/pam.d/su file contains the following settings:
 
+[source,bash]
+----
 [root@ipaserver ~]# vi /etc/pam.d/su
-
 #%PAM-1.0
-
-auth required pam_env.so
-
-auth sufficient pam_rootok.so
-
+auth            required        pam_env.so
+auth            sufficient      pam_rootok.so
 # Uncomment the following line to implicitly trust users in the "wheel" group.
-
-#auth sufficient pam_wheel.so trust use_uid
-
+#auth           sufficient      pam_wheel.so trust use_uid
 # Uncomment the following line to require a user to be in the "wheel" group.
-
-#auth required pam_wheel.so use_uid
-
-auth include system-auth
-
-auth include postlogin
-
-account sufficient pam_succeed_if.so uid = 0 use_uid quiet
-
-account include system-auth
-
-password include system-auth
-
-session include system-auth
-
-session include postlogin
-
-session optional pam_xauth.so
+#auth           required        pam_wheel.so use_uid
+auth            include         system-auth
+auth            include         postlogin
+account         sufficient      pam_succeed_if.so uid = 0 use_uid quiet
+account         include         system-auth
+password        include         system-auth
+session         include         system-auth
+session         include         postlogin
+session         optional        pam_xauth.so
+----
 
 [arabic, start=4]
 . Copy the /etc/pam.d/su file from admin node (ipaserver) to all the nodes using the following command:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/pam.d/su dest=/etc/pam.d/su"
+----
 
 [arabic, start=9]
 . The ulimit values are applied on a new shell, running the command on a node on an earlier instance of a shell will show old values.
@@ -2490,14 +2468,19 @@ Adjusting the tcp_retries parameter for the system network enables faster detect
 [arabic]
 . Edit the file /etc/sysctl.conf on ipaserver node and add the following lines:
 
+[source,bash]
+----
 [root@ipaserver ~]# vi /etc/sysctl.conf
-
 net.ipv4.tcp_retries2=5
+----
 
 [arabic, start=2]
 . Copy the /etc/sysctl.conf file from admin node to all the nodes using the following command:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/sysctl.conf dest=/etc/sysctl.conf"
+----
 
 [arabic, start=12]
 . Disable IPv6 Defaults
@@ -2505,11 +2488,12 @@ net.ipv4.tcp_retries2=5
 [arabic]
 . Run the following command:
 
-[root@ipaserver ~]#* ansible all -m shell -a "echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.conf" -l 'all:!ecsmasternodes:!ecsnodes'
-
-[root@ipaserver ~]#* ansible all -m shell -a "echo 'net.ipv6.conf.default.disable_ipv6 = 1' >> /etc/sysctl.conf" -l 'all:!ecsmasternodes:!ecsnodes'
-
-[root@ipaserver ~]#* ansible all -m shell -a "echo 'net.ipv6.conf.lo.disable_ipv6 = 0' >> /etc/sysctl.conf" -l 'all:!ecsmasternodes:!ecsnodes'
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.conf" -l 'all:!ecsmasternodes:!ecsnodes'
+[root@ipaserver ~]# ansible all -m shell -a "echo 'net.ipv6.conf.default.disable_ipv6 = 1' >> /etc/sysctl.conf" -l 'all:!ecsmasternodes:!ecsnodes'
+[root@ipaserver ~]# ansible all -m shell -a "echo 'net.ipv6.conf.lo.disable_ipv6 = 0' >> /etc/sysctl.conf" -l 'all:!ecsmasternodes:!ecsnodes'
+----
 
 [arabic, start=13]
 . Disable Swapping
@@ -2517,7 +2501,10 @@ net.ipv4.tcp_retries2=5
 [arabic]
 . Run the following to set VM swappiness to 1, by updating /etc/sysctl.conf file on all nodes:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "echo 'vm.swappiness=1' >> /etc/sysctl.conf"
+----
 
 [arabic, start=14]
 . Disable Memory Overcommit
@@ -2525,28 +2512,26 @@ net.ipv4.tcp_retries2=5
 [arabic]
 . Run the following on all nodes. Variable vm.overcommit_memory=0
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "echo 'vm.overcommit_memory=0' >> /etc/sysctl.conf"
+----
 
 [arabic, start=2]
 . Load the settings from default sysctl file /etc/sysctl.conf and verify the content of sysctl.conf:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "sysctl -p" ## Reload sysctl.conf
-
 [root@ipaserver ~]# ansible all -m shell -a "cat /etc/sysctl.conf"
-
 net.ipv4.tcp_retries2=5
-
 net.ipv6.conf.all.disable_ipv6 = 1
-
 net.ipv6.conf.default.disable_ipv6 = 1
-
 net.ipv6.conf.lo.disable_ipv6 = 0
-
 vm.swappiness=1
-
 vm.overcommit_memory=0
-
 [root@ipaserver ~]#
+----
 
 [arabic, start=15]
 . Disable Transparent Huge Pages
@@ -2556,63 +2541,51 @@ Disabling Transparent Huge Pages (THP) reduces elevated CPU usage caused by THP.
 [arabic]
 . You must run the following commands for every reboot:
 
-[root@ipaserver ~]#* ansible all -m shell -a "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
-
-[root@ipaserver ~]#* ansible all -m shell -a "echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+[root@ipaserver ~]# ansible all -m shell -a "echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+----
 
 [arabic, start=2]
 . On the Ansible-controller/ ipaserver node, run the following commands:
 
-[root@ipaserver ~]#* rm –f /root/thp_disable
+[source,bash]
+----
+[root@ipaserver ~]# rm –f /root/thp_disable
+[root@ipaserver ~]# echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /root/thp_disable
+[root@ipaserver ~]# echo "echo never > /sys/kernel/mm/transparent_hugepage/defrag" >> /root/thp_disable
 
-[root@ipaserver ~]#* echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /root/thp_disable
-
-[root@ipaserver ~]#* echo "echo never > /sys/kernel/mm/transparent_hugepage/defrag" >> /root/thp_disable
-
-*##### Disable IPV6
-
-[root@ipaserver ~]#* echo "sysctl -w net.ipv6.conf.all.disable_ipv6=1" >> /root/thp_disable
-
-[root@ipaserver ~]#* echo "sysctl -w net.ipv6.conf.default.disable_ipv6=1" >> /root/thp_disable
-
-[root@ipaserver ~]#* echo "sysctl -w net.ipv6.conf.lo.disable_ipv6=0" >> /root/thp_disable
+##### Disable IPV6
+[root@ipaserver ~]# echo "sysctl -w net.ipv6.conf.all.disable_ipv6=1" >> /root/thp_disable
+[root@ipaserver ~]# echo "sysctl -w net.ipv6.conf.default.disable_ipv6=1" >> /root/thp_disable
+[root@ipaserver ~]# echo "sysctl -w net.ipv6.conf.lo.disable_ipv6=0" >> /root/thp_disable
+----
 
 [arabic, start=3]
 . Copy file to each node to copy the command to *_/etc/rc.d/rc.local_* so they are executed automatically for every reboot:
 
-[root@ipaserver ~]#* ansible all -m copy -a "src=/root/thp_disable dest=/root/thp_disable"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m copy -a "src=/root/thp_disable dest=/root/thp_disable"
 
-*##### Append the content of file thp_disable to /etc/rc.d/rc.local:
-
-[root@ipaserver ~]#* ansible all -m shell -a "cat /root/thp_disable >> /etc/rc.d/rc.local"
-
-[root@ipaserver ~]#* ansible all -m shell -a "chmod {plus}x /etc/rc.d/rc.local"
-
-[root@ipaserver ~]#* ansible all -m shell -a "cat /etc/rc.d/rc.local"
-
+##### Append the content of file thp_disable to /etc/rc.d/rc.local:
+[root@ipaserver ~]# ansible all -m shell -a "cat /root/thp_disable >> /etc/rc.d/rc.local"
+[root@ipaserver ~]# ansible all -m shell -a "chmod {plus}x /etc/rc.d/rc.local"
+[root@ipaserver ~]# ansible all -m shell -a "cat /etc/rc.d/rc.local"
 #!/bin/bash
-
 # Please note that you must run 'chmod {plus}x /etc/rc.d/rc.local' to ensure
-
 # that this script will be executed during boot.
-
 touch /var/lock/subsys/local
-
 # Disable Transparent Huge Pages
-
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
-
 echo never > /sys/kernel/mm/transparent_hugepage/defrag
-
 # Disable IPV6
-
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
-
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
-
 sysctl -w net.ipv6.conf.lo.disable_ipv6=0
-
 [root@ipaserver ~]#
+----
 
 image:extracted-media/media/image65.png[huge page ipv6,width=453,height=249]
 
@@ -2624,60 +2597,53 @@ For Cloudera cluster with hosts are running RHEL/CentOS 7.x or 8.x or 9.x, disab
 [arabic]
 . Ensure that the tuned service is started.
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "systemctl start tuned"
+----
 
 [arabic, start=2]
 . Turn the tuned service off.
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "tuned-adm off"
+----
 
 [arabic, start=3]
 . Ensure that there are no active profiles.
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m shell -a "tuned-adm list"
-
 # The output should contain the following line:
-
 # pvcecs-worker4.cldrsetup.local | CHANGED | rc=0 >>
-
 Available profiles:
-
-- accelerator-performance - Throughput performance based tuning with disabled higher latency STOP states
-
-- aws - Optimize for aws ec2 instances
-
-- balanced - General non-specialized tuned profile
-
-- desktop - Optimize for the desktop use-case
-
-- hpc-compute - Optimize for HPC compute workloads
-
-- intel-sst - Configure for Intel Speed Select Base Frequency
-
-- latency-performance - Optimize for deterministic performance at the cost of increased power consumption
-
-- network-latency - Optimize for deterministic performance at the cost of increased power consumption, focused on low latency network performance
-
-- network-throughput - Optimize for streaming network throughput, generally only necessary on older CPUs or 40G{plus} networks
-
-- optimize-serial-console - Optimize for serial console use.
-
-- powersave - Optimize for low power consumption
-
-- throughput-performance - Broadly applicable tuning that provides excellent performance across a variety of common server workloads
-
-- virtual-guest - Optimize for running inside a virtual guest
-
-- virtual-host - Optimize for running KVM guests
-
+- accelerator-performance     - Throughput performance based tuning with disabled higher latency STOP states
+- aws                         - Optimize for aws ec2 instances
+- balanced                    - General non-specialized tuned profile
+- desktop                     - Optimize for the desktop use-case
+- hpc-compute                 - Optimize for HPC compute workloads
+- intel-sst                   - Configure for Intel Speed Select Base Frequency
+- latency-performance         - Optimize for deterministic performance at the cost of increased power consumption
+- network-latency             - Optimize for deterministic performance at the cost of increased power consumption, focused on low latency network performance
+- network-throughput          - Optimize for streaming network throughput, generally only necessary on older CPUs or 40G+ networks
+- optimize-serial-console     - Optimize for serial console use.
+- powersave                   - Optimize for low power consumption
+- throughput-performance      - Broadly applicable tuning that provides excellent performance across a variety of common server workloads
+- virtual-guest               - Optimize for running inside a virtual guest
+- virtual-host                - Optimize for running KVM guests
 No current active profile.
+----
 
 [arabic, start=4]
 . Shutdown and disable the tuned service.
 
-[root@ipaserver ~]#* ansible all -m shell -a "systemctl stop tuned"
-
-[root@ipaserver ~]#* ansible all -m shell -a "systemctl disable tuned"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "systemctl stop tuned"
+[root@ipaserver ~]# ansible all -m shell -a "systemctl disable tuned"
+----
 
 [arabic, start=17]
 . Turning off TCP checksum offload on the all ecs nodes’ (both master and worker) network interface (For VMWare Machines)
@@ -2690,24 +2656,26 @@ Here's how you can perform the workaround for customers experiencing issues with
 
 *Step 1:* Identify the network interface:
 
-*#####* Determine the network interface used by the affected ECS nodes. This can typically be found using the `ifconfig` or `ip addr` command:
+[source,bash]
+----
+##### Determine the network interface used by the affected ECS nodes. This can typically be found using the `ifconfig` or `ip addr` command:
 [root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "ifconfig | grep flags | grep -v lo && ip addr | grep mtu | grep -v lo"
 
 [root@ipaserver ~]$ ifconfig | grep flags | grep -v lo
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST> mtu 9001
-
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
 [root@ipaserver ~]$ ip addr | grep mtu | grep -v lo
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc mq state UP group default qlen 1000
-
-[root@ipaserver ~]$
+[root@ipaserver ~]$ 
+----
 
 *Step 2:* Disable TCP Checksum Offload: Use the appropriate commands or configuration settings to disable TCP checksum offload on the identified network interface. For example, using ethtool:
 
-##### Replace *`<interface_name>`* with the name of the network interface identified in step 1.
-
+[source,bash]
+----
+##### Replace `<interface_name>` with the name of the network interface identified in step 1.
 [root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "sudo ethtool -K <interface_name> tx off"
-
-*#*#### After disabling TCP checksum offload, verify that the changes have been applied correctly and that the affected ECS nodes no longer experience the reported issues.
+##### After disabling TCP checksum offload, verify that the changes have been applied correctly and that the affected ECS nodes no longer experience the reported issues.
+----
 
 [arabic, start=18]
 . Create partitions on ECS nodes (master and worker) manually, if not present: (Do df -h) *(Skip this)
@@ -2717,190 +2685,115 @@ eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST> mtu 9001
 [source,bash]
 ----
 [root@pvcecs-master ~]# lsblk
-
-NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINTS
-
-xvda 202:0 0 600G 0 disk
-
-├─xvda1 202:1 0 1M 0 part
-
-├─xvda2 202:2 0 200M 0 part /boot/efi
-
-├─xvda3 202:3 0 600M 0 part /boot
-
-└─xvda4 202:4 0 599.2G 0 part /
-
-xvdb 202:16 0 600G 0 disk
-
-xvdc 202:32 0 600G 0 disk
-
-xvdd 202:48 0 600G 0 disk
-
-xvde 202:48 0 600G 0 disk
+NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+xvda    202:0    0   600G  0 disk 
+├─xvda1 202:1    0     1M  0 part 
+├─xvda2 202:2    0   200M  0 part /boot/efi
+├─xvda3 202:3    0   600M  0 part /boot
+└─xvda4 202:4    0 599.2G  0 part /
+xvdb    202:16   0   600G  0 disk 
+xvdc    202:32   0   600G  0 disk 
+xvdd    202:48   0   600G  0 disk 
+xvde    202:48   0   600G  0 disk 
 
 [root@pvcecs-master ~]# fdisk -l
-
 Disk /dev/sda: 268.4 GB, 268435456000 bytes, 524288000 sectors
-
 Units = sectors of 1 * 512 = 512 bytes
-
 Sector size (logical/physical): 512 bytes / 512 bytes
-
 I/O size (minimum/optimal): 512 bytes / 512 bytes
-
 Disk label type: dos
-
 Disk identifier: 0x000a04a5
 
-Device Boot Start End Blocks Id System
-
-/dev/sda1 * 2048 2099199 1048576 83 Linux
-
-/dev/sda2 2099200 524287999 261094400 8e Linux LVM
-
-/dev/xvdb 2099200 524287999 261094400 8e Linux LVM
-
-/dev/xvdc 2099200 524287999 261094400 8e Linux LVM
-
-/dev/xvdd 2099200 524287999 261094400 8e Linux LVM
-
-/dev/xvde 2099200 524287999 261094400 8e Linux LVM
+Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     2099199     1048576   83  Linux
+/dev/sda2         2099200   524287999   261094400   8e  Linux LVM
+/dev/xvdb         2099200   524287999   261094400   8e  Linux LVM
+/dev/xvdc         2099200   524287999   261094400   8e  Linux LVM
+/dev/xvdd         2099200   524287999   261094400   8e  Linux LVM
+/dev/xvde         2099200   524287999   261094400   8e  Linux LVM
 
 Disk /dev/sdb: 644.2 GB, 644245094400 bytes, 1258291200 sectors
-
 Units = sectors of 1 * 512 = 512 bytes
-
 Sector size (logical/physical): 512 bytes / 512 bytes
-
 I/O size (minimum/optimal): 512 bytes / 512 bytes
-
-[root@pvcecs-master ~]#
+[root@pvcecs-master ~]# 
 
 [root@pvcecs-master ~]# sudo parted /dev/xvdb mklabel gpt
-
 Information: You may need to update /etc/fstab.
 
 [root@pvcecs-master ~]# sudo parted /dev/xvdc mklabel gpt
-
 [root@pvcecs-master ~]# sudo parted /dev/xvdd mklabel gpt
 
 [root@pvcecs-master ~]# sudo parted -a opt /dev/xvdb mkpart primary ext4 0% 100%
-
 Information: You may need to update /etc/fstab.
 
 [root@pvcecs-master ~]# sudo parted -a opt /dev/xvdc mkpart primary ext4 0% 100%
-
 [root@pvcecs-master ~]# sudo parted -a opt /dev/xvdd mkpart primary ext4 0% 100%
 
 [root@pvcecs-master ~]# sudo mkfs.ext4 /dev/xvdb
-
 mke2fs 1.46.5 (30-Dec-2021)
-
 Found a gpt partition table in /dev/xvdb
-
-Proceed anyway? (y,N) y
-
+Proceed anyway? (y,N) y    
 Creating filesystem with 157286400 4k blocks and 39321600 inodes
-
 Filesystem UUID: 934fece5-074e-4102-8481-6ed3a3b99931
+Superblock backups stored on blocks: 
+        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+        4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+        102400000
 
-Superblock backups stored on blocks:
-
-32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-
-4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-
-102400000
-
-Allocating group tables: done
-
-Writing inode tables: done
-
-Creating journal (262144 blocks):
-
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (262144 blocks): 
 done
-
-Writing superblocks and filesystem accounting information: done
+Writing superblocks and filesystem accounting information: done     
 
 [root@pvcecs-master ~]# sudo mkfs.ext4 /dev/xvdc
-
 [root@pvcecs-master ~]# sudo mkfs.ext4 /dev/xvdd
 
 [root@pvcecs-master ~]# sudo mkdir -p /docker /cdwdata /lhdata
 
 [root@pvcecs-master ~]# sudo mount /dev/xvdb /docker
-
 [root@pvcecs-master ~]# sudo mount /dev/xvdc /cdwdata
-
 [root@pvcecs-master ~]# sudo mount /dev/xvdd /lhdata
 
 [root@pvcecs-master ~]# sudo blkid /dev/xvdb
-
 [root@pvcecs-master ~]# sudo blkid /dev/xvdc
-
 [root@pvcecs-master ~]# sudo blkid /dev/xvdd
 
 [root@pvcecs-master ~]# cat /etc/fstab
-
-UUID=497ad222-04fa-453f-b110-ba8001d38788 / xfs defaults 0 0
-
-UUID=2e0d9ec9-a82a-43cc-a8e2-c6db30e7f6a4 /boot xfs defaults 0 0
-
-UUID=7B77-95E7 /boot/efi vfat defaults,uid=0,gid=0,umask=077,shortname=winnt 0 2
-
-[root@pvcecs-master ~]#
+UUID=497ad222-04fa-453f-b110-ba8001d38788       /       xfs     defaults        0       0
+UUID=2e0d9ec9-a82a-43cc-a8e2-c6db30e7f6a4       /boot   xfs     defaults        0       0
+UUID=7B77-95E7  /boot/efi       vfat    defaults,uid=0,gid=0,umask=077,shortname=winnt  0       2
+[root@pvcecs-master ~]# 
 
 [root@pvcecs-master ~]# cat>> /etc/fstab
-
-UUID=497ad222-04fa-453f-b110-ba8001d38788 / xfs defaults 0 0
-
-UUID=2e0d9ec9-a82a-43cc-a8e2-c6db30e7f6a4 /boot xfs defaults 0 0
-
-UUID=7B77-95E7 /boot/efi vfat defaults,uid=0,gid=0,umask=077,shortname=winnt 0 2
-
-UUID="934fece5-074e-4102-8481-6ed3a3b99931" /docker xfs defaults 0 0
-
-UUID="52f4940d-3dca-4b90-a223-3bef6eee2b74" /cdwdata xfs defaults 0 0
-
-UUID="d7e9640b-cc12-49ac-b6c2-6eb3136679a1" /lhdata xfs defaults 0 0
+UUID=497ad222-04fa-453f-b110-ba8001d38788       /       xfs     defaults        0       0
+UUID=2e0d9ec9-a82a-43cc-a8e2-c6db30e7f6a4       /boot   xfs     defaults        0       0
+UUID=7B77-95E7  /boot/efi       vfat    defaults,uid=0,gid=0,umask=077,shortname=winnt  0       2
+UUID="934fece5-074e-4102-8481-6ed3a3b99931"   /docker  xfs  defaults  0  0
+UUID="52f4940d-3dca-4b90-a223-3bef6eee2b74"  /cdwdata   xfs     defaults        0       0
+UUID="d7e9640b-cc12-49ac-b6c2-6eb3136679a1"  /lhdata   xfs     defaults        0       0
 
 [root@pvcecs-master ~]# mount -av
-
 [root@pvcecsmaster overlay2]# lvs
-
-LV VG Attr LSize Pool Origin Data% Meta% Move Log Cpy%Sync Convert
-
-home centos -wi-ao---- 183.24g
-
-root centos -wi-ao---- 50.00g
-
-swap centos -wi-ao---- 15.75g
-
-cdwdata vgcdp -wi-ao---- 600.00g
-
-docker vgcdp -wi-ao---- <600.00g
-
-var vgcdp -wi-ao---- <600.00g
-
-lhdata vgcdp -wi-ao---- 1200.00g
-
-[root@pvcecsmaster overlay2]#
-
+  LV      VG     Attr       LSize    Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  home    centos -wi-ao----  183.24g                                                    
+  root    centos -wi-ao----   50.00g                                                    
+  swap    centos -wi-ao----   15.75g                                                    
+  cdwdata vgcdp  -wi-ao----  600.00g                                                    
+  docker  vgcdp  -wi-ao---- <600.00g                                                    
+  var     vgcdp  -wi-ao---- <600.00g                                                    
+  lhdata  vgcdp  -wi-ao----  1200.00g                                                    
+[root@pvcecsmaster overlay2]# 
+                                                
 [root@pvcecsmaster overlay2]# pvs
-
-PV VG Fmt Attr PSize PFree
-
-/dev/sda2 centos lvm2 a-- <249.00g 4.00m
-
-/dev/sdb vgcdp lvm2 a-- <600.00g <224.96g
-
-/dev/sdc vgcdp lvm2 a-- <600.00g <224.96g
-
-/dev/sdd vgcdp lvm2 a-- <1200.00g<224.96g
-
-/dev/sde vgcdp lvm2 a-- <600.00g <224.96g
-
-[root@pvcecs-master ~]#
+  PV         VG     Fmt  Attr PSize    PFree   
+  /dev/sda2  centos lvm2 a--  <249.00g    4.00m
+  /dev/sdb   vgcdp  lvm2 a--  <600.00g <224.96g
+  /dev/sdc   vgcdp  lvm2 a--  <600.00g <224.96g
+  /dev/sdd   vgcdp  lvm2 a--  <1200.00g<224.96g
+  /dev/sde   vgcdp  lvm2 a--  <600.00g <224.96g
+[root@pvcecs-master ~]# 
 ----
 
 [arabic, start=19]
@@ -2914,43 +2807,35 @@ Setting up the RHEL repository on the cloudera-manager node requires httpd.
 [arabic, start=10]
 . The Red Hat repository is hosted using HTTP on the admin node; this machine is accessible by all the hosts in the cluster.
 
+[source,bash]
+----
 [root@cldr-mngr ~]# dnf install -y httpd mod_ssl createrepo_c
+----
 
 [arabic, start=2]
 . Generate CA certificate.
 
 [source,bash]
 ----
-[root@cldr-mngr ~]# openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/httpd.key -x509 -days 3650 -out /etc/pki/tls/certs/httpd.crt -subj "/C=US/ST=North Carolina/L=Raleigh/O=Red Hat Inc/OU=CLDR/CN=cldr-mngr.cldrsetup.local"
-
-...{plus}.{plus}..{plus}...{plus}.{plus}......{plus}...{plus}............{plus}..{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}*.......{plus}.....{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}*.{plus}.....{plus}....{plus}.........{plus}.....{plus}......{plus}...{plus}.......{plus}.....{plus}....{plus}..{plus}....{plus}......{plus}..{plus}......{plus}....{plus}...{plus}..{plus}.......{plus}..............{plus}.{plus}...............{plus}...{plus}..{plus}.........{plus}....{plus}..{plus}...{plus}.{plus}...........{plus}...{plus}.{plus}.....{plus}.......{plus}..{plus}.......{plus}........{plus}.......{plus}.........{plus}..{plus}....{plus}...........{plus}...{plus}.{plus}......{plus}........{plus}....{plus}......{plus}......{plus}...{plus}............{plus}......{plus}.....{plus}...{plus}......{plus}.{plus}...{plus}..............{plus}.{plus}............{plus}........{plus}..........{plus}..{plus}.......{plus}..{plus}.............{plus}..{plus}...{plus}.{plus}..............{plus}...{plus}...{plus}.{plus}.....{plus}.........{plus}.........{plus}............{plus}..........{plus}......{plus}.................{plus}.{plus}..{plus}.......{plus}......{plus}............{plus}...{plus}...............{plus}......{plus}.....{plus}.{plus}..{plus}.{plus}......{plus}........{plus}......{plus}.......{plus}.....{plus}...{plus}...................{plus}...........{plus}..........{plus}..{plus}...{plus}....{plus}...{plus}.................{plus}......{plus}.........{plus}.......{plus}...{plus}..{plus}.{plus}...{plus}...........{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}
-
-...{plus}.........{plus}...........{plus}.{plus}..............{plus}...{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}*....{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}*.{plus}.......{plus}...{plus}..{plus}............{plus}....{plus}.....{plus}......{plus}...{plus}.{plus}..{plus}............{plus}.{plus}......{plus}...{plus}...{plus}...{plus}......{plus}.....{plus}...................{plus}......{plus}...{plus}..{plus}.{plus}.....{plus}....{plus}..................{plus}..{plus}.{plus}.....{plus}....{plus}...............{plus}...{plus}.....{plus}...{plus}..................{plus}.{plus}...........{plus}...{plus}.{plus}.....{plus}...................{plus}.........{plus}............{plus}........{plus}......{plus}....{plus}...........{plus}.{plus}........{plus}.............{plus}..{plus}...{plus}.......{plus}...{plus}..............{plus}.............{plus}......{plus}.........{plus}...........{plus}.........{plus}.............{plus}..{plus}.{plus}......{plus}.........{plus}...........{plus}.{plus}.....{plus}......................{plus}...............{plus}..{plus}....{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}{plus}
-
+[root@cldr-mngr ~]# openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/httpd.key -x509 -days 3650 -out /etc/pki/tls/certs/httpd.crt \
+-subj "/C=US/ST=North Carolina/L=Raleigh/O=Red Hat Inc/OU=CLDR/CN=cldr-mngr.cldrsetup.local"
+...+.+..+...+.+......+...+............+..+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*.......+.....+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*.+.....+....+.........+.....+......+...+.......+.....+....+..+....+......+..+......+....+...+..+.......+..............+.+...............+...+..+.........+....+..+...+.+...........+...+.+.....+.......+..+.......+........+.......+.........+..+....+...........+...+.+......+........+....+......+......+...+............+......+.....+...+......+.+...+..............+.+............+........+..........+..+.......+..+.............+..+...+.+..............+...+...+.+.....+.........+.........+............+..........+......+.................+.+..+.......+......+............+...+...............+......+.....+.+..+.+......+........+......+.......+.....+...+...................+...........+..........+..+...+....+...+.................+......+.........+.......+...+..+.+...+...........+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+...+.........+...........+.+..............+...+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*....+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*.+.......+...+..+............+....+.....+......+...+.+..+............+.+......+...+...+...+......+.....+...................+......+...+..+.+.....+....+..................+..+.+.....+....+...............+...+.....+...+..................+.+...........+...+.+.....+...................+.........+............+........+......+....+...........+.+........+.............+..+...+.......+...+..............+.............+......+.........+...........+.........+.............+..+.+......+.........+...........+.+.....+......................+...............+..+....+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -----
 
 [root@cldr-mngr ~]# ls -l /etc/pki/tls/private/ /etc/pki/tls/certs/
-
 /etc/pki/tls/certs/:
-
 total 8
-
-lrwxrwxrwx. 1 root root 49 Jul 28 2022 ca-bundle.crt -> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
-
-lrwxrwxrwx. 1 root root 55 Jul 28 2022 ca-bundle.trust.crt -> /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
-
--rw-r--r--. 1 root root 1432 Mar 4 13:34 httpd.crt
-
--rw-r--r--. 1 root root 2260 Mar 1 16:36 postfix.pem
+lrwxrwxrwx. 1 root root   49 Jul 28  2022 ca-bundle.crt -> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+lrwxrwxrwx. 1 root root   55 Jul 28  2022 ca-bundle.trust.crt -> /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+-rw-r--r--. 1 root root 1432 Mar  4 13:34 httpd.crt
+-rw-r--r--. 1 root root 2260 Mar  1 16:36 postfix.pem
 
 /etc/pki/tls/private/:
-
 total 8
--rw-------. 1 root root 1700 Mar 4 13:33 httpd.key
--rw-------. 1 root root 3268 Mar 1 16:36 postfix.key
-
-[root@cldr-mngr ~]#
-
+-rw-------. 1 root root 1700 Mar  4 13:33 httpd.key
+-rw-------. 1 root root 3268 Mar  1 16:36 postfix.key
+[root@cldr-mngr ~]# 
 ----
 
 [arabic, start=3]
@@ -2959,11 +2844,8 @@ total 8
 [source,bash]
 ----
 [root@cldr-mngr ~]# mkdir -p /var/www/https/
-
 [root@cldr-mngr ~]# echo secure content > /var/www/https/index.html
-
 [root@cldr-mngr ~]# cat /var/www/https/index.html
-
 secure content
 ----
 
@@ -2973,7 +2855,6 @@ secure content
 [source,bash]
 ----
 [root@cldr-mngr ~]# vi /etc/httpd/conf/httpd.conf
-
 ServerName cldr-mngr.cldrsetup.local:80
 ----
 
@@ -2982,9 +2863,9 @@ ServerName cldr-mngr.cldrsetup.local:80
 
 [source,bash]
 ----
-[root@cldr-mngr ~]#* systemctl start httpd
-[root@cldr-mngr ~]#* systemctl enable httpd
-[root@cldr-mngr ~]#* systemctl is-enabled httpd
+[root@cldr-mngr ~]# systemctl start httpd
+[root@cldr-mngr ~]# systemctl enable httpd
+[root@cldr-mngr ~]# systemctl is-enabled httpd
 ----
 
 ++**************************************************************************************************************++
@@ -3075,7 +2956,7 @@ https://docs.cloudera.com/cdp-private-cloud-upgrade/latest/upgrade/topics/cdpdc-
 
 ++**************************************************************************************************************++
 
-==== CDP PvC Cloudera Manager Server Setup
+=== CDP PvC Cloudera Manager Server Setup
 
 This section outlines the steps needed to set up a 6 node Private Cloud Base cluster. Below are the prerequisites which base cluster should have before installing/configuring Data Services.
 
@@ -3097,25 +2978,21 @@ https://supportmatrix.cloudera.com/[[.underline]#https://supportmatrix.cloudera.
 
 [source,bash]
 ----
-[root@ipaserver ~]#* ssh root@cldr-mngr
-
-[root@cldr-mngr ~]#* mkdir -p /var/www/html/cloudera-repos/cloudera-manager/
+[root@ipaserver ~]# ssh root@cldr-mngr
+[root@cldr-mngr ~]# mkdir -p /var/www/html/cloudera-repos/cloudera-manager/
+----
 
 *Step 2:* Download Cloudera Manager Repository:
 
-[root@cldr-mngr ~]#* cd /var/www/html/cloudera-repos/cloudera-manager/
-
-[root@cldr-mngr cloudera-manager]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/cloudera-manager.repo
-
-[root@cldr-mngr cloudera-manager]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/cloudera-manager-trial.repo
-
-[root@cldr-mngr cloudera-manager]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPM-GPG-KEY-cloudera
-
-[root@cldr-mngr cloudera-manager]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/allkeys.asc
-
-[root@cldr-mngr cloudera-manager]#* wget https://<username>:<password>@http://archive.cloudera.com/p/cm7/7.11.3.7/allkeyssha256.asc[[.underline]#archive.cloudera.com/p/cm7/7.11.3.28/allkeyssha256.asc#]
-
-[root@cldr-mngr cloudera-manager]#
+[source,bash]
+----
+[root@cldr-mngr ~]# cd /var/www/html/cloudera-repos/cloudera-manager/
+[root@cldr-mngr cloudera-manager]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/cloudera-manager.repo
+[root@cldr-mngr cloudera-manager]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/cloudera-manager-trial.repo
+[root@cldr-mngr cloudera-manager]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPM-GPG-KEY-cloudera
+[root@cldr-mngr cloudera-manager]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/allkeys.asc
+[root@cldr-mngr cloudera-manager]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/allkeyssha256.asc
+[root@cldr-mngr cloudera-manager]# 
 ----
 
 *Step 3:* Edit cloudera-manager.repo file baseurl and GPG key with username and password provided by Cloudera and edit URL to match repository location *(OR)* Verify, if username and password are already present, so no action needed.
@@ -3124,94 +3001,58 @@ https://supportmatrix.cloudera.com/[[.underline]#https://supportmatrix.cloudera.
 
 [source,bash]
 ----
-[root@cldr-mngr cloudera-manager]#* vi cloudera-manager.repo
-
+##### Verify if username and password are already present, so no action needed.
+[root@cldr-mngr cloudera-manager]# vi cloudera-manager.repo
 [cloudera-manager]
-
 name=Cloudera Manager 7.11.3.28
-
 baseurl=https://archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/
-
 gpgkey=https://archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPM-GPG-KEY-cloudera
-
-username=**<username>*
-
-password=**<password>*
-
+username=<username>
+password=<password>
 gpgcheck=1
-
 enabled=1
-
 autorefresh=0
-
 type=rpm-md
 
 [postgresql10]
-
 name=Postgresql 10
-
 baseurl=https://archive.cloudera.com/postgresql10/redhat9/
-
 gpgkey=https://archive.cloudera.com/postgresql10/redhat9/RPM-GPG-KEY-PGDG-10
-
 enabled=1
-
 gpgcheck=1
-
 module_hotfixes=true
 
-*##### If not, update the cloudera-manager.repo to look like below.
-
-[root@cldr-mngr cloudera-manager]#* vi cloudera-manager.repo
-
+##### If not, update the cloudera-manager.repo to look like below.
+[root@cldr-mngr cloudera-manager]# vi cloudera-manager.repo
 [cloudera-manager]
-
 name=Cloudera Manager 7.11.3.28
-
-baseurl=[.underline]#https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/#
-
-gpgkey=[.underline]#https://<username>:<password>@@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPM-GPG-KEY-cloudera#
-
+baseurl=https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/
+gpgkey=https://<username>:<password>@@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPM-GPG-KEY-cloudera
 gpgcheck=1
-
 enabled=1
-
 autorefresh=0
-
 type=rpm-md
-
-[root@cldr-mngr cloudera-manager]#* cd
+[root@cldr-mngr cloudera-manager]# cd
 ----
 
 *Step 4:* Create directory to download cloudera manager agent, daemon, and server files
 
 [source,bash]
 ----
-[root@cldr-mngr ~]#* mkdir -p /var/www/html/cloudera-repos/cloudera-manager/cm7.11.3/redhat9/yum/RPMS/x86_64/
+[root@cldr-mngr ~]# mkdir -p /var/www/html/cloudera-repos/cloudera-manager/cm7.11.3/redhat9/yum/RPMS/x86_64/
+[root@cldr-mngr ~]# cd /var/www/html/cloudera-repos/cloudera-manager/cm7.11.3/redhat9/yum/RPMS/x86_64/
+[root@cldr-mngr x86_64]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-agent-7.11.3.28-60766845.el9.x86_64.rpm
+[root@cldr-mngr x86_64]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-daemons-7.11.3.28-60766845.el9.x86_64.rpm
+[root@cldr-mngr x86_64]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-server-7.11.3.28-60766845.el9.x86_64.rpm
+[root@cldr-mngr x86_64]# wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-server-db-2-7.11.3.28-60766845.el9.x86_64.rpm
 
-[root@cldr-mngr ~]#* cd /var/www/html/cloudera-repos/cloudera-manager/cm7.11.3/redhat9/yum/RPMS/x86_64/
-
-[root@cldr-mngr x86_64]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-agent-7.11.3.28-60766845.el9.x86_64.rpm
-
-[root@cldr-mngr x86_64]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-daemons-7.11.3.28-60766845.el9.x86_64.rpm
-
-[root@cldr-mngr x86_64]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-server-7.11.3.28-60766845.el9.x86_64.rpm
-
-[root@cldr-mngr x86_64]#* wget https://<username>:<password>@archive.cloudera.com/p/cm7/7.11.3.28/redhat9/yum/RPMS/x86_64/cloudera-manager-server-db-2-7.11.3.28-60766845.el9.x86_64.rpm
-
-[root@cldr-mngr x86_64]#* ls -lt /var/www/html/cloudera-repos/cloudera-manager/cm7.11.3/redhat9/yum/RPMS/x86_64 && cd
-
+[root@cldr-mngr x86_64]# ls -lt /var/www/html/cloudera-repos/cloudera-manager/cm7.11.3/redhat9/yum/RPMS/x86_64 && cd
 total 1147504
-
--rw-r--r-- 1 root root 80901377 Aug 16 12:45 cloudera-manager-agent-7.11.3.28-60766845.el9.x86_64.rpm
-
--rw-r--r-- 1 root root 20588 Aug 16 12:45 cloudera-manager-server-7.11.3.28-60766845.el9.x86_64.rpm
-
--rw-r--r-- 1 root root 15058 Aug 16 12:45 cloudera-manager-server-db-2-7.11.3.28-60766845.el9.x86_64.rpm
-
+-rw-r--r-- 1 root root   80901377 Aug 16 12:45 cloudera-manager-agent-7.11.3.28-60766845.el9.x86_64.rpm
+-rw-r--r-- 1 root root      20588 Aug 16 12:45 cloudera-manager-server-7.11.3.28-60766845.el9.x86_64.rpm
+-rw-r--r-- 1 root root      15058 Aug 16 12:45 cloudera-manager-server-db-2-7.11.3.28-60766845.el9.x86_64.rpm
 -rw-r--r-- 1 root root 1094095967 Aug 16 12:45 cloudera-manager-daemons-7.11.3.28-60766845.el9.x86_64.rpm
-
-[root@cldr-mngr ~]#
+[root@cldr-mngr ~]# 
 ----
 
 *Step 5:* Run createrepo command to create a local repository.
@@ -3225,28 +3066,31 @@ total 1147504
 
 *Step 6:* Copy cloudera-manager.repo file to /etc/yum.repos.d/ on all nodes to enable it to find the packages that are locally hosted on the admin node.
 
+[source,bash]
+----
 [root@cldr-mngr ~]# cp /var/www/html/cloudera-repos/cloudera-manager/cloudera-manager.repo /etc/yum.repos.d/cloudera-manager.repo
+----
 
 *Step 7:* Edit cloudera-manager.repo. file as per the customer repository location configuration in the step above. Copy the updated repo file to the ipaserver node so it can be copied to the rest of servers using ansible.
 
-[root@cldr-mngr ~]#* vi /etc/yum.repos.d/cloudera-manager.repo
-
+[source,bash]
+----
+[root@cldr-mngr ~]# vi /etc/yum.repos.d/cloudera-manager.repo
 [cloudera-manager]
-
 name=Cloudera Manager 7.11.3.28
-
-baseurl=http://13.251.65.11/cloudera-repos/cloudera-manager/[[.underline]#http://*<ip_of_cldr_mngr>*/cloudera-repos/cloudera-manager/#] +
+baseurl=http://<ip_of_cldr_mngr>/cloudera-repos/cloudera-manager/
 #Update IP of Repo/cldr-mngr server
-
 gpgcheck=0
-
 enabled=1
-
 [root@cldr-mngr ~]# scp -r /etc/yum.repos.d/cloudera-manager.repo root@ipaserver:/etc/yum.repos.d/cloudera-manager.repo
+----
 
 *Step 8:* From the ansible control node copy the repo files to /etc/yum.repos.d/ of all the nodes of the cluster:
 
-[root@ipaserver ~]#* ansible all -m copy -a "src=/etc/yum.repos.d/cloudera-manager.repo dest=/etc/yum.repos.d/cloudera-manager.repo"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m copy -a "src=/etc/yum.repos.d/cloudera-manager.repo dest=/etc/yum.repos.d/cloudera-manager.repo"
+----
 
 [arabic, start=2]
 . Set Up the Local Parcels for CDP Private Cloud Base 7.1.9
@@ -3255,53 +3099,37 @@ enabled=1
 . From a host connected the internet, download CDP Private Cloud Base 7.1.9 parcels for RHEL9 from the URL: https://archive.cloudera.com/p/cdh7/7.1.9.9/parcels/[[.underline]#https://archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/#] and place them in the directory /var/www/html/cloudera-repos/cdh7.1.9/ of the cldr-mngr node.
 . Create a directory to download CDH parcels.
 
-[root@cldr-mngr ~]#* mkdir -p /var/www/html/cloudera-repos/cdh7.1.9/
+[source,bash]
+----
+[root@cldr-mngr ~]# mkdir -p /var/www/html/cloudera-repos/cdh7.1.9/
+----
 
 *Step 3.* Download CDH parcels as highlighted below:
 
 [source,bash]
 ----
-[root@cldr-mngr ~]#* cd /var/www/html/cloudera-repos/cdh7.1.9/
+[root@cldr-mngr ~]# cd /var/www/html/cloudera-repos/cdh7.1.9/
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha1
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha256 
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha1
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha256
+[root@cldr-mngr cdh7.1.9]# wget https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/manifest.json
+[root@cldr-mngr cdh7.1.9]# chmod -R ugo+rX /var/www/html/cloudera-repos/cdh7.1.9/ && cd
 
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/CDH-7.1.9-1.cdh7.1.9.p9.52289703-el9.parcel[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/CDH-7.1.9-1.cdh7.1.9.p9.52289703-el9.parcel.sha1[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha1#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/CDH-7.1.9-1.cdh7.1.9.p9.52289703-el9.parcel.sha256[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha256#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/KEYTRUSTEE_SERVER-7.1.9.9-1.keytrustee7.1.9.9.p0.52289703-el8.parcel[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/KEYTRUSTEE_SERVER-7.1.9.9-1.keytrustee7.1.9.9.p0.52289703-el8.parcel.sha[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/KEYTRUSTEE_SERVER-7.1.9.9-1.keytrustee7.1.9.9.p0.52289703-el8.parcel.sha1[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha1#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/KEYTRUSTEE_SERVER-7.1.9.9-1.keytrustee7.1.9.9.p0.52289703-el8.parcel.sha256[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha256#]
-
-[root@cldr-mngr cdh7.1.9]#* wget link:https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.9/parcels/manifest.json[[.underline]#https://<username>:<password>@archive.cloudera.com/p/cdh7/7.1.9.1023/parcels/manifest.json#]
-
-[root@cldr-mngr cdh7.1.9]#* chmod -R ugo{plus}rX /var/www/html/cloudera-repos/cdh7.1.9/ && cd
-
-[root@cldr-mngr ~]#* ls -l /var/www/html/cloudera-repos/cdh7.1.9/
-
+[root@cldr-mngr ~]# ls -l /var/www/html/cloudera-repos/cdh7.1.9/
 total 8818000
-
--rw-r--r-- 1 root root 8984189751 Jun 5 09:44 CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel
-
--rw-r--r-- 1 root root 40 Jun 5 09:42 CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha1
-
--rw-r--r-- 1 root root 64 Jun 5 09:42 CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha256
-
--rw-r--r-- 1 root root 45387086 Jul 30 05:14 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel
-
--rw-r--r-- 1 root root 41 Jul 30 05:13 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha
-
--rw-r--r-- 1 root root 41 Jul 30 05:14 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha1
-
--rw-r--r-- 1 root root 65 Jul 30 05:14 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha256
-
--rw-r--r-- 1 root root 31493 Jul 30 05:17 manifest.json
-
-[root@cldr-mngr ~]#
+-rw-r--r-- 1 root root 8984189751 Jun  5 09:44 CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel
+-rw-r--r-- 1 root root         40 Jun  5 09:42 CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha1
+-rw-r--r-- 1 root root         64 Jun  5 09:42 CDH-7.1.9-1.cdh7.1.9.p1023.60818430-el9.parcel.sha256
+-rw-r--r-- 1 root root   45387086 Jul 30 05:14 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel
+-rw-r--r-- 1 root root         41 Jul 30 05:13 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha
+-rw-r--r-- 1 root root         41 Jul 30 05:14 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha1
+-rw-r--r-- 1 root root         65 Jul 30 05:14 KEYTRUSTEE_SERVER-7.1.9.1023-1.keytrustee7.1.9.1023.p0.60818430-el9.parcel.sha256
+-rw-r--r-- 1 root root      31493 Jul 30 05:17 manifest.json
+[root@cldr-mngr ~]# 
 ----
 
 [arabic, start=13]
@@ -3319,35 +3147,28 @@ total 8818000
 [arabic, start=2]
 . Create a directory to download CDS parcels.
 
-[root@cldr-mngr ~]#* mkdir -p /var/www/html/cloudera-repos/spark3/3.3.7191000.4
-
-[root@cldr-mngr ~]#* cd /var/www/html/cloudera-repos/spark3/3.3.7191000.4
+[source,bash]
+----
+[root@cldr-mngr ~]# mkdir -p /var/www/html/cloudera-repos/spark3/3.3.7191000.4
+[root@cldr-mngr ~]# cd /var/www/html/cloudera-repos/spark3/3.3.7191000.4
+----
 
 *Step 3.* Download CDS parcels as highlighted below:
 
 [source,bash]
 ----
-[root@cldr-mngr 3.3.7191000.4]#* wget https://<username>:<password>@http://archive.cloudera.com/p/spark3/3.3.7190.4/parcels/SPARK3-3.3.2.3.3.7190.4-1-1.p0.51021169-el9.parcel[[.underline]#archive.cloudera.com/p/spark3/3.3.7191000.4/parcels/SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel#]
+[root@cldr-mngr 3.3.7191000.4]# wget https://<username>:<password>@archive.cloudera.com/p/spark3/3.3.7191000.4/parcels/SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel
+[root@cldr-mngr 3.3.7191000.4]# wget https://<username>:<password>@archive.cloudera.com/p/spark3/3.3.7191000.4/parcels/SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel.sha1
+[root@cldr-mngr 3.3.7191000.4]# wget https://<username>:<password>@archive.cloudera.com/p/spark3/3.3.7191000.4/parcels/manifest.json
+[root@cldr-mngr 3.3.7191000.4]# chmod -R ugo+rX /var/www/html/cloudera-repos/spark3/ && cd
 
-[root@cldr-mngr 3.3.7191000.4]#* wget https://<username>:<password>@http://archive.cloudera.com/p/spark3/3.3.7190.4/parcels/SPARK3-3.3.2.3.3.7190.4-1-1.p0.51021169-el9.parcel.sha1[[.underline]#archive.cloudera.com/p/spark3/3.3.7191000.4/parcels/SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel.sha1#]
-
-[root@cldr-mngr 3.3.7191000.4]#* wget link:https://<username>:<password>@archive.cloudera.com/p/spark3/3.3.7190.3/parcels/manifest.json[[.underline]#https://<username>:<password>@#]archive.cloudera.com/p/spark3/3.3.7191000.4/parcels/manifest.json
-
-[root@cldr-mngr 3.3.7191000.4]#* chmod -R ugo{plus}rX /var/www/html/cloudera-repos/spark3/ && cd
-
-[root@cldr-mngr ~]#* ls -l /var/www/html/cloudera-repos/spark3/3.3.7191000.4
-
+[root@cldr-mngr ~]# ls -l /var/www/html/cloudera-repos/spark3/3.3.7191000.4
 total 1998888
-
 -rw-r--r-- 1 root root 2046842555 Jul 30 07:49 SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel
-
--rw-r--r-- 1 root root 41 Jul 30 07:49 SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel.sha1
-
--rw-r--r-- 1 root root 8962 Jul 30 07:48 manifest.json
-
-[root@cldr-mngr ~]#
+-rw-r--r-- 1 root root         41 Jul 30 07:49 SPARK3-3.3.2.3.3.7191000.4-1-1.p0.60728639-el9.parcel.sha1
+-rw-r--r-- 1 root root       8962 Jul 30 07:48 manifest.json
+[root@cldr-mngr ~]# 
 ----
-
 
 *Step 4.* In a web browser please check and verify cloudera manager repository created by entering baseurl: http://10.29.148.150/cloudera-repos/spark3.3[[.underline]#http://13.251.65.11/cloudera-repos/spark3#]
 
@@ -3362,90 +3183,111 @@ For support and requirement on minimum python version please refer to: https://d
 [arabic]
 . To install Python 3.9 standard package on RHEL 9 run following command:
 
-[root@ipaserver ~]#* ansible all -m shell -a "dnf install -y python3 python3-pip"
-
-[root@ipaserver ~]#* ansible all -m shell -a "python3 --version"
-
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "dnf install -y python3 python3-pip"
+[root@ipaserver ~]# ansible all -m shell -a "python3 --version"
 Python 3.9.18
-
 [root@ipaserver ~]#
+----
 
 *To install standard Python 3.9 binary on RHEL9 at standard or custom location, Follow steps below:
 
 *Step 2.* Install the following packages before installing Python 3.9 from ansible control node:
 
-[root@ipaserver ~]#* ansible all -m shell -a "sudo dnf install gcc openssl-devel bzip2-devel libffi-devel zlib-devel -y"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "sudo dnf install gcc openssl-devel bzip2-devel libffi-devel zlib-devel -y"
+----
 
 *Step 3.* Download Python 3.9 and decompress the package by running the following commands:
 
-[root@ipaserver ~]#* ansible all -m shell -a "cd /opt/ && curl -O https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz[[.underline]#https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz#] && tar -zxvf Python-3.9.18.tgz"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "cd /opt/ && curl -O https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz[[.underline]#https://www.python.org/ftp/python/3.9.18/Python-3.9.18.tgz#] && tar -zxvf Python-3.9.18.tgz"
+----
 
 *Step 4.* Go to decompressed Python directory and Install Python 3.9 as follows:
 
-[root@ipaserver ~]#* ansible all -m shell -a "cd /opt/Python-3.9.18/ && ./configure --enable-optimizations –-enable-shared"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "cd /opt/Python-3.9.18/ && ./configure --enable-optimizations –-enable-shared"
+----
 
 [arabic, start=16]
 . By default, Python could be installed in any one of the following locations. If you are installing Python 3.9 in any other location, then you must specify the path using the --prefix option.
 
+[source,bash]
+----
 /usr/bin
-
 /usr/local/python39/bin
-
 /usr/local/bin
-
 /opt/rh/rh-python39/root/usr/bin
+----
 
 [arabic, start=17]
 . The --enabled-shared option is used to build a shared library instead of a static library.
 
-[root@ipaserver ~]#* ansible all -m shell -a "echo $LD_LIBRARY_PATH"
-
-[root@ipaserver ~]#* ansible all -m shell -a "echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/' >> ~/.bashrc && source ~/.bashrc"
-
-[root@ipaserver ~]#* ansible all -m shell -a "cd /usr/local/bin/ && ls -l"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "echo $LD_LIBRARY_PATH"
+[root@ipaserver ~]# ansible all -m shell -a "echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/' >> ~/.bashrc && source ~/.bashrc"
+[root@ipaserver ~]# ansible all -m shell -a "cd /usr/local/bin/ && ls -l"
+----
 
 *Step 5.* Built Python 3.9 as follows:
 
-[root@ipaserver ~]#* ansible all -m shell -a "cd /opt/Python-3.9.18/ && make"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "cd /opt/Python-3.9.18/ && make"
+----
 
 *Step 6.* Run the following command to put the compiled files in the default location or in the custom location that you specified using the --prefix option:
 
-[root@ipaserver ~]#* ansible all -m shell -a "cd /opt/Python-3.9.18/ && make install"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "cd /opt/Python-3.9.18/ && make install"
+----
 
 *Step 7.* Copy the shared compiled library files (libpython3.9.so) to the /lib64/ directory:
 
-[root@ipaserver ~]#* ansible all -m shell -a "cd /opt/Python-3.9.18/ && cp --no-clobber ./libpython3.9.so* /lib64/"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "cd /opt/Python-3.9.18/ && cp --no-clobber ./libpython3.9.so* /lib64/"
+----
 
 *Step 8.* Change the permissions of the libpython3.9.so files as follows:
 
-[root@ipaserver ~]#* ansible all -m shell -a "chmod 755 /lib64/libpython3.9.so*"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "chmod 755 /lib64/libpython3.9.so*"
+----
 
 *Step 9.* If you see an error such as error while loading shared libraries: libpython3.9.so.1.0: cannot open shared object file: No such file or directory, then run the following command:
 
-[root@ipaserver ~]#* ansible all -m shell -a "echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/' >> ~/.bashrc && source ~/.bashrc"
+[source,bash]
+----
+[root@ipaserver ~]# ansible all -m shell -a "echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/' >> ~/.bashrc && source ~/.bashrc"
+----
 
 *Step 10. _(For Hue)_* If you have installed Python 3.9 at a custom location, then you must append the custom path in Cloudera Manager > Clusters > Hue > Configuration > Hue Service Environment Advanced Configuration Snippet (Safety Valve) separated by colon (:) as follows *_(Later- after Base Cluster Installation)_*:
 
+[source,bash]
+----
 Key: PATH
-
 Value: [***CUSTOM-INSTALL-PATH***]:/usr/local/sbin:/usr/local/bin:/usr/sbin:
+----
 
 *Step 11.* Check Python version
 
 [source,bash]
 ----
 [root@ipaserver ~]#* ansible all -m command -a "python3 --version"
-
 pvcbase-worker2.cldrsetup.local | CHANGED | rc=0 >>
-
 Python 3.9.18
-
 pvcbase-worker3.cldrsetup.local | CHANGED | rc=0 >>
-
 Python 3.9.18
-
 pvcbase-master.cldrsetup.local | CHANGED | rc=0 >>
-
 Python 3.9.18
 ----
 
@@ -3473,42 +3315,44 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 
 *##### Install the repository RPM:
 
-[root@cldr-mngr ~]#* sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+[source,bash]
+----
+[root@cldr-mngr ~]# sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+----
 
 *##### Disable the built-in PostgreSQL module:
 
-[root@cldr-mngr ~]#* sudo dnf -qy module disable postgresql
+[source,bash]
+----
+[root@cldr-mngr ~]# sudo dnf -qy module disable postgresql
+----
 
 *##### Install PostgreSQL:
 
-[root@cldr-mngr ~]#* sudo dnf install -y postgresql14 postgresql14-server postgresql14-libs
-
+[source,bash]
+----
+[root@cldr-mngr ~]# sudo dnf install -y postgresql14 postgresql14-server postgresql14-libs
 [root@cldr-mngr ~]#
+----
 
 [arabic, start=2]
 . Install the PostgreSQL JDBC driver by running the following command on ansible-controller/ipaserver node. Rename the Postgres JDBC driver .jar file to postgresql-connector-java.jar and copy it to the /usr/share/java directory. The following copy command can be used if the Postgres JDBC driver .jar file is installed from the OS repositories: *_(Skip this, as we already performed it in prior steps)_
 
-*##### Install JDBC Connector
-
 [source,bash]
 ----
-[root@ipaserver ~]#* wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar[[.underline]#https://jdbc.postgresql.org/download/postgresql-42.7.3.jar#]
+##### Install JDBC Connector
+[root@ipaserver ~]# wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar 
+[root@ipaserver ~]# mv -v postgresql-42.7.3.jar postgresql-connector-java.jar
+[root@ipaserver ~]# ansible all -m copy -a "src=postgresql-connector-java.jar dest=/usr/share/java/postgresql-connector-java.jar"
+[root@ipaserver ~]# ansible all -m shell -a "sudo chmod 644 /usr/share/java/postgresql-connector-java.jar"
 
-[root@ipaserver ~]#* mv -v https://jdbc.postgresql.org/download/postgresql-42.7.3.jar[[.underline]#postgresql-42.7.3.jar#] postgresql-connector-java.jar
-
-[root@ipaserver ~]#* ansible all -m copy -a "src=postgresql-connector-java.jar dest=/usr/share/java/postgresql-connector-java.jar"
-[root@ipaserver ~]#* ansible all -m shell -a "sudo chmod 644 /usr/share/java/postgresql-connector-java.jar"
 [root@ipaserver ~]# ansible all -m shell -a "sudo ls -l /usr/share/java/postgresql*.jar"
-
 ipaserver.cldrsetup.local | CHANGED | rc=0 >>
+-rw-r--r-- 1 root root 1089312 Jun  3 08:06 /usr/share/java/postgresql-connector-java.jar
 
--rw-r--r-- 1 root root 1089312 Jun 3 08:06 /usr/share/java/postgresql-connector-java.jar
-
-*##### Alternate way (Not recommended)
-
-[root@ipaserver ~]#* ansible all -m shell -a "sudo dnf install postgresql-jdbc -y"
-
-[root@ipaserver ~]#* ansible all -m shell -a "java -version"
+##### Alternate way (Not recommended)
+[root@ipaserver ~]# ansible all -m shell -a "sudo dnf install postgresql-jdbc -y"
+[root@ipaserver ~]# ansible all -m shell -a "java -version"
 ----
 
 *Step 4.* Make sure that the data directory, which by default is /var/lib/pgsql/14/data/, is on a partition that has sufficient free space.
@@ -3523,39 +3367,37 @@ ipaserver.cldrsetup.local | CHANGED | rc=0 >>
 
 *Step 6.* Make sure the psycopg2 package dependencies for RHEL 9 is installed on all required hosts, by running the following commands:
 
+[source,bash]
+----
 ##### Install the psycopg2-binary package as follows:
-
 [root@ipaserver ~]#* ansible all -m shell -a "pip3 install psycopg2-binary && pip3 list | grep psyc"
 
 ipaserver.cldrsetup.local | CHANGED | rc=0 >>
-
 Requirement already satisfied: psycopg2-binary in /usr/local/lib64/python3.9/site-packages (2.9.9)
-
 psycopg2-binary 2.9.9
 
 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
 
 [root@ipaserver ~]#
+----
 
 *Step 7.* Initialize the database:
 
+[source,bash]
+----
 *# Initialize the DB
-
-[root@cldr-mngr ~]#* sudo /usr/pgsql-14/bin/postgresql-14-setup initdb
+[root@cldr-mngr ~]# sudo /usr/pgsql-14/bin/postgresql-14-setup initdb
 
 *# Verify PG Version
-
-[root@cldr-mngr ~]#* cat /var/lib/pgsql/14/data/PG_VERSION
-
+[root@cldr-mngr ~]# cat /var/lib/pgsql/14/data/PG_VERSION
 14
 
 *# Verify Psycopg Version
-
 [root@cldr-mngr ~]# pip3 list |grep psycopg
-
 psycopg2-binary 2.9.9
 
 *# data directory is very critical, if you want to cleanup postgres simply rename or remove /var/lib/pgsql/14/data directory
+----
 
 *Step 8.* Make sure that LC_ALL is set to C.UTF-8 to enable UTF-8 CHARSET and initialize the database as follows:
 
