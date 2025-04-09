@@ -979,7 +979,6 @@ Choose one of the nodes of the cluster or a separate node as the Ansible Admin/C
 [root@pvcecs-worker10 ~]# sudo hostnamectl set-hostname --static pvcecs-worker10.cldrsetup.local
 ----
 
-
 [arabic, start=2]
 . While you set the hostnames by logging in to each individual hosts, make sure to run the dnf update and install python3 dependencies as well, since these are fresh nodes:
 
@@ -988,7 +987,10 @@ Choose one of the nodes of the cluster or a separate node as the Ansible Admin/C
 [arabic, start=3]
 . Log into the ipaserver Node using IP provided previously by the VMware team.
 
+[source,bash]
+----
 [root@ipaserver ~]# ssh 172.31.24.240
+----
 
 [arabic, start=4]
 . Setup /etc/hosts on the ipaserver node; this is a pre-configuration to setup Private DNS as shown in the next section. In large scale production grade deployment, DNS server setup is highly recommended.
@@ -999,7 +1001,6 @@ Populate the host file with IP addresses and corresponding hostnames on the ipas
 
 [source,bash]
 ----
-
 [root@ipaserver ~]# sudo vi /etc/hosts
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -1031,18 +1032,16 @@ Populate the host file with IP addresses and corresponding hostnames on the ipas
 172.31.26.25 pvcecs-worker8.cldrsetup.local pvcecs-worker8
 172.31.24.199 pvcecs-worker9.cldrsetup.local pvcecs-worker9
 172.31.24.54 pvcecs-worker10.cldrsetup.local pvcecs-worker10
-
 ----
 
 [arabic, start=5]
 . Perform the basic validation of OS version and hostname/IP configurations:
 
-*## Ensure that the OS version is RHEL 9.x.
-
-*## To verify the version, run the below command. It should return RedHat Linux version 9.x.
-
 [source,bash]
 ----
+## Ensure that the OS version is RHEL 9.x.
+## To verify the version, run the below command. It should return RedHat Linux version 9.x.
+
 [root@ipaserver ~]# cat /etc/*rel* |grep -E 'NAME|VERSION'
 NAME="Red Hat Enterprise Linux"
 VERSION="9.4 (Plow)"
@@ -1051,12 +1050,9 @@ PRETTY_NAME="Red Hat Enterprise Linux 9.4 (Plow)"
 CPE_NAME="cpe:/o:redhat:enterprise_linux:9::baseos"
 REDHAT_BUGZILLA_PRODUCT_VERSION=9.4
 REDHAT_SUPPORT_PRODUCT_VERSION="9.4"
-----
 
-*## Verify Hostname and IP addresses
+## Verify Hostname and IP addresses
 
-[source,bash]
-----
 [root@ipaserver ~]# hostname -f
 ipaserver.cldrsetup.local
 
@@ -1081,14 +1077,11 @@ inet 172.31.24.240/24 brd 172.31.1.255 scope global dynamic noprefixroute eth1
 ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 
 ;; QUESTION SECTION:
-
 --
-
 ;; ANSWER SECTION:
 ipaserver.cldrsetup.local. 1200 IN A *172.31.24.240
 
 [root@ipaserver ~]#
-
 [root@ipaserver ~]# uname -a
 Linux ipaserver.cldrsetup.local 5.14.0-427.26.1.el9_4.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Jul 5 11:34:54 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux
 ----
@@ -1263,360 +1256,238 @@ Please keep the same password for both Directory manager and IPA admin so that t
 [arabic]
 . Login to IPAServer node and Install ipa-server packages:
 
+[source,bash]
+----
 # Install ipa server dependencies packages through dnf using the below command.
-
 [root@ipaserver ~]# sudo dnf install -y ipa-server bind bind-dyndb-ldap ipa-server-dns firewalld
 
 # If required, use below command to set the java version
-
 [root@ipaserver ~]# update-alternatives --config java
 
+# Install ipa server dependencies packages through dnf using the below command.
+[root@ipaserver ~]# sudo dnf install -y ipa-server bind bind-dyndb-ldap ipa-server-dns firewalld
 
-[source,bash]
-----
+# If required, use below command to set the java version
+[root@ipaserver ~]# update-alternatives --config java
+
 # Configure ipa-server and DNS by using command: ipa-server-install --setup-dns
-
 [root@ipaserver ~]# ipa-server-install --setup-dns
 
 The log file for this installation can be found in /var/log/ipaserver-install.log
-
 ==============================================================================
-
 This program will set up the IPA Server.
-
 Version 4.11.0
 
 This includes:
-
-* Configure a stand-alone CA (dogtag) for certificate management
-
-* Configure the NTP client (chronyd)
-
-* Create and configure an instance of Directory Server
-
-* Create and configure a Kerberos Key Distribution Center (KDC)
-
-* Configure Apache (httpd)
-
-* Configure DNS (bind)
-
-* Configure SID generation
-
-* Configure the KDC to enable PKINIT
+  * Configure a stand-alone CA (dogtag) for certificate management
+  * Configure the NTP client (chronyd)
+  * Create and configure an instance of Directory Server
+  * Create and configure a Kerberos Key Distribution Center (KDC)
+  * Configure Apache (httpd)
+  * Configure DNS (bind)
+  * Configure SID generation
+  * Configure the KDC to enable PKINIT
 
 To accept the default shown in brackets, press the Enter key.
 
 Enter the fully qualified domain name of the computer
-
 on which you're setting up server software. Using the form
-
 <hostname>.<domainname>
-
 Example: ipaserver.cldrsetup.local
 
-Server host name [ipaserver.cldrsetup.local]: *_<ENTER>_
+Server host name [ipaserver.cldrsetup.local]: <ENTER>
 
 Warning: skipping DNS resolution of host ipaserver.cldrsetup.local
-
 The domain name has been determined based on the host name.
 
-Please confirm the domain name [cldrsetup.local]: *_<ENTER>_
+Please confirm the domain name [cldrsetup.local]: <ENTER>
 
 The kerberos protocol requires a Realm name to be defined.
-
 This is typically the domain name converted to uppercase.
 
-Please provide a realm name [CLDRSETUP.LOCAL]: *_<ENTER>_
-
+Please provide a realm name [CLDRSETUP.LOCAL]: <ENTER>
 Certain directory server operations require an administrative user.
-
 This user is referred to as the Directory Manager and has full access
-
 to the Directory for system management tasks and will be added to the
-
 instance of directory server created for IPA.
-
 The password must be at least 8 characters long.
 
-Directory Manager password: *_<vmware123>_
-
-Password (confirm): *_<vmware123>_
+Directory Manager password: <vmware123>
+Password (confirm): <vmware123>
 
 The IPA server requires an administrative user, named 'admin'.
-
 This user is a regular system account used for IPA server administration.
 
-IPA admin password: *_<vmware123>_
-
-Password (confirm): *_<vmware123>_
+IPA admin password: <vmware123>
+Password (confirm): <vmware123>
 
 Checking DNS domain cldrsetup.local., please wait ...
-
-Do you want to configure DNS forwarders? [yes]: *_no_
-
+Do you want to configure DNS forwarders? [yes]: no
 No DNS forwarders configured
-
-Do you want to search for missing reverse zones? [yes]: *_no_
-
+Do you want to search for missing reverse zones? [yes]: no
 Trust is configured but no NetBIOS domain name found, setting it now.
-
 Enter the NetBIOS name for the IPA domain.
-
 Only up to 15 uppercase ASCII letters, digits and dashes are allowed.
-
 Example: EXAMPLE.
 
-NetBIOS domain name [CLDRSETUP]: *_<ENTER>_
+NetBIOS domain name [CLDRSETUP]: <ENTER>
 
-Do you want to configure chrony with NTP server or pool address? [no]: *_yes_
-
-Enter NTP source server addresses separated by comma, or press Enter to skip: *_<ENTER>_
-
-Enter a NTP source pool address, or press Enter to skip: *_<ENTER>_
+Do you want to configure chrony with NTP server or pool address? [no]: yes
+Enter NTP source server addresses separated by comma, or press Enter to skip: <ENTER>
+Enter a NTP source pool address, or press Enter to skip: <ENTER>
 
 The IPA Master Server will be configured with:
-
-Hostname: ipaserver.cldrsetup.local
-
+Hostname:       ipaserver.cldrsetup.local
 IP address(es): 172.31.24.240
-
-Domain name: cldrsetup.local
-
-Realm name: CLDRSETUP.LOCAL
+Domain name:    cldrsetup.local
+Realm name:     CLDRSETUP.LOCAL
 
 The CA will be configured with:
-
-Subject DN: CN=Certificate Authority,O=CLDRSETUP.LOCAL
-
+Subject DN:   CN=Certificate Authority,O=CLDRSETUP.LOCAL
 Subject base: O=CLDRSETUP.LOCAL
-
-Chaining: self-signed
+Chaining:     self-signed
 
 BIND DNS server will be configured to serve IPA domain with:
+Forwarders:       No forwarders
+Forward policy:   only
+Reverse zone(s):  No reverse zone
 
-Forwarders: No forwarders
-
-Forward policy: only
-
-Reverse zone(s): No reverse zone
-
-Continue to configure the system with these values? [no]: *_yes_
+Continue to configure the system with these values? [no]: yes
 
 The following operations may take some minutes to complete.
-
 Please wait until the prompt is returned.
 
 Disabled p11-kit-proxy
-
 Synchronizing time
-
 No SRV records of NTP servers were found and no NTP server or pool address was provided.
-
 Using default chrony configuration.
-
 Attempting to sync time with chronyc.
-
 Time synchronization was successful.
-
 Configuring directory server (dirsrv). Estimated time: 30 seconds
-
-[1/43]: creating directory server instance
-
+  [1/43]: creating directory server instance
 Validate installation settings ...
-
 Create file system structures ...
-
 Perform SELinux labeling ...
-
 Create database backend: dc=cldrsetup,dc=local ...
-
 Perform post-installation tasks ...
-
-[2/43]: tune ldbm plugin
-
-[3/43]: adding default schema
-
+  [2/43]: tune ldbm plugin
+  [3/43]: adding default schema
 —-----
-
 —-----
-
 —-----
-
 —-----
-
 —-----
-
-[6/8]: restarting Directory Server to take MS PAC and LDAP plugins changes into account
-
-[7/8]: adding fallback group
-
-[8/8]: adding SIDs to existing users and groups
-
+  [6/8]: restarting Directory Server to take MS PAC and LDAP plugins changes into account
+  [7/8]: adding fallback group
+  [8/8]: adding SIDs to existing users and groups
 This step may take a considerable amount of time, please wait..
-
 Done.
-
 Configuring client side components
-
 This program will set up an IPA client.
-
 Version 4.11.0
 
 Using the existing certificate '/etc/ipa/ca.crt'.
-
 Client hostname: ipaserver.cldrsetup.local
-
 Realm: CLDRSETUP.LOCAL
-
 DNS Domain: cldrsetup.local
-
 IPA Server: ipaserver.cldrsetup.local
-
 BaseDN: dc=cldrsetup,dc=local
 
 Configured /etc/sssd/sssd.conf
-
 Systemwide CA database updated.
-
 Adding SSH public key from /etc/ssh/ssh_host_rsa_key.pub
-
 Adding SSH public key from /etc/ssh/ssh_host_ecdsa_key.pub
-
 Adding SSH public key from /etc/ssh/ssh_host_ed25519_key.pub
-
 SSSD enabled
-
 Configured /etc/openldap/ldap.conf
-
 Configured /etc/ssh/ssh_config
-
 Configured /etc/ssh/sshd_config.d/04-ipa.conf
-
 Configuring cldrsetup.local as NIS domain.
-
 Client configuration complete.
-
 The ipa-client-install command was successful
 
 ==============================================================================
-
 Setup complete
 
 Next steps:
+        1. You must make sure these network ports are open:
+                TCP Ports:
+                  * 80, 443: HTTP/HTTPS
+                  * 389, 636: LDAP/LDAPS
+                  * 88, 464: kerberos
+                  * 53: bind
+                UDP Ports:
+                  * 88, 464: kerberos
+                  * 53: bind
+                  * 123: ntp
 
-{empty}1. You must make sure these network ports are open:
-
-TCP Ports:
-
-* 80, 443: HTTP/HTTPS
-
-* 389, 636: LDAP/LDAPS
-
-* 88, 464: kerberos
-
-* 53: bind
-
-UDP Ports:
-
-* 88, 464: kerberos
-
-* 53: bind
-
-* 123: ntp
-
-{empty}2. You can now obtain a kerberos ticket using the command: 'kinit admin'
-
-This ticket will allow you to use the IPA tools (e.g., ipa user-add)
-
-and the web user interface.
+        2. You can now obtain a kerberos ticket using the command: 'kinit admin'
+           This ticket will allow you to use the IPA tools (e.g., ipa user-add)
+           and the web user interface.
 
 Be sure to back up the CA certificates stored in /root/cacert.p12
-
 These files are required to create replicas. The password for these
-
 files is the Directory Manager password
-
 The ipa-server-install command was successful
-
 [root@ipaserver ~]#
 
-----
-
-*##### Disable the firewall on ipaserver to be able to connect from rest of hosts
-
-[root@ipaserver ~]#* systemctl stop firewalld
-
-[root@ipaserver ~]#* systemctl disable firewalld
-
+##### Disable the firewall on ipaserver to be able to connect from rest of hosts
+[root@ipaserver ~]# systemctl stop firewalld
+[root@ipaserver ~]# systemctl disable firewalld
 Removed "/etc/systemd/system/multi-user.target.wants/firewalld.service".
-
 Removed "/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service".
+[root@ipaserver ~]# 
 
-[root@ipaserver ~]#
-
-*##### If Fail, do: If the installation fails, then run the below command to uninstall and retry with the above command for installation.
-
+##### If Fail, do: If the installation fails, then run the below command to uninstall and retry with the above command for installation.
 [root@ipaserver ~]# ipa-server-install --uninstall
-
 [root@ipaserver ~]# ipa-server-install --setup-dns (again)
 
-The setup will take 10-15 Minutes. If everything goes fine then you should get an output similar to the below screenshot.
+##### Disable the firewall on ipaserver to be able to connect from rest of hosts
+[root@ipaserver ~]#* systemctl stop firewalld
+[root@ipaserver ~]#* systemctl disable firewalld
+Removed "/etc/systemd/system/multi-user.target.wants/firewalld.service".
+Removed "/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service".
+[root@ipaserver ~]#
+----
 
+The setup will take 10-15 Minutes. If everything goes fine then you should get an output similar to the below screenshot.
 image:extracted-media/media/image114.png[ipa server setup,width=504,height=272]
 
 [arabic, start=2]
 . Verify KDC setup: kerberos ticket is working fine by generating a ticket for the admin user.
 
-*##### Run the kinit admin command to authenticate as admin and enter the directory password provided during ipa server installation. The command should generate the ticket and should be listed by executing klist -e.
-
 [source,bash]
 ----
-[root@ipaserver ~]# kinit admin
+##### Run the kinit admin command to authenticate as admin and enter the directory password provided during ipa server installation. The command should generate the ticket and should be listed by executing klist -e. 
 
-Password for admin@CLDRSETUP.LOCAL: *_<vmware123>_
+[root@ipaserver ~]# kinit admin 
+Password for admin@CLDRSETUP.LOCAL: <vmware123>
 
 [root@ipaserver ~]# klist -e
-
 Ticket cache: KCM:0
-
 Default principal: admin@CLDRSETUP.LOCAL
 
-Valid starting Expires Service principal
+Valid starting       Expires              Service principal
+05/13/2024 04:07:15  05/14/2024 03:30:48  krbtgt/CLDRSETUP.LOCAL@CLDRSETUP.LOCAL
+        Etype (skey, tkt): aes256-cts-hmac-sha384-192, aes256-cts-hmac-sha384-192 
 
-05/13/2024 04:07:15 05/14/2024 03:30:48 krbtgt/CLDRSETUP.LOCAL@CLDRSETUP.LOCAL
-
-Etype (skey, tkt): aes256-cts-hmac-sha384-192, aes256-cts-hmac-sha384-192
-
-*##### try kinit admin@CLDRSETUP.LOCAL
-
-*##### (if fails anytime, run below commands)
-
+##### try kinit admin@CLDRSETUP.LOCAL
+##### (if fails anytime, run below commands)
 [root@ipaserver ~]# ipactl stop && ipactl start && ipactl status
 
-*##### Verify the status of ipa services installed
+##### Verify the status of ipa services installed
 
 [root@ipaserver ~]# ipactl status
-
 Directory Service: RUNNING
-
 krb5kdc Service: RUNNING
-
 kadmin Service: RUNNING
-
 named Service: RUNNING
-
 httpd Service: RUNNING
-
 ipa-custodia Service: RUNNING
-
 pki-tomcatd Service: RUNNING
-
 ipa-otpd Service: RUNNING
-
 ipa-dnskeysyncd Service: RUNNING
-
 ipa: INFO: The ipactl command was successful
-
 ----
 
 This command should return the below output:
@@ -1626,296 +1497,15 @@ image:extracted-media/media/image23.png[klist verify,width=624,height=184]
 [arabic, start=3]
 . *(Optional)* Enable WebUI for IPAServer Administration:
 
-*##### Install NodeJS and NPM on IPAServer.
-
-[root@ipaserver ~]# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
-
-% Total % Received % Xferd Average Speed Time Time Time Current
-
-Dload Upload Total Spent Left Speed
-
-100 16555 100 16555 0 0 241k 0 --:--:-- --:--:-- --:--:-- 241k
-
-=> Downloading nvm from git to '/root/.nvm'
-
-=> Cloning into '/root/.nvm'...
-
-remote: Enumerating objects: 375, done.
-
-remote: Counting objects: 100% (375/375), done.
-
-remote: Compressing objects: 100% (319/319), done.
-
-remote: Total 375 (delta 46), reused 175 (delta 29), pack-reused 0 (from 0)
-
-Receiving objects: 100% (375/375), 379.25 KiB | 9.98 MiB/s, done.
-
-Resolving deltas: 100% (46/46), done.
-
-* (HEAD detached at FETCH_HEAD)
-
-master
-
-=> Compressing and cleaning up git repository
-
-=> nvm source string already in /root/.bashrc
-
-=> bash_completion source string already in /root/.bashrc
-
-=> Close and reopen your terminal to start using nvm or run the following to use it now:
-
-export NVM_DIR="$HOME/.nvm"
-
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-[root@ipaserver freeipa-webui]# source ~/.bashrc
-
-[root@ipaserver freeipa-webui]# nvm install node
-
-Downloading and installing node v22.6.0...
-
-Downloading https://nodejs.org/dist/v22.6.0/node-v22.6.0-linux-x64.tar.xz...
-
-########################################################################################################### 100.0%
-
-Computing checksum with sha256sum
-
-Checksums matched!
-
-Creating default alias: default -> node (-> v22.6.0)
-
-*##### Verify NodeJS and NPM Versions
-
-[root@ipaserver freeipa-webui]# node --version && npm --version
-
-Node.js v22.6.0
-
-NPM v10.8.2
-
-*##### Install WebUI app
-
-[root@ipaserver ~]# cd /opt
-
-[root@ipaserver ~]# git clone https://github.com/freeipa/freeipa-webui.git
-
-[root@ipaserver ~]# cd freeipa-webui
-
-[root@ipaserver freeipa-webui]# npm install
-
-[root@ipaserver freeipa-webui]# npm audit fix
-
-[root@ipaserver freeipa-webui]# npm run build
-
-#npm run serve
-
-[root@ipaserver freeipa-webui]# npm install -g pm2
-
-added 138 packages in 4s
-
-13 packages are looking for funding
-
-run `npm fund` for details
-
-*##### Start the application server for FreeIPA WebUI.
-
-[root@ipaserver freeipa-webui]# pm2 start npm --name "freeipa_webui" -- start
-
--------------
-
-__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
-
-_\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
-
-_\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
-
-_\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
-
-_\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
-
-_\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
-
-_\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
-
-_\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
-
-_\///______________\///______________\///__\///////////////__
-
-Runtime Edition
-
-PM2 is a Production Process Manager for Node.js applications
-
-with a built-in Load Balancer.
-
-Start and Daemonize any application:
-
-$ pm2 start app.js
-
-Load Balance 4 instances of api.js:
-
-$ pm2 start api.js -i 4
-
-Monitor in production:
-
-$ pm2 monitor
-
-Make pm2 auto-boot at server restart:
-
-$ pm2 startup
-
-To go further checkout:
-
-http://pm2.io/
-
--------------
-
-[PM2] Spawning PM2 daemon with pm2_home=/root/.pm2
-
-[PM2] PM2 Successfully daemonized
-
-[PM2] Starting /root/.nvm/versions/node/v22.6.0/bin/npm in fork_mode (1 instance)
-
-[PM2] Done.
-
-┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
-
-│ id │ name │ mode │ ↺ │ status │ cpu │ memory │
-
-├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
-
-│ 0 │ freeipa_webui │ fork │ 0 │ online │ 0% │ 32.5mb │
-
-*└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
-
-*##### Verify app is running
-
-[root@ipaserver freeipa-webui]# pm2 list
-
-*┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
-
-│ id │ name │ mode │ ↺ │ status │ cpu │ memory │
-
-├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
-
-│ 0 │ freeipa_webui │ fork │ 0 │ online │ 0% │ 70.5mb │
-
-└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
-
-[root@ipaserver freeipa-webui]#
-
-*##### Make pm2 auto-boot at server restart:
-
-[root@ipaserver ~]# pm2 startup
-
-[PM2] Init System found: systemd
-
-Platform systemd
-
-Template
-
-[Unit]
-
-Description=PM2 process manager
-
-Documentation=https://pm2.keymetrics.io/
-
-After=network.target
-
-[Service]
-
-Type=forking
-
-User=root
-
-LimitNOFILE=infinity
-
-LimitNPROC=infinity
-
-LimitCORE=infinity
-
-Environment=PATH=/root/.nvm/versions/node/v22.6.0/bin:/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
-
-Environment=PM2_HOME=/root/.pm2
-
-PIDFile=/root/.pm2/pm2.pid
-
-Restart=on-failure
-
-ExecStart=/root/.nvm/versions/node/v22.6.0/lib/node_modules/pm2/bin/pm2 resurrect
-
-ExecReload=/root/.nvm/versions/node/v22.6.0/lib/node_modules/pm2/bin/pm2 reload all
-
-ExecStop=/root/.nvm/versions/node/v22.6.0/lib/node_modules/pm2/bin/pm2 kill
-
-[Install]
-
-WantedBy=multi-user.target
-
-Target path
-
-/etc/systemd/system/pm2-root.service
-
-Command list
-
-[ 'systemctl enable pm2-root' ]
-
-[PM2] Writing init configuration in /etc/systemd/system/pm2-root.service
-
-[PM2] Making script booting at startup...
-
-[PM2] [-] Executing: systemctl enable pm2-root...
-
-Created symlink /etc/systemd/system/multi-user.target.wants/pm2-root.service → /etc/systemd/system/pm2-root.service.
-
-[PM2] [v] Command successfully executed.
-
-{plus}---------------------------------------{plus}
-
-[PM2] Freeze a process list on reboot via:
-
-$ pm2 save
-
-[PM2] Remove init script via:
-
-$ pm2 unstartup systemd
-
-[root@ipaserver ~]# pm2 save
-
-[PM2] Saving current process list...
-
-[PM2] Successfully saved in /root/.pm2/dump.pm2
-
-[root@ipaserver ~]# pm2 status
-
-┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
-
-│ id │ name │ mode │ ↺ │ status │ cpu │ memory │
-
-├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
-
-│ 0 │ freeipa_webui │ fork │ 15 │ errored │ 0% │ 0b │
-
-└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
-
-[root@ipaserver ~]# pm2 logs
-
-[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
-
-/root/.pm2/pm2.log last 15 lines:
-
-PM2 | 2024-08-19T04:49:18: PM2 log: App [freeipa_webui:0] online
-
-PM2 | 2024-08-19T04:49:18: PM2 log: App [freeipa_webui:0] exited with code [254] via signal [SIGINT]
-
 *##### Add IPAserver IP address mapping to your local system’s (Laptop) /etc/hosts file, similar to as below.
 
+[source,bash]
+----
 *ksahu@Kuldeeps-MacBook-Air % sudo vi /etc/hosts
-
 35.83.155.109 ipaserver.cldrsetup.local ipaserver
+----
 
 *##### Access the below URL on browser, and the IPA Admin console will open.
-
 https://ipaserver.cdppvcds.com/ipa/ui/[[.underline]#https://ipaserver.cldrsetup.local/ipa/ui/#*]
 
 [arabic, start=4]
@@ -1937,15 +1527,19 @@ Enable the passwordless login across all the nodes when Red Hat Linux is install
 
 *Step 1.* Log into the ipaserver Node.
 
+[source,bash]
+----
 [root@ipaserver ~]# ssh 172.31.24.240
+----
 
 *Step 2.* Run the ssh-keygen command to create both public and private SSH key-pair on the ansible-controller node.
 
+[source,bash]
+----
 [root@ipaserver ~]# ssh-keygen -N '' -f ~/.ssh/id_rsa
-
 [root@ipaserver ~]# ls -l /root/.ssh
-
 [root@ipaserver ~]# chmod 600 /root/.ssh/id_rsa
+----
 
 image:extracted-media/media/image45.png[ssh keygen pw,width=417,height=65]
 
@@ -1953,29 +1547,24 @@ image:extracted-media/media/image45.png[ssh keygen pw,width=417,height=65]
 
 _*(NA in AWS EC2, need to be done manually, as right now password based authentication for non-root users is disabled*)_
 
-[root@ipaserver ~]#* for i in {1}; do echo "copying ipaserver.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@ipaserver.cldrsetup.local; done;
+[source,bash]
+----
+[root@ipaserver ~]# for i in {1}; do echo "copying ipaserver.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@ipaserver.cldrsetup.local; done;
+[root@ipaserver ~]# for i in {1}; do echo "copying cldr-mngr.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@cldr-mngr.cldrsetup.local; done;
+[root@ipaserver ~]# for i in {1}; do echo "copying pvcbase-master.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcbase-master.cldrsetup.local; done;
+[root@ipaserver ~]# for i in {1..5}; do echo "copying pvcbase-worker$i.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcbase-worker$i.cldrsetup.local; done;
+[root@ipaserver ~]# for i in {1}; do echo "copying pvcecs-master.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcecs-master.cldrsetup.local; done;
+[root@ipaserver ~]# for i in {1..10}; do echo "copying pvcecs-worker$i.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcecs-worker$i.cldrsetup.local; done;
 
-[root@ipaserver ~]#* for i in {1}; do echo "copying cldr-mngr.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@cldr-mngr.cldrsetup.local; done;
-
-[root@ipaserver ~]#* for i in {1}; do echo "copying pvcbase-master.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcbase-master.cldrsetup.local; done;
-
-[root@ipaserver ~]#* for i in {1..5}; do echo "copying pvcbase-worker$i.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcbase-worker$i.cldrsetup.local; done;
-
-[root@ipaserver ~]#* for i in {1}; do echo "copying pvcecs-master.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcecs-master.cldrsetup.local; done;
-
-[root@ipaserver ~]#* for i in {1..10}; do echo "copying pvcecs-worker$i.cldrsetup.local"; ssh-copy-id -i ~/.ssh/id_rsa.pub root@pvcecs-worker$i.cldrsetup.local; done;
-
-*##### Alternate way is to add pub key to authorized_keys file manually on ipaserver node and copy the entire .ssh directory to all other NODES; otherwise login into each hosts and manually update authorized_keys:
-
+##### Alternate way is to add pub key to authorized_keys file manually on ipaserver node and copy the entire .ssh directory to all other NODES; otherwise login into each hosts and manually update authorized_keys:
 [root@ipaserver ~]# cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 
-*##### copy the entire .ssh directory to all NODES
-
+##### copy the entire .ssh directory to all NODES
 [root@ipaserver ~]# scp -r /root/.ssh mailto:root@cldr-mngr.cdppvcds.com[[.underline]#root@cldr-mngr.cldrsetup.local#]:/root/.
 
-*##### (provide root user password when prompted)
-
-*##### Download the id_rsa and id_rsa.pub to your local machine by either using scp or sftp (as it will be required later)
+##### (provide root user password when prompted)
+##### Download the id_rsa and id_rsa.pub to your local machine by either using scp or sftp (as it will be required later)
+----
 
 *Step 4.* Enter yes for *_Are you sure you want to continue connecting (yes/no)_*?
 
@@ -1986,201 +1575,130 @@ _*(NA in AWS EC2, need to be done manually, as right now password based authenti
 
 *Step 1.* Login to IPAServer node and Install ansible-core
 
+[source,bash]
+----
 [root@ipaserver ~]# dnf install -y ansible-core
-
 [root@ipaserver ~]# ansible --version
-
 ansible [core 2.14.14]
-
-config file = /etc/ansible/ansible.cfg
-
-configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
-
-ansible python module location = /usr/lib/python3.9/site-packages/ansible
-
-ansible collection location = /root/.ansible/collections:/usr/share/ansible/collections
-
-executable location = /bin/ansible
-
-python version = 3.9.18 (main, Jan 24 2024, 00:00:00) [GCC 11.4.1 20231218 (Red Hat 11.4.1-3)] (/usr/bin/python3)
-
-jinja version = 3.1.2
-
-libyaml = True
-
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python3.9/site-packages/ansible
+  ansible collection location = /root/.ansible/collections:/usr/share/ansible/collections
+  executable location = /bin/ansible
+  python version = 3.9.18 (main, Jan 24 2024, 00:00:00) [GCC 11.4.1 20231218 (Red Hat 11.4.1-3)] (/usr/bin/python3)
+  jinja version = 3.1.2
+  libyaml = True
 [root@ipaserver ~]# echo "export ANSIBLE_HOST_KEY_CHECKING=False" >> ~/.bashrc && source ~/.bashrc
+----
 
 *Step 2.* Prepare the host inventory file for Ansible as shown below. Various host groups have been created based on any specific installation requirements of certain hosts.
 
+[source,bash]
+----
 [root@ipaserver ~]# vi /etc/ansible/hosts
 
 [admin]
-
 ipaserver.cldrsetup.local
 
 [ipaserver]
-
 ipaserver.cldrsetup.local
 
 [cldr-mngr]
-
 cldr-mngr.cldrsetup.local
 
 [namenodes]
-
 pvcbase-master.cldrsetup.local
 
 [datanodes]
-
 pvcbase-worker1.cldrsetup.local
-
 pvcbase-worker2.cldrsetup.local
-
 pvcbase-worker3.cldrsetup.local
-
 pvcbase-worker4.cldrsetup.local
-
 pvcbase-worker5.cldrsetup.local
 
 [ecsmasternodes]
-
 pvcecs-master.cldrsetup.local
 
 [ecsnodes]
-
 pvcecs-worker1.cldrsetup.local
-
 pvcecs-worker2.cldrsetup.local
-
 pvcecs-worker3.cldrsetup.local
-
 pvcecs-worker4.cldrsetup.local
-
 pvcecs-worker5.cldrsetup.local
-
 pvcecs-worker6.cldrsetup.local
-
 pvcecs-worker7.cldrsetup.local
-
 pvcecs-worker8.cldrsetup.local
-
 pvcecs-worker9.cldrsetup.local
-
 pvcecs-worker10.cldrsetup.local
 
 [nodes]
-
 pvcbase-master.cldrsetup.local
-
 pvcbase-worker1.cldrsetup.local
-
 pvcbase-worker2.cldrsetup.local
-
 pvcbase-worker3.cldrsetup.local
-
 pvcbase-worker4.cldrsetup.local
-
 pvcbase-worker5.cldrsetup.local
-
 pvcecs-master.cldrsetup.local
-
 pvcecs-worker1.cldrsetup.local
-
 pvcecs-worker2.cldrsetup.local
-
 pvcecs-worker3.cldrsetup.local
-
 pvcecs-worker4.cldrsetup.local
-
 pvcecs-worker5.cldrsetup.local
-
 pvcecs-worker6.cldrsetup.local
-
 pvcecs-worker7.cldrsetup.local
-
 pvcecs-worker8.cldrsetup.local
-
 pvcecs-worker9.cldrsetup.local
-
 pvcecs-worker10.cldrsetup.local
+----
 
 *Step 3.* Verify the host group by running the following commands.
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible datanodes -m ping
-
 pvcbase-worker2.cldrsetup.local | SUCCESS => {
-
-"ansible_facts": {
-
-"discovered_interpreter_python": "/usr/bin/python3"
-
-},
-
-"changed": false,
-
-"ping": "pong"
-
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
 }
-
 pvcbase-worker4.cldrsetup.local | SUCCESS => {
-
-"ansible_facts": {
-
-"discovered_interpreter_python": "/usr/bin/python3"
-
-},
-
-"changed": false,
-
-"ping": "pong"
-
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
 }
-
 pvcbase-worker3.cldrsetup.local | SUCCESS => {
-
-"ansible_facts": {
-
-"discovered_interpreter_python": "/usr/bin/python3"
-
-},
-
-"changed": false,
-
-"ping": "pong"
-
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
 }
-
 pvcbase-worker1.cldrsetup.local | SUCCESS => {
-
-"ansible_facts": {
-
-"discovered_interpreter_python": "/usr/bin/python3"
-
-},
-
-"changed": false,
-
-"ping": "pong"
-
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
 }
-
 pvcbase-worker5.cldrsetup.local | SUCCESS => {
-
-"ansible_facts": {
-
-"discovered_interpreter_python": "/usr/bin/python3"
-
-},
-
-"changed": false,
-
-"ping": "pong"
-
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
 }
+----
 
 *Step 4.* Copy /etc/hosts file to each node part of the cloudera deployment to resolve fqdn across the cluster
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/hosts dest=/etc/hosts"
+----
 
 [arabic, start=5]
 . Set up Network configuration files and DNS Zones/Records
@@ -2194,17 +1712,16 @@ pvcbase-worker5.cldrsetup.local | SUCCESS => {
 
 https://docs.cloudera.com/data-warehouse/1.5.4/release-notes/topics/dw-private-cloud-known-issues-ecs-environments.html[[.underline]#https://docs.cloudera.com/data-warehouse/1.5.4/release-notes/topics/dw-private-cloud-known-issues-ecs-environments.html#]
 
+[source,bash]
+----
 [root@ipaserver ~]# cat /etc/resolv.conf
-
 search ap-southeast-1.compute.internal cldrsetup.local
-
 nameserver 172.31.24.240 # PrivateIP of FreeIPA Server must be first nameserver entry after search
-
 nameserver 172.31.0.2 # DNS of AWS i.e. in case of PvC Configured on EC2
-
 nameserver 127.0.0.1
 
 [root@ipaserver ~]#
+----
 
 image:extracted-media/media/image32.png[resolv conf,width=428,height=59]
 
@@ -2213,87 +1730,80 @@ image:extracted-media/media/image32.png[resolv conf,width=428,height=59]
 
 (The changes in *_/etc/resolv.conf_* above are temporary and would get overwritten if the machine is rebooted. In order to keep the nameserver entry persistent, open the file *_/etc/sysconfig/network_* in edit mode and add below entries.)
 
+[source,bash]
+----
 [root@ipaserver ~]# cat /etc/sysconfig/network
-
 NETWORKING=yes
-
 NISDOMAIN=cldrsetup.local # our DNS DOMAIN
-
 DNS1=172.31.24.240 # PRIVATE_IP_OF_IPASERVER
-
 NOZEROCONF=yes
 
 [root@ipaserver ~]#
+----
 
 image:extracted-media/media/image55.png[sysconfig network,width=213,height=79]
 
 [arabic, start=3]
 . Copy */etc/resolv.conf* file to each node to make them able to resolve FQDNs across the cluster:
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/resolv.conf dest=/etc/resolv.conf" --become
+----
 
 [arabic, start=4]
 . Copy */etc/sysconfig/network* file to each node to make them able to resolve FQDNs across the cluster: (/etc/resolv.conf changes may vanished after the reboot, so to persist those changes, we need the below configuration)
 
+[source,bash]
+----
 [root@ipaserver ~]# ansible all -m copy -a "src=/etc/sysconfig/network dest=/etc/sysconfig/network" --become
+----
 
 [arabic, start=5]
 . Update Network config to make sure DNS entries persist, even after reboot:
 
+[source,bash]
+----
 *# Extract DNS entries
-
 [root@ipaserver ~]#* grep '^nameserver' /etc/resolv.conf | awk '{print "DNS" NR "=" $2}' > /tmp/dns_entries.txt
 
 *# Update ifcfg-eth0 with DNS entries
-
 [root@ipaserver ~]#* while IFS= read -r line; do
-
 ansible all -m lineinfile -a "path=/etc/sysconfig/network-scripts/ifcfg-eth0 line='${line}' state=present backup=true" --become
-
 done < /tmp/dns_entries.txt
 
 *# Clean up
-
 [root@ipaserver ~]#* rm -vf /tmp/dns_entries.txt
+----
 
 [arabic, start=6]
 . Setup Reverse DNS Zone on ipaserver, –from-ip is VPC-CIDR In this step we will be setting up a reverse DNS zone on the FreeIPA server for reverse lookup:
 
-*##### Take the CIDR block of the network in which the instances are created and create a reverse DNS zone by executing the below command on the IPA Server machine.
+[source,bash]
+----
+##### Take the CIDR block of the network in which the instances are created and create a reverse DNS zone by executing the below command on the IPA Server machine.
+##### ipa dnszone-add --name-from-ip=<YOUR_VPC_CIDR>
 
-*##### ipa dnszone-add --name-from-ip=<YOUR_VPC_CIDR>
-
-*##### If your VPC has a CIDR 172.16.0.0/16, then the command looks as below.
+##### If your VPC has a CIDR 172.16.0.0/16, then the command looks as below.
 
 [root@ipaserver ~]# ipa dnszone-add --name-from-ip=172.31.0.0/16
+Zone name [31.172.in-addr.arpa.]: 
+  Zone name: 31.172.in-addr.arpa.
+  Active zone: True
+  Authoritative nameserver: ipaserver.cldrsetup.local.
+  Administrator e-mail address: hostmaster
+  SOA serial: 1715598489
+  SOA refresh: 3600
+  SOA retry: 900
+  SOA expire: 1209600
+  SOA minimum: 3600
+  BIND update policy: grant CLDRSETUP.LOCAL krb5-subdomain 31.172.in-addr.arpa. PTR;
+  Dynamic update: False
+  Allow query: any;
+  Allow transfer: none;
 
-Zone name [31.172.in-addr.arpa.]:
-
-Zone name: 31.172.in-addr.arpa.
-
-Active zone: True
-
-Authoritative nameserver: ipaserver.cldrsetup.local.
-
-Administrator e-mail address: hostmaster
-
-SOA serial: 1715598489
-
-SOA refresh: 3600
-
-SOA retry: 900
-
-SOA expire: 1209600
-
-SOA minimum: 3600
-
-BIND update policy: grant CLDRSETUP.LOCAL krb5-subdomain 31.172.in-addr.arpa. PTR;
-
-Dynamic update: False
-
-Allow query: any;
-
-Allow transfer: none;
+##### Once you execute the above command, accept the default value by hitting the enter key. It will create a reverse DNS zone by name 16.172.in-addr.arpa. (with a trailing dot)
+----
 
 *##### Once you execute the above command, accept the default value by hitting the enter key. It will create a reverse DNS zone by name 16.172.in-addr.arpa. (with a trailing dot)
 
@@ -2302,259 +1812,200 @@ image:extracted-media/media/image79.png[ipa dns zone add,width=624,height=241]
 [arabic, start=7]
 . Disable krb5 ccache config and verify:
 
-*##### OPEN /etc/krb5.conf on IPASERVER and comment ccache conf: (this step is not needed on any cluster node, as CDP will manage the krb5.conf in further steps config) ​​
+[source,bash]
+----
+##### OPEN /etc/krb5.conf on IPASERVER and comment ccache conf: (this step is not needed on any cluster node, as CDP will manage the krb5.conf in further steps config) ​​
 
-*#### After the setup is complete, we need to make a kerberos config change which gets enabled automatically post the ipa server setup.
-
-*##### Open the file /etc/krb5.conf in edit mode and comment out the line related to ccache_name as shown below.
-
+#### After the setup is complete, we need to make a kerberos config change which gets enabled automatically post the ipa server setup.
+##### Open the file /etc/krb5.conf in edit mode and comment out the line related to ccache_name as shown below.
 [root@ipaserver ~]# vi /etc/krb5.conf
 
-*##### Comment the below ccache config
-
+##### Comment the below ccache config
 #default_ccache_name = KEYRING:persistent:%{uid}
 
-*##### After any changes of /etc/krb5.conf anytime, do run the below commands to restart all the IPA services.
-
+##### After any changes of /etc/krb5.conf anytime, do run the below commands to restart all the IPA services.
 [root@ipaserver ~]# ipactl restart
+----
 
 image:extracted-media/media/image48.png[ipa kerb keyring,width=365,height=270]
 
 [arabic, start=8]
 . Prepare the commands for adding dnsrecord and configuring reverse lookup:
 
-*##### ADD The entry of all individual machines (separate IP separate command) to reverse DNS zone:
+[source,bash]
+----
+##### ADD The entry of all individual machines (separate IP separate command) to reverse DNS zone:
+##### We need to create a record for each machine in the reverse DNS zone, created previously.
+##### Use the below command as reference and make changes as per your configuration/machine’s private IP and Hostname.
+##### Add the entry of this e.g. IPA server machine to the reverse DNS zone.
 
-*##### We need to create a record for each machine in the reverse DNS zone, created previously.
+##### We need to add the IPV4 address in reverse order. The first two octets are already added in the reverse zone above. Now we need to create a record for this machine inside that zone by using the last two octets.
 
-*##### Use the below command as reference and make changes as per your configuration/machine’s private IP and Hostname.
+##### In the command below you need to add the record by providing the last two octets of your machine’s private IPV4 in reverse order. Include the trailing dot after the machine name FQDN in the above command.
 
-*##### Add the entry of this e.g. IPA server machine to the reverse DNS zone.
+##### Generate the command as shown below and run the same for all the FreeIPA agents, that includes all the nodes of Base and ECS cluster.
+ipa dnsrecord-add <2nd>.<1st>.in-addr.arpa. <4th>.<3rd> --ptr-rec <server FQDN>.
 
-*##### We need to add the IPV4 address in reverse order. The first two octets are already added in the reverse zone above. Now we need to create a record for this machine inside that zone by using the last two octets.
+##### Example:
+ipa dnsrecord-add 16.172.in-addr.arpa. 226.31 --ptr-rec ipaserver.cldrsetup.local.
 
-*##### In the command below you need to add the record by providing the last two octets of your machine’s private IPV4 in reverse order. Include the trailing dot after the machine name FQDN in the above command.
-
-*##### Generate the command as shown below and run the same for all the FreeIPA agents, that includes all the nodes of Base and ECS cluster.
-
-*ipa dnsrecord-add <2nd>.<1st>.in-addr.arpa. <4th>.<3rd> --ptr-rec <server FQDN>.
-
-*##### Example:
-
-*ipa dnsrecord-add 16.172.in-addr.arpa. 226.31 --ptr-rec ipaserver.cldrsetup.local.
-
-*##### Following the same, The record for the machine should be created in the Reverse DNS zone.
+##### Following the same, The record for the machine should be created in the Reverse DNS zone.
+----
 
 image:extracted-media/media/image184.png[ipa dnsrecord add,width=697,height=52]
 
 image:extracted-media/media/image116.png[ipa dns record ipa agent,width=697,height=57]
 
-[root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 240.24 --ptr-rec ipaserver.cldrsetup.local.
-
-Record name: 240.24
-
-PTR record: ipaserver.cldrsetup.local.
+[source,bash]
+----
+[root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 240.24  --ptr-rec ipaserver.cldrsetup.local.
+  Record name: 240.24
+  PTR record: ipaserver.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 139.27 --ptr-rec cldr-mngr.cldrsetup.local.
-
-Record name: 139.27
-
-PTR record: cldr-mngr.cldrsetup.local.
+  Record name: 139.27
+  PTR record: cldr-mngr.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 104.21 --ptr-rec pvcbase-master.cldrsetup.local.
-
-Record name: 104.21
-
-PTR record: pvcbase-master.cldrsetup.local.
+  Record name: 104.21
+  PTR record: pvcbase-master.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 185.16 --ptr-rec pvcbase-worker1.cldrsetup.local.
-
-Record name: 185.16
-
-PTR record: pvcbase-worker1.cldrsetup.local.
+  Record name: 185.16
+  PTR record: pvcbase-worker1.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 0.23 --ptr-rec pvcbase-worker2.cldrsetup.local.
-
-Record name: 0.23
-
-PTR record: pvcbase-worker2.cldrsetup.local.
+  Record name: 0.23
+  PTR record: pvcbase-worker2.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 240.18 --ptr-rec pvcbase-worker3.cldrsetup.local.
-
-Record name: 240.18
-
-PTR record: pvcbase-worker3.cldrsetup.local.
+  Record name: 240.18
+  PTR record: pvcbase-worker3.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 1.23 --ptr-rec pvcbase-worker4.cldrsetup.local.
-
-Record name: 1.23
-
-PTR record: pvcbase-worker4.cldrsetup.local.
+  Record name: 1.23
+  PTR record: pvcbase-worker4.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 241.18 --ptr-rec pvcbase-worker5.cldrsetup.local.
-
-Record name: 241.18
-
-PTR record: pvcbase-worker5.cldrsetup.local.
+  Record name: 241.18
+  PTR record: pvcbase-worker5.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 239.30 --ptr-rec pvcecs-master.cldrsetup.local.
-
-Record name: 239.30
-
-PTR record: pvcecs-master.cldrsetup.local.
+  Record name: 239.30
+  PTR record: pvcecs-master.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 43.22 --ptr-rec pvcecs-worker1.cldrsetup.local.
-
-Record name: 43.22
-
-PTR record: pvcecs-worker1.cldrsetup.local.
+  Record name: 43.22
+  PTR record: pvcecs-worker1.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 249.30 --ptr-rec pvcecs-worker2.cldrsetup.local.
-
-Record name: 249.30
-
-PTR record: pvcecs-worker2.cldrsetup.local.
+  Record name: 249.30
+  PTR record: pvcecs-worker2.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 24.26 --ptr-rec pvcecs-worker3.cldrsetup.local.
-
-Record name: 24.26
-
-PTR record: pvcecs-worker3.cldrsetup.local.
+  Record name: 24.26
+  PTR record: pvcecs-worker3.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 198.24 --ptr-rec pvcecs-worker4.cldrsetup.local.
-
-Record name: 198.24
-
-PTR record: pvcecs-worker4.cldrsetup.local.
+  Record name: 198.24
+  PTR record: pvcecs-worker4.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 53.24 --ptr-rec pvcecs-worker5.cldrsetup.local.
-
-Record name: 53.24
-
-PTR record: pvcecs-worker5.cldrsetup.local.
+  Record name: 53.24
+  PTR record: pvcecs-worker5.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 43.22 --ptr-rec pvcecs-worker6.cldrsetup.local.
-
-Record name: 43.22
-
-PTR record: pvcecs-worker6.cldrsetup.local.
+  Record name: 43.22
+  PTR record: pvcecs-worker6.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 249.30 --ptr-rec pvcecs-worker7.cldrsetup.local.
-
-Record name: 249.30
-
-PTR record: pvcecs-worker7.cldrsetup.local.
+  Record name: 249.30
+  PTR record: pvcecs-worker7.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 24.26 --ptr-rec pvcecs-worker8.cldrsetup.local.
-
-Record name: 24.26
-
-PTR record: pvcecs-worker8.cldrsetup.local.
+  Record name: 24.26
+  PTR record: pvcecs-worker8.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 198.24 --ptr-rec pvcecs-worker9.cldrsetup.local.
-
-Record name: 198.24
-
-PTR record: pvcecs-worker9.cldrsetup.local.
+  Record name: 198.24
+  PTR record: pvcecs-worker9.cldrsetup.local.
 
 [root@ipaserver ~]# ipa dnsrecord-add 31.172.in-addr.arpa. 53.24 --ptr-rec pvcecs-worker10.cldrsetup.local.
-
-Record name: 53.24
-
-PTR record: pvcecs-worker10.cldrsetup.local.
+  Record name: 53.24
+  PTR record: pvcecs-worker10.cldrsetup.local.
+----
 
 [arabic, start=9]
 . Verify the DNS records have been added successfully:
 
+[source,bash]
+----
 [root@ipaserver ~]# ipa dnsrecord-find 31.172.in-addr.arpa.
+  Record name: @
+  NS record: ipaserver.cldrsetup.local.
 
-Record name: @
+  Record name: 240.24
+  PTR record: ipaserver.cldrsetup.local.
 
-NS record: ipaserver.cldrsetup.local.
+  Record name: 139.27
+  PTR record: cldr-mngr.cldrsetup.local.
 
-Record name: 240.24
+  Record name: 104.21
+  PTR record: pvcbase-master.cldrsetup.local.
 
-PTR record: ipaserver.cldrsetup.local.
+  Record name: 185.16
+  PTR record: pvcbase-worker1.cldrsetup.local.
 
-Record name: 139.27
+  Record name: 0.23
+  PTR record: pvcbase-worker2.cldrsetup.local.
 
-PTR record: cldr-mngr.cldrsetup.local.
+  Record name: 240.18
+  PTR record: pvcbase-worker3.cldrsetup.local.
 
-Record name: 104.21
+  Record name: 185.16
+  PTR record: pvcbase-worker4.cldrsetup.local.
 
-PTR record: pvcbase-master.cldrsetup.local.
+  Record name: 240.18
+  PTR record: pvcbase-worker5.cldrsetup.local.
 
-Record name: 185.16
+  Record name: 239.30
+  PTR record: pvcecs-master.cldrsetup.local.
 
-PTR record: pvcbase-worker1.cldrsetup.local.
+  Record name: 43.22
+  PTR record: pvcecs-worker1.cldrsetup.local.
 
-Record name: 0.23
+  Record name: 249.30
+  PTR record: pvcecs-worker2.cldrsetup.local.
 
-PTR record: pvcbase-worker2.cldrsetup.local.
+  Record name: 198.24
+  PTR record: pvcecs-worker3.cldrsetup.local.
 
-Record name: 240.18
+  Record name: 53.24
+  PTR record: pvcecs-worker4.cldrsetup.local.
 
-PTR record: pvcbase-worker3.cldrsetup.local.
+  Record name: 24.26
+  PTR record: pvcecs-worker5.cldrsetup.local.
 
-Record name: 185.16
+  Record name: 43.22
+  PTR record: pvcecs-worker6.cldrsetup.local.
 
-PTR record: pvcbase-worker4.cldrsetup.local.
+  Record name: 0.23
+  PTR record: pvcecs-worker7.cldrsetup.local.
 
-Record name: 240.18
+  Record name: 198.24
+  PTR record: pvcecs-worker8.cldrsetup.local.
 
-PTR record: pvcbase-worker5.cldrsetup.local.
+  Record name: 53.24
+  PTR record: pvcecs-worker9.cldrsetup.local.
 
-Record name: 239.30
-
-PTR record: pvcecs-master.cldrsetup.local.
-
-Record name: 43.22
-
-PTR record: pvcecs-worker1.cldrsetup.local.
-
-Record name: 249.30
-
-PTR record: pvcecs-worker2.cldrsetup.local.
-
-Record name: 198.24
-
-PTR record: pvcecs-worker3.cldrsetup.local.
-
-Record name: 53.24
-
-PTR record: pvcecs-worker4.cldrsetup.local.
-
-Record name: 24.26
-
-PTR record: pvcecs-worker5.cldrsetup.local.
-
-Record name: 43.22
-
-PTR record: pvcecs-worker6.cldrsetup.local.
-
-Record name: 0.23
-
-PTR record: pvcecs-worker7.cldrsetup.local.
-
-Record name: 198.24
-
-PTR record: pvcecs-worker8.cldrsetup.local.
-
-Record name: 53.24
-
-PTR record: pvcecs-worker9.cldrsetup.local.
-
-Record name: 24.26
-
-PTR record: pvcecs-worker10.cldrsetup.local.
-
+  Record name: 24.26
+  PTR record: pvcecs-worker10.cldrsetup.local.
+  
 -----------------------------
-
 Number of entries returned 20
-
 -----------------------------
-
-[root@ipaserver ~]#
+[root@ipaserver ~]# 
+----
 
 [arabic, start=6]
 . Configure freeipa-client on all other nodes to get them managed by ipa-server
@@ -2569,11 +2020,14 @@ Number of entries returned 20
 
 https://docs.cloudera.com/cdp-private-cloud-upgrade/latest/release-guide/topics/cdpdc-java-requirements.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-upgrade/latest/release-guide/topics/cdpdc-java-requirements.html#]
 
+[source,bash]
+----
 [root@ipaserver ~]#* ansible all -m shell -a "sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms && sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms && sudo dnf install -y java-17-openjdk java-17-openjdk-devel python3-pip wget telnet mlocate tar traceroute net-tools bind-utils traceroute nc && java -version && python3 -V && pip3 install --upgrade pip && pip3 -V && pip3 install psycopg2-binary && pip3 list |grep psy"
 
 [root@ipaserver ~]#* ansible all -m shell -a "sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm && sudo dnf install -y postgresql14"
 
 [root@ipaserver ~]#* ansible all -m shell -a "sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms && sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms && sudo dnf install -y freeipa-client openldap-clients krb5-workstation krb5-libs && chronyc tracking && chronyc sources" -l 'all:!admin'
+----
 
 *Step 2:* Install and Setup IPA services by configuring the free-ipa client on all machines (except ipaserver) and add all the machines to the DNS server, by running the command “*_ipa-client-install_*” to set up the IPA client.
 
@@ -2653,143 +2107,92 @@ ____
 
 |===
 
-*root@pvcbase-master ~]# ipa-client-install --force-join
-
+[source,bash]
+----
+[root@pvcbase-master ~]# ipa-client-install --force-join
 This program will set up IPA client.
-
 Version 4.11.0
 
 Discovery was successful!
-
-Do you want to configure chrony with NTP server or pool address? [no]: *_yes_
-
-Enter NTP source server addresses separated by comma, or press Enter to skip: *_<ENTER>_
-
-Enter a NTP source pool address, or press Enter to skip: *_<ENTER>_
-
+Do you want to configure chrony with NTP server or pool address? [no]: yes
+Enter NTP source server addresses separated by comma, or press Enter to skip: <ENTER>
+Enter a NTP source pool address, or press Enter to skip: <ENTER>
 Client hostname: cldr-mngr.cldrsetup.local
-
 Realm: CLDRSETUP.LOCAL
-
 DNS Domain: cldrsetup.local
-
 IPA Server: ipaserver.cldrsetup.local
-
 BaseDN: dc=cldrsetup,dc=local
 
-Continue to configure the system with these values? [no]: *_yes_
-
+Continue to configure the system with these values? [no]: yes
 Synchronizing time
-
 No SRV records of NTP servers were found and no NTP server or pool address was provided.
-
 Using default chrony configuration.
-
 Attempting to sync time with chronyc.
-
 Time synchronization was successful.
-
-User authorized to enroll computers: <**_admin>_*
-
-Password for admin@CLDRSETUP.LOCAL: *_<vmware123>_
-
+User authorized to enroll computers: <admin>
+Password for admin@CLDRSETUP.LOCAL: <vmware123>
 Successfully retrieved CA cert
-
-Subject: CN=Certificate Authority,O=CLDRSETUP.LOCAL
-
-Issuer: CN=Certificate Authority,O=CLDRSETUP.LOCAL
-
-Valid From: 2024-05-13 10:59:53{plus}00:00
-
-Valid Until: 2044-05-13 10:59:53{plus}00:00
+    Subject:     CN=Certificate Authority,O=CLDRSETUP.LOCAL
+    Issuer:      CN=Certificate Authority,O=CLDRSETUP.LOCAL
+    Valid From:  2024-05-13 10:59:53+00:00
+    Valid Until: 2044-05-13 10:59:53+00:00
 
 Enrolled in IPA realm CLDRSETUP.LOCAL
-
 Created /etc/ipa/default.conf
-
 Configured /etc/sssd/sssd.conf
-
 Systemwide CA database updated.
-
 Hostname (pvcbase-master.cldrsetup.local) does not have A/AAAA record.
-
 Adding SSH public key from /etc/ssh/ssh_host_rsa_key.pub
-
 Adding SSH public key from /etc/ssh/ssh_host_ecdsa_key.pub
-
 Adding SSH public key from /etc/ssh/ssh_host_ed25519_key.pub
-
 SSSD enabled
-
 Configured /etc/openldap/ldap.conf
-
 Configured /etc/ssh/ssh_config
-
 Configured /etc/ssh/sshd_config.d/04-ipa.conf
-
 Configuring cldrsetup.local as NIS domain.
-
 Configured /etc/krb5.conf for IPA realm CLDRSETUP.LOCAL
-
 Client configuration complete.
-
 The ipa-client-install command was successful
-
-[root@pvcbase-master ~]#
+[root@pvcbase-master ~]# 
+----
 
 image:extracted-media/media/image87.png[ipa client install,width=616,height=459]
 
 *Step 3:* Verify KDC setup: kerberos ticket generation is working fine by generating a ticket for the admin user from all individual hosts.
 
-*##### Run the kinit admin command to authenticate as admin and enter the directory password provided during ipa server installation. The command should generate the ticket and should be listed by executing klist -e.
+[source,bash]
+----
+##### Run the kinit admin command to authenticate as admin and enter the directory password provided during ipa server installation. The command should generate the ticket and should be listed by executing klist -e. 
 
-[root@ipaserver ~]# kinit admin
-
-Password for admin@CLDRSETUP.LOCAL: *_<vmware123>_
+[root@ipaserver ~]# kinit admin 
+Password for admin@CLDRSETUP.LOCAL: <vmware123>
 
 [root@ipaserver ~]# klist -e
-
 Ticket cache: KCM:0
-
 Default principal: admin@CLDRSETUP.LOCAL
 
-Valid starting Expires Service principal
+Valid starting       Expires              Service principal
+05/13/2024 04:07:15  05/14/2024 03:30:48  krbtgt/CLDRSETUP.LOCAL@CLDRSETUP.LOCAL
+        Etype (skey, tkt): aes256-cts-hmac-sha384-192, aes256-cts-hmac-sha384-192 
 
-05/13/2024 04:07:15 05/14/2024 03:30:48 krbtgt/CLDRSETUP.LOCAL@CLDRSETUP.LOCAL
-
-Etype (skey, tkt): aes256-cts-hmac-sha384-192, aes256-cts-hmac-sha384-192
-
-*##### try kinit admin@CLDRSETUP.LOCAL
-
-*##### (if fails anytime, run below commands
-
+##### try kinit admin@CLDRSETUP.LOCAL
+##### (if fails anytime, run below commands
 [root@ipaserver ~]# ipactl stop && ipactl start && ipactl status
 
-*##### Verify the status of ipa services installed
-
+##### Verify the status of ipa services installed
 [root@ipaserver ~]# ipactl status
-
 Directory Service: RUNNING
-
 krb5kdc Service: RUNNING
-
 kadmin Service: RUNNING
-
 named Service: RUNNING
-
 httpd Service: RUNNING
-
 ipa-custodia Service: RUNNING
-
 ntpd Service: RUNNING
-
 pki-tomcatd Service: RUNNING
-
 ipa-otpd Service: RUNNING
-
 ipa-dnskeysyncd Service: RUNNING
-
 ipa: INFO: The ipactl command was successful
+----
 
 This command should return the below output:
 
