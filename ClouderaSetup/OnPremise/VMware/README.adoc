@@ -1,8 +1,8 @@
 = CDP Private Cloud (PvC) :: Deployment Guide
 
-**Installation & Setup on VMWare Infrastructure*
+**Installation & Setup on VMWare Infrastructure**
 
-**Published: April 2025*
+**Published: April 2025**
 
 image:extracted-media/media/image117.png[extracted-media/media/image117,width=350,height=79]
 
@@ -10,15 +10,15 @@ In partnership with:
 
 image:extracted-media/media/image144.png[A close up of a logo Description automatically generated,width=244,height=49]
 
-By: *Kuldeep Sahu*, Partner Solutions Engineer, Cloudera Inc.
+*Author: Kuldeep Sahu*, Partner Solutions Engineer, Cloudera Inc.
 
 ---
 
-*Audience
+**Audience**
 
 The intended audience for this document includes, but is not limited to, sales engineers, field consultants, professional services, IT managers, IT engineers, partners, and customers who are interested in learning about and deploying the Cloudera Data Platform Private Cloud (CDP Private Cloud) on the VMware Platform for digital transformation through cloud-native modern data analytics and AI/ML.
 
-*Purpose of this Document
+**Purpose of this Document**
 
 This document describes the architecture, installation, configuration, and validated use cases for the VMware Platform using Cloudera Data Platform Private Cloud Base on VMware servers. A reference architecture is provided to configure the Cloudera Data Platform on VMware.
 
@@ -230,13 +230,13 @@ This document provides all the required information for setup and install CDP Pr
 
 === Important URLs:
 
-*Install CDP PvC Base and Data Service Clusters:
+**Install CDP PvC Base and Data Service Clusters:**
 
 https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-installation.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-installation.html#]
 
 https://docs.cloudera.com/cdp-private-cloud-data-services/latest/installation-ecs/topics/cdppvc-installation-ecs-steps.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-data-services/latest/installation-ecs/topics/cdppvc-installation-ecs-steps.html#]
 
-*Uninstall and cleanup CDP PvC Base, Data Service Clusters and PostgreSQL DB:
+**Uninstall and cleanup CDP PvC Base, Data Service Clusters and PostgreSQL DB:**
 
 https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-uninstallation.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-uninstallation.html#]
 
@@ -244,13 +244,11 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs
 
 https://kb.objectrocket.com/postgresql/how-to-completely-uninstall-postgresql-757[[.underline]#https://kb.objectrocket.com/postgresql/how-to-completely-uninstall-postgresql-757#]
 
-*Internal documentation: Prerequisites list by Dennis Lee and PvC AWS Setup by Puneet Joshi
+**Internal documentation: Prerequisites list by Dennis Lee**
 
 https://dennislee22.github.io/docs/cdppvc[[.underline]#https://dennislee22.github.io/docs/cdppvc#]
 
 https://docs.google.com/document/d/1OSKBChSTbc8NhuQ8YXRN-YxFnaVBj47Lz4cWro-zTVs/edit[[.underline]#https://docs.google.com/document/d/1OSKBChSTbc8NhuQ8YXRN-YxFnaVBj47Lz4cWro-zTVs/edit#]
-
-https://github.com/pjoshi06/Cloudera_Partner_CDP_PvC_Setup/tree/main/AWS_Infrastructure[[.underline]#https://github.com/pjoshi06/Cloudera_Partner_CDP_PvC_Setup/tree/main/AWS_Infrastructure#]
 
 *=================================================================================
 
