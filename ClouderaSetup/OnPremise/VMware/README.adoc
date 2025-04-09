@@ -2691,15 +2691,12 @@ Here's how you can perform the workaround for customers experiencing issues with
 *Step 1:* Identify the network interface:
 
 *#####* Determine the network interface used by the affected ECS nodes. This can typically be found using the `ifconfig` or `ip addr` command:
-
 [root@ipaserver ~]# ansible ecsmasternodes,ecsnodes -m shell -a "ifconfig | grep flags | grep -v lo && ip addr | grep mtu | grep -v lo"
 
 [root@ipaserver ~]$ ifconfig | grep flags | grep -v lo
-
 eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST> mtu 9001
 
 [root@ipaserver ~]$ ip addr | grep mtu | grep -v lo
-
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc mq state UP group default qlen 1000
 
 [root@ipaserver ~]$
@@ -3671,13 +3668,11 @@ could not change directory to "/root": Permission denied
 psql (14.13)
 Type "help" for help.
 
-
 postgres=# SELECT * FROM pg_stat_ssl;
   pid  | ssl | version | cipher | bits | client_dn | client_serial | issuer_dn
 -------+-----+---------+--------+------+-----------+---------------+-----------
  41275 | f   |         |        |      |           |               |
 (1 row)
-
 
 postgres=# SHOW ssl;
  ssl
@@ -3685,27 +3680,20 @@ postgres=# SHOW ssl;
  off
 (1 row)
 
-
 postgres=# \q
 
-
 [root@cldr-mngr ~]# sudo dnf install -y mod_ssl
-
 
 ##### Stop Postgres DB service. 
 [root@cldr-mngr ~]# systemctl stop postgresql-14
 
-
 [root@cldr-mngr ~]# cd /var/lib/pgsql/14/data/
-
 
 ##### Generate CA-signed certificates for clients to verify with openssl command line tool. 
 ##### Update value for "-days 3650". Currently set for 3650 days = 10 years.
 
-
 ##### create a certificate signing request (CSR) and a public/private key file
 [root@cldr-mngr data]# openssl req -new -nodes -text -out root.csr -keyout root.key -subj '/C=US/ST=California/L=Santa Clara/O=Cloudera Inc/OU=CLDR/CN=cldr-mngr.cldrsetup.local'
-
 
 ##### Output for above command
 [root@cldr-mngr data]# ls -ltr root*
@@ -3714,9 +3702,7 @@ total 8
 -rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
 [root@cldr-mngr data]# 
 
-
 [root@cldr-mngr data]# chmod 400 root.key
-
 
 [root@cldr-mngr data]# ls -ltr root*
 total 8
@@ -3724,12 +3710,10 @@ total 8
 -rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
 [root@cldr-mngr data]# 
 
-
 ##### create a root certificate authority
 [root@cldr-mngr data]# openssl x509 -req -in root.csr -text -days 3650 -extfile /etc/ssl/openssl.cnf -extensions v3_ca -signkey root.key -out root.crt
 Certificate request self-signature ok
 subject=C = US, ST = California, L = Santa Clara, O = Cloudera Inc, OU = CLDR, CN = cldr-mngr.cldrsetup.local
-
 
 [root@cldr-mngr data]# ls -l
 total 16
@@ -3738,10 +3722,8 @@ total 16
 -rw-r--r-- 1 root root 4592 Jun  3 07:46 root.crt
 [root@cldr-mngr data]# 
 
-
 # create a server certificate signed by the new root certificate authority
 [root@cldr-mngr data]# openssl req -new -nodes -text -out server.csr -keyout server.key -subj "/CN=cldr-mngr.cldrsetup.local" 
-
 
 [root@cldr-mngr data]# ls -ltr root* server*
 total 24
@@ -3752,9 +3734,7 @@ total 24
 -rw-r--r-- 1 root root 3388 Jun  3 07:47 server.csr
 [root@cldr-mngr data]#
 
-
 [root@cldr-mngr data]# chmod 400 server.key 
-
 
 [root@cldr-mngr data]# ls -ltr root* server*
 total 24
@@ -3765,11 +3745,9 @@ total 24
 -rw-r--r-- 1 root root 3388 Jun  3 07:47 server.csr
 [root@cldr-mngr data]# 
 
-
 [root@cldr-mngr data]# openssl x509 -req -in server.csr -text -days 3650 -CA root.crt -CAkey root.key -CAcreateserial -out server.crt
 Certificate request self-signature ok
 subject=CN = cldr-mngr.cldrsetup.local
-
 
 [root@cldr-mngr data]# ls -ltr root* server*
 total 32
@@ -3782,12 +3760,9 @@ total 32
 -rw-r--r-- 1 root root 3933 Jun  3 07:51 server.crt
 [root@cldr-mngr data]# 
 
-
 ##### The above steps will create a server.crt and server.key file in that location.
 
-
 [root@cldr-mngr data]# chown postgres:postgres server.crt server.key root.crt
-
 
 ##### Artifacts generated from above command:
 [root@cldr-mngr data]# ls -l server\.* root\.*
@@ -3799,7 +3774,6 @@ total 32
 -rw-r--r--. 1 root     root     3388 Aug  9 14:35 server.csr
 -r--------. 1 postgres postgres 1704 Aug  9 14:35 server.key
 [root@cldr-mngr data]# 
-
 
 ##### Verify Key and Certs generated fine
 [root@cldr-mngr data]# openssl rsa -noout -text -in server.key
@@ -3834,7 +3808,6 @@ privateExponent:
 ———
 ———
 
-
 [root@cldr-mngr data]# openssl x509 -noout -text -in server.crt
 Certificate:
     Data:
@@ -3859,11 +3832,9 @@ Certificate:
 ———
 ———
 
-
 # Correct permissions for the private key file
 [root@cldr-mngr data]# chmod 644 server.crt root.crt
 [root@cldr-mngr data]# chmod 0600 /var/lib/pgsql/14/data/server.key
-
 
 ##### Edit Configuration file for PostgreSQL (postgresql.conf) to enable SSL 
 [root@cldr-mngr data]# cat <<EOF >> /var/lib/pgsql/14/data/postgresql.conf
@@ -3873,15 +3844,12 @@ ssl_cert_file = 'server.crt'
 ssl_key_file = 'server.key'
 EOF
 
-
 # Find the location of the private key file, typically in the data directory
 [root@cldr-mngr data]# ls -l /var/lib/pgsql/14/data/server.key
-
 
 ##### Restart PostgreSQL database service to pick up the SSL related configuration changes and verify login with SSL
 [root@cldr-mngr data]# systemctl restart postgresql-14.service
 [root@cldr-mngr data]# systemctl status postgresql-14.service -l
-
 
 [root@cldr-mngr data]# psql -h cldr-mngr.cldrsetup.local -d postgres -U postgres
 Password for user postgres: <postgres>
@@ -3889,20 +3857,17 @@ psql (14.13)
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
 Type "help" for help.
 
-
 postgres=# SELECT * FROM pg_stat_ssl;
   pid  | ssl | version |         cipher         | bits | client_dn | client_serial | issuer_dn
 -------+-----+---------+------------------------+------+-----------+---------------+-----------
  43895 | t   | TLSv1.3 | TLS_AES_256_GCM_SHA384 |  256 |           |               |
 (1 row)
 
-
 postgres=# SHOW ssl;
  ssl
 -----
  on
 (1 row)
-
 
 postgres=#
 ##### Verify SSL is actually applied for DB 
@@ -3929,24 +3894,19 @@ postgres-#
 (15 rows)
 postgres-# \q
 
-
 ##### Copy /var/lib/pgsql/14/data/root.crt to /root/.postgresql/root.crt
 [root@cldr-mngr data]# mkdir -p /root/.postgresql/
 [root@cldr-mngr data]# cp /var/lib/pgsql/14/data/root.crt /root/.postgresql/root.crt
 
-
 ##### Copy the root.crt to all other hosts with the help of ansible, for this copy the root.crt file to ipaserver/ansible control node
 [root@cldr-mngr data]# scp -r /root/.postgresql/root.crt root@ipaserver:~/
 
-
 ##### Login to ipaserver and copy the root.crt Postgres DB certificate file to all other nodes  at location /root/.postgresql/ with the help of ansible.
-
 
 [root@ipaserver ~]# ls -l
 [root@ipaserver ~]# chmod 644 root.crt
 [root@ipaserver ~]# ansible all -m shell -a "mkdir -p /root/.postgresql/ && chmod -R 755 /root/.postgresql/"
 [root@ipaserver ~]# ansible all -m copy -a "src=root.crt dest=/root/.postgresql/root.crt"
-
 
 [root@cldr-mngr data]# psql -h cldr-mngr.cldrsetup.local -p 5432 -U postgres "dbname=postgres sslmode=verify-full"
 Password for user postgres: 
@@ -3955,7 +3915,6 @@ SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, co
 Type "help" for help.
 postgres=# 
 postgres=# \q
-
 
 [root@cldr-mngr data]# psql -h cldr-mngr.cldrsetup.local -p 5432 -U postgres "dbname=postgres sslmode=verify-ca"
 Password for user postgres: 
