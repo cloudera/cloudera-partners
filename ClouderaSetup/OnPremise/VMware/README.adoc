@@ -3632,489 +3632,340 @@ jit = off
 
 *Step 11.* Start the PostgreSQL Server and configure it to start at boot.
 
-[root@cldr-mngr ~]#* systemctl start postgresql-14.service
-
-[root@cldr-mngr ~]#* systemctl enable postgresql-14.service
-
-[root@cldr-mngr ~]#* systemctl status postgresql-14.service -l
-
-[root@cldr-mngr ~]#* netstat -ltnupa | grep LIST | grep -E '5432|postgres'
+[source,bash]
+----
+[root@cldr-mngr ~]# systemctl start postgresql-14.service
+[root@cldr-mngr ~]# systemctl enable postgresql-14.service
+[root@cldr-mngr ~]# systemctl status postgresql-14.service -l
+[root@cldr-mngr ~]# netstat -ltnupa | grep LIST | grep -E '5432|postgres'
+----
 
 *Step 12.* Create or verify login
 
+[source,bash]
+----
 [root@cldr-mngr ~]# sudo -u postgres psql
-
 could not change directory to "/root": Permission denied
-
 psql (14.13)
-
 Type "help" for help.
 
 postgres=# ALTER USER postgres PASSWORD 'postgres';
-
 ALTER ROLE
-
 postgres=# \q
 
 [root@cldr-mngr ~]# psql -h cldr-mngr.cldrsetup.local -d postgres -U postgres
-
 Password for user postgres:
-
 psql (14.13)
-
 Type "help" for help.
 
 postgres=#\q
+----
 
 *Step 13.* Enable TLS 1.2 for PostgreSQL database before setting up Cloudera Manager.
 
+[source,bash]
+----
 ##### Verify TLS is enabled or not:
-
 [root@cldr-mngr ~]# sudo -u postgres psql
-
 could not change directory to "/root": Permission denied
-
 psql (14.13)
-
 Type "help" for help.
 
+
 postgres=# SELECT * FROM pg_stat_ssl;
-
-pid | ssl | version | cipher | bits | client_dn | client_serial | issuer_dn
-
--------{plus}-----{plus}---------{plus}--------{plus}------{plus}-----------{plus}---------------{plus}-----------
-
-41275 | f | | | | | |
-
+  pid  | ssl | version | cipher | bits | client_dn | client_serial | issuer_dn
+-------+-----+---------+--------+------+-----------+---------------+-----------
+ 41275 | f   |         |        |      |           |               |
 (1 row)
+
 
 postgres=# SHOW ssl;
-
-ssl
-
+ ssl
 -----
-
-off
-
+ off
 (1 row)
 
+
 postgres=# \q
+
 
 [root@cldr-mngr ~]# sudo dnf install -y mod_ssl
 
-##### Stop Postgres DB service.
 
+##### Stop Postgres DB service. 
 [root@cldr-mngr ~]# systemctl stop postgresql-14
+
 
 [root@cldr-mngr ~]# cd /var/lib/pgsql/14/data/
 
-##### Generate CA-signed certificates for clients to verify with openssl command line tool.
 
+##### Generate CA-signed certificates for clients to verify with openssl command line tool. 
 ##### Update value for "-days 3650". Currently set for 3650 days = 10 years.
 
-##### create a certificate signing request (CSR) and a public/private key file
 
+##### create a certificate signing request (CSR) and a public/private key file
 [root@cldr-mngr data]# openssl req -new -nodes -text -out root.csr -keyout root.key -subj '/C=US/ST=California/L=Santa Clara/O=Cloudera Inc/OU=CLDR/CN=cldr-mngr.cldrsetup.local'
 
+
 ##### Output for above command
-
 [root@cldr-mngr data]# ls -ltr root*
-
 total 8
+-rw------- 1 root root 1704 Jun  3 07:43 root.key
+-rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
+[root@cldr-mngr data]# 
 
--rw------- 1 root root 1704 Jun 3 07:43 root.key
-
--rw-r--r-- 1 root root 3589 Jun 3 07:43 root.csr
-
-[root@cldr-mngr data]#
 
 [root@cldr-mngr data]# chmod 400 root.key
 
+
 [root@cldr-mngr data]# ls -ltr root*
-
 total 8
+-r-------- 1 root root 1704 Jun  3 07:43 root.key
+-rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
+[root@cldr-mngr data]# 
 
--r-------- 1 root root 1704 Jun 3 07:43 root.key
-
--rw-r--r-- 1 root root 3589 Jun 3 07:43 root.csr
-
-[root@cldr-mngr data]#
 
 ##### create a root certificate authority
-
 [root@cldr-mngr data]# openssl x509 -req -in root.csr -text -days 3650 -extfile /etc/ssl/openssl.cnf -extensions v3_ca -signkey root.key -out root.crt
-
 Certificate request self-signature ok
-
 subject=C = US, ST = California, L = Santa Clara, O = Cloudera Inc, OU = CLDR, CN = cldr-mngr.cldrsetup.local
 
+
 [root@cldr-mngr data]# ls -l
-
 total 16
+-r-------- 1 root root 1704 Jun  3 07:43 root.key
+-rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
+-rw-r--r-- 1 root root 4592 Jun  3 07:46 root.crt
+[root@cldr-mngr data]# 
 
--r-------- 1 root root 1704 Jun 3 07:43 root.key
-
--rw-r--r-- 1 root root 3589 Jun 3 07:43 root.csr
-
--rw-r--r-- 1 root root 4592 Jun 3 07:46 root.crt
-
-[root@cldr-mngr data]#
 
 # create a server certificate signed by the new root certificate authority
+[root@cldr-mngr data]# openssl req -new -nodes -text -out server.csr -keyout server.key -subj "/CN=cldr-mngr.cldrsetup.local" 
 
-[root@cldr-mngr data]# openssl req -new -nodes -text -out server.csr -keyout server.key -subj "/CN=cldr-mngr.cldrsetup.local"
-
-[root@cldr-mngr data]# ls -ltr root* server*
-
-total 24
-
--r-------- 1 root root 1704 Jun 3 07:43 root.key
-
--rw-r--r-- 1 root root 3589 Jun 3 07:43 root.csr
-
--rw-r--r-- 1 root root 4592 Jun 3 07:46 root.crt
-
--rw------- 1 root root 1704 Jun 3 07:47 server.key
-
--rw-r--r-- 1 root root 3388 Jun 3 07:47 server.csr
-
-[root@cldr-mngr data]#
-
-[root@cldr-mngr data]# chmod 400 server.key
 
 [root@cldr-mngr data]# ls -ltr root* server*
-
 total 24
-
--r-------- 1 root root 1704 Jun 3 07:43 root.key
-
--rw-r--r-- 1 root root 3589 Jun 3 07:43 root.csr
-
--rw-r--r-- 1 root root 4592 Jun 3 07:46 root.crt
-
--r-------- 1 root root 1704 Jun 3 07:47 server.key
-
--rw-r--r-- 1 root root 3388 Jun 3 07:47 server.csr
-
+-r-------- 1 root root 1704 Jun  3 07:43 root.key
+-rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
+-rw-r--r-- 1 root root 4592 Jun  3 07:46 root.crt
+-rw------- 1 root root 1704 Jun  3 07:47 server.key
+-rw-r--r-- 1 root root 3388 Jun  3 07:47 server.csr
 [root@cldr-mngr data]#
+
+
+[root@cldr-mngr data]# chmod 400 server.key 
+
+
+[root@cldr-mngr data]# ls -ltr root* server*
+total 24
+-r-------- 1 root root 1704 Jun  3 07:43 root.key
+-rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
+-rw-r--r-- 1 root root 4592 Jun  3 07:46 root.crt
+-r-------- 1 root root 1704 Jun  3 07:47 server.key
+-rw-r--r-- 1 root root 3388 Jun  3 07:47 server.csr
+[root@cldr-mngr data]# 
+
 
 [root@cldr-mngr data]# openssl x509 -req -in server.csr -text -days 3650 -CA root.crt -CAkey root.key -CAcreateserial -out server.crt
-
 Certificate request self-signature ok
-
 subject=CN = cldr-mngr.cldrsetup.local
 
+
 [root@cldr-mngr data]# ls -ltr root* server*
-
 total 32
+-r-------- 1 root root 1704 Jun  3 07:43 root.key
+-rw-r--r-- 1 root root 3589 Jun  3 07:43 root.csr
+-rw-r--r-- 1 root root 4592 Jun  3 07:46 root.crt
+-r-------- 1 root root 1704 Jun  3 07:47 server.key
+-rw-r--r-- 1 root root 3388 Jun  3 07:47 server.csr
+-rw-r--r-- 1 root root   41 Jun  3 07:51 root.srl
+-rw-r--r-- 1 root root 3933 Jun  3 07:51 server.crt
+[root@cldr-mngr data]# 
 
--r-------- 1 root root 1704 Jun 3 07:43 root.key
-
--rw-r--r-- 1 root root 3589 Jun 3 07:43 root.csr
-
--rw-r--r-- 1 root root 4592 Jun 3 07:46 root.crt
-
--r-------- 1 root root 1704 Jun 3 07:47 server.key
-
--rw-r--r-- 1 root root 3388 Jun 3 07:47 server.csr
-
--rw-r--r-- 1 root root 41 Jun 3 07:51 root.srl
-
--rw-r--r-- 1 root root 3933 Jun 3 07:51 server.crt
-
-[root@cldr-mngr data]#
 
 ##### The above steps will create a server.crt and server.key file in that location.
 
+
 [root@cldr-mngr data]# chown postgres:postgres server.crt server.key root.crt
 
+
 ##### Artifacts generated from above command:
-
 [root@cldr-mngr data]# ls -l server\.* root\.*
+-rw-r--r--. 1 postgres postgres 4586 Aug  9 14:34 root.crt
+-rw-r--r--. 1 root     root     3584 Aug  9 14:33 root.csr
+-r--------. 1 root     root     1704 Aug  9 14:33 root.key
+-rw-r--r--. 1 root     root       41 Aug  9 14:37 root.srl
+-rw-r--r--. 1 postgres postgres 3928 Aug  9 14:37 server.crt
+-rw-r--r--. 1 root     root     3388 Aug  9 14:35 server.csr
+-r--------. 1 postgres postgres 1704 Aug  9 14:35 server.key
+[root@cldr-mngr data]# 
 
--rw-r--r--. 1 postgres postgres 4586 Aug 9 14:34 root.crt
-
--rw-r--r--. 1 root root 3584 Aug 9 14:33 root.csr
-
--r--------. 1 root root 1704 Aug 9 14:33 root.key
-
--rw-r--r--. 1 root root 41 Aug 9 14:37 root.srl
-
--rw-r--r--. 1 postgres postgres 3928 Aug 9 14:37 server.crt
-
--rw-r--r--. 1 root root 3388 Aug 9 14:35 server.csr
-
--r--------. 1 postgres postgres 1704 Aug 9 14:35 server.key
-
-[root@cldr-mngr data]#
 
 ##### Verify Key and Certs generated fine
-
 [root@cldr-mngr data]# openssl rsa -noout -text -in server.key
-
 Private-Key: (2048 bit, 2 primes)
-
 modulus:
-
-00:b3:30:86:66:49:8d:c4:de:62:c6:17:e2:50:6c:
-
-88:91:10:49:26:6a:7f:a7:1d:6a:33:3a:71:0d:2c:
-
-f0:08:1b:3d:88:bc:73:43:b9:82:00:1a:a3:15:0f:
-
-08:ed:53:94:be:1e:25:7b:dd:99:66:c0:f5:2d:42:
-
-92:f0:d6:52:67:18:80:ab:a1:86:e1:aa:5c:53:47:
-
-41:3c:e2:2e:e1:dd:f8:5d:b7:e0:d0:39:26:f4:23:
-
-3d:78:71:9f:75:66:a0:0e:c7:9a:bc:c2:fb:db:1b:
-
-d1:fe:b2:2e:5d:a5:72:54:5f:04:54:1a:d8:76:77:
-
-a8:04:9d:05:9a:f6:25:5b:ed:73:88:6b:1a:e6:0f:
-
-09:62:d3:19:07:7c:2b:77:d0:5d:af:c3:bd:ff:44:
-
-7f:a9:08:b9:b2:e3:8c:5a:fd:90:dd:c7:bf:db:1e:
-
-c9:fe:72:16:e2:09:c2:0c:90:de:31:8b:06:58:e8:
-
-6c:37:7a:a4:bf:91:7e:ca:d4:15:60:d8:6f:b7:0b:
-
-e5:a1:5c:a2:30:98:d4:34:9c:69:88:57:f4:d1:b8:
-
-2a:1d:a1:c6:1f:5c:1d:10:56:5a:80:b5:5d:f3:f1:
-
-59:7f:4b:42:2c:82:3d:96:6d:5d:91:88:2a:de:12:
-
-6b:b4:65:f3:9d:c0:b8:02:4b:a6:21:bc:3b:5c:3f:
-
-32:3b
-
+    00:b3:30:86:66:49:8d:c4:de:62:c6:17:e2:50:6c:
+    88:91:10:49:26:6a:7f:a7:1d:6a:33:3a:71:0d:2c:
+    f0:08:1b:3d:88:bc:73:43:b9:82:00:1a:a3:15:0f:
+    08:ed:53:94:be:1e:25:7b:dd:99:66:c0:f5:2d:42:
+    92:f0:d6:52:67:18:80:ab:a1:86:e1:aa:5c:53:47:
+    41:3c:e2:2e:e1:dd:f8:5d:b7:e0:d0:39:26:f4:23:
+    3d:78:71:9f:75:66:a0:0e:c7:9a:bc:c2:fb:db:1b:
+    d1:fe:b2:2e:5d:a5:72:54:5f:04:54:1a:d8:76:77:
+    a8:04:9d:05:9a:f6:25:5b:ed:73:88:6b:1a:e6:0f:
+    09:62:d3:19:07:7c:2b:77:d0:5d:af:c3:bd:ff:44:
+    7f:a9:08:b9:b2:e3:8c:5a:fd:90:dd:c7:bf:db:1e:
+    c9:fe:72:16:e2:09:c2:0c:90:de:31:8b:06:58:e8:
+    6c:37:7a:a4:bf:91:7e:ca:d4:15:60:d8:6f:b7:0b:
+    e5:a1:5c:a2:30:98:d4:34:9c:69:88:57:f4:d1:b8:
+    2a:1d:a1:c6:1f:5c:1d:10:56:5a:80:b5:5d:f3:f1:
+    59:7f:4b:42:2c:82:3d:96:6d:5d:91:88:2a:de:12:
+    6b:b4:65:f3:9d:c0:b8:02:4b:a6:21:bc:3b:5c:3f:
+    32:3b
 publicExponent: 65537 (0x10001)
-
 privateExponent:
-
-12:78:80:8a:1f:af:dc:e8:bd:8e:c4:dc:7f:c4:c8:
-
-49:07:c0:3a:95:04:c6:91:aa:26:50:b2:61:94:cd:
-
-c3:50:27:86:26:42:cd:6a:dc:63:2d:5b:bd:2a:79:
-
-15:99:a5:7d:f9:76:8c:af:99:85:f5:82:f0:60:e9:
-
-eb:a8:74:03:0b:8c:0b:e5:11:15:c6:ed:50:6a:4a:
-
+    12:78:80:8a:1f:af:dc:e8:bd:8e:c4:dc:7f:c4:c8:
+    49:07:c0:3a:95:04:c6:91:aa:26:50:b2:61:94:cd:
+    c3:50:27:86:26:42:cd:6a:dc:63:2d:5b:bd:2a:79:
+    15:99:a5:7d:f9:76:8c:af:99:85:f5:82:f0:60:e9:
+    eb:a8:74:03:0b:8c:0b:e5:11:15:c6:ed:50:6a:4a:
+———
+———
 ———
 
-———
-
-———
 
 [root@cldr-mngr data]# openssl x509 -noout -text -in server.crt
-
 Certificate:
-
-Data:
-
-Version: 1 (0x0)
-
-Serial Number:
-
-40:26:f6:7b:84:d1:ad:30:65:2a:07:df:20:f8:4f:a3:91:0e:09:c7
-
-Signature Algorithm: sha256WithRSAEncryption
-
-Issuer: C = US, ST = California, L = Santa Clara, O = Cloudera Inc, OU = CLDR, CN = cldr-mngr.cldrsetup.local
-
-Validity
-
-Not Before: May 14 06:33:09 2024 GMT
-
-Not After : May 12 06:33:09 2034 GMT
-
-Subject: CN = cldr-mngr.cldrsetup.local
-
-Subject Public Key Info:
-
-Public Key Algorithm: rsaEncryption
-
-Public-Key: (2048 bit)
-
-Modulus:
-
-00:b3:30:86:66:49:8d:c4:de:62:c6:17:e2:50:6c:
-
-88:91:10:49:26:6a:7f:a7:1d:6a:33:3a:71:0d:2c:
-
-f0:08:1b:3d:88:bc:73:43:b9:82:00:1a:a3:15:0f:
-
-08:ed:53:94:be:1e:25:7b:dd:99:66:c0:f5:2d:42:
-
+    Data:
+        Version: 1 (0x0)
+        Serial Number:
+            40:26:f6:7b:84:d1:ad:30:65:2a:07:df:20:f8:4f:a3:91:0e:09:c7
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C = US, ST = California, L = Santa Clara, O = Cloudera Inc, OU = CLDR, CN = cldr-mngr.cldrsetup.local
+        Validity
+            Not Before: May 14 06:33:09 2024 GMT
+            Not After : May 12 06:33:09 2034 GMT
+        Subject: CN = cldr-mngr.cldrsetup.local
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:b3:30:86:66:49:8d:c4:de:62:c6:17:e2:50:6c:
+                    88:91:10:49:26:6a:7f:a7:1d:6a:33:3a:71:0d:2c:
+                    f0:08:1b:3d:88:bc:73:43:b9:82:00:1a:a3:15:0f:
+                    08:ed:53:94:be:1e:25:7b:dd:99:66:c0:f5:2d:42:
+———
+———
 ———
 
-———
-
-———
 
 # Correct permissions for the private key file
-
 [root@cldr-mngr data]# chmod 644 server.crt root.crt
-
 [root@cldr-mngr data]# chmod 0600 /var/lib/pgsql/14/data/server.key
 
-##### Edit Configuration file for PostgreSQL (postgresql.conf) to enable SSL
 
+##### Edit Configuration file for PostgreSQL (postgresql.conf) to enable SSL 
 [root@cldr-mngr data]# cat <<EOF >> /var/lib/pgsql/14/data/postgresql.conf
-
 ssl = on
-
 ssl_ca_file = 'root.crt'
-
 ssl_cert_file = 'server.crt'
-
 ssl_key_file = 'server.key'
+EOF
 
-*EOF
 
 # Find the location of the private key file, typically in the data directory
+[root@cldr-mngr data]# ls -l /var/lib/pgsql/14/data/server.key
 
-[root@cldr-mngr data]#* ls -l /var/lib/pgsql/14/data/server.key
 
 ##### Restart PostgreSQL database service to pick up the SSL related configuration changes and verify login with SSL
-
 [root@cldr-mngr data]# systemctl restart postgresql-14.service
-
 [root@cldr-mngr data]# systemctl status postgresql-14.service -l
 
+
 [root@cldr-mngr data]# psql -h cldr-mngr.cldrsetup.local -d postgres -U postgres
-
-Password for user postgres: *_<postgres>_
-
+Password for user postgres: <postgres>
 psql (14.13)
-
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
-
 Type "help" for help.
+
 
 postgres=# SELECT * FROM pg_stat_ssl;
-
-pid | ssl | version | cipher | bits | client_dn | client_serial | issuer_dn
-
--------{plus}-----{plus}---------{plus}------------------------{plus}------{plus}-----------{plus}---------------{plus}-----------
-
-43895 | t | TLSv1.3 | TLS_AES_256_GCM_SHA384 | 256 | | |
-
+  pid  | ssl | version |         cipher         | bits | client_dn | client_serial | issuer_dn
+-------+-----+---------+------------------------+------+-----------+---------------+-----------
+ 43895 | t   | TLSv1.3 | TLS_AES_256_GCM_SHA384 |  256 |           |               |
 (1 row)
+
 
 postgres=# SHOW ssl;
-
-ssl
-
+ ssl
 -----
-
-on
-
+ on
 (1 row)
 
+
 postgres=#
-
-*##### Verify SSL is actually applied for DB
-
+##### Verify SSL is actually applied for DB 
 postgres=# SELECT name, setting FROM pg_settings WHERE name LIKE '%ssl%';
-
-postgres-#
-
-postgres-#
-
-name | setting
-
-----------------------------------------{plus}--------------------------
-
-ssl | on
-
-ssl_ca_file | root.crt
-
-ssl_cert_file | server.crt
-
-ssl_ciphers | HIGH:MEDIUM:{plus}3DES:!aNULL
-
-ssl_crl_dir |
-
-ssl_crl_file |
-
-ssl_dh_params_file |
-
-ssl_ecdh_curve | prime256v1
-
-ssl_key_file | server.key
-
-ssl_library | OpenSSL
-
-ssl_max_protocol_version |
-
-ssl_min_protocol_version | TLSv1.2
-
-ssl_passphrase_command |
-
-ssl_passphrase_command_supports_reload | off
-
-ssl_prefer_server_ciphers | on
-
+postgres-# 
+postgres-# 
+                  name                  |         setting
+----------------------------------------+--------------------------
+ ssl                                    | on
+ ssl_ca_file                            | root.crt
+ ssl_cert_file                          | server.crt
+ ssl_ciphers                            | HIGH:MEDIUM:+3DES:!aNULL
+ ssl_crl_dir                            |
+ ssl_crl_file                           |
+ ssl_dh_params_file                     |
+ ssl_ecdh_curve                         | prime256v1
+ ssl_key_file                           | server.key
+ ssl_library                            | OpenSSL
+ ssl_max_protocol_version               |
+ ssl_min_protocol_version               | TLSv1.2
+ ssl_passphrase_command                 |
+ ssl_passphrase_command_supports_reload | off
+ ssl_prefer_server_ciphers              | on
 (15 rows)
-
 postgres-# \q
 
+
 ##### Copy /var/lib/pgsql/14/data/root.crt to /root/.postgresql/root.crt
-
 [root@cldr-mngr data]# mkdir -p /root/.postgresql/
-
 [root@cldr-mngr data]# cp /var/lib/pgsql/14/data/root.crt /root/.postgresql/root.crt
 
-##### Copy the root.crt to all other hosts with the help of ansible, for this copy the root.crt file to ipaserver/ansible control node
 
+##### Copy the root.crt to all other hosts with the help of ansible, for this copy the root.crt file to ipaserver/ansible control node
 [root@cldr-mngr data]# scp -r /root/.postgresql/root.crt root@ipaserver:~/
 
-##### Login to ipaserver and copy the root.crt Postgres DB certificate file to all other nodes at location /root/.postgresql/ with the help of ansible.
+
+##### Login to ipaserver and copy the root.crt Postgres DB certificate file to all other nodes  at location /root/.postgresql/ with the help of ansible.
+
 
 [root@ipaserver ~]# ls -l
-
 [root@ipaserver ~]# chmod 644 root.crt
-
 [root@ipaserver ~]# ansible all -m shell -a "mkdir -p /root/.postgresql/ && chmod -R 755 /root/.postgresql/"
-
 [root@ipaserver ~]# ansible all -m copy -a "src=root.crt dest=/root/.postgresql/root.crt"
 
+
 [root@cldr-mngr data]# psql -h cldr-mngr.cldrsetup.local -p 5432 -U postgres "dbname=postgres sslmode=verify-full"
-
-Password for user postgres:
-
+Password for user postgres: 
 psql (14.13)
-
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
-
 Type "help" for help.
-
-postgres=#
-
+postgres=# 
 postgres=# \q
+
 
 [root@cldr-mngr data]# psql -h cldr-mngr.cldrsetup.local -p 5432 -U postgres "dbname=postgres sslmode=verify-ca"
-
-Password for user postgres:
-
+Password for user postgres: 
 psql (14.13)
-
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
-
 Type "help" for help.
-
-postgres=#
-
+postgres=# 
 postgres=# \q
-
-[root@cldr-mngr data]#
+[root@cldr-mngr data]# 
+----
 
 *Step 14.* Create databases and service accounts for components that require databases. Following components requires databases: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-required-databases.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-required-databases.html#] https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-configuring-starting-postgresql-server.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-configuring-starting-postgresql-server.html#]
 
