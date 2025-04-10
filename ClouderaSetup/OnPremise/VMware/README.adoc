@@ -56,7 +56,7 @@ link:#pvc-data-service-ecs-cluster-with-cml-we-will-be-installing-a-4-node-clust
 
 link:#pvc-data-service-ecs-cluster-with-cde-we-will-be-installing-a-4-node-cluster-on-vms[[.underline]#PvC Data Service (ECS) Cluster with CDE: we will be installing a 4-node cluster on VMs:#]
 
-link:#pvc-data-serviceecs-cluster-with-cdwcdecml-we-will-be-installing-a-11-node-cluster-on-vms[[.underline]#PvC Data Service(ECS) Cluster with CDW{plus}CDE{plus}CML: we will be installing a 11-node cluster on VMs:#]
+link:#pvc-data-serviceecs-cluster-with-cdwcdecml-we-will-be-installing-a-11-node-cluster-on-vms[[.underline]#PvC Data Service(ECS) Cluster with CDW+CDE+CML: we will be installing a 11-node cluster on VMs:#]
 
 link:#reference-architecture[[.underline]#Reference Architecture#]
 
@@ -390,7 +390,7 @@ The external DNS server is expected to be ready prior to installing the CDP Priv
 
 image:extracted-media/media/image44.png[extracted-media/media/image44,width=445,height=211]
 
-*Kerberos {plus} LDAP Server/AD {plus} Certificate (Required only, in case we are not going with FreeIPA)
+*Kerberos + LDAP Server/AD + Certificate (Required only, in case we are not going with FreeIPA)
 
 An external Kerberos server and the Kerberos key distribution center (KDC) (with a realm established) must be available to provide authentication to CDP services, users and hosts.
 
@@ -426,7 +426,7 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 [width="100%",cols="27%,14%,8%,9%,15%,27%",options="header",]
 |===
 |*Role* |*HostName* |*CPU* |*RAM* |*Disk* |*Partitions
-|ipaserver{plus}ansible-controller |ipaserver |16 |32GB |OS disk (250GB) |large root partition
+|ipaserver+ansible-controller |ipaserver |16 |32GB |OS disk (250GB) |large root partition
 |cldr-mngr, postgres db, bits |cldr-mngr |32 |64GB |1.5TB a|
 large root partition, /var=600GB
 
@@ -464,13 +464,13 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 |===
 |*Role* |*HostName* |*CPU* |*RAM* |*Disk* |*Partitions
 |*ECS DS CLUSTER* |*CDW* | | | |
-|ECS-Master |pvcecs-master |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
-|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
-|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
-|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
-|ECS-Worker |pvcecs-worker4 |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
-|ECS-Worker |pvcecs-worker5 |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
-|ECS-Worker |pvcecs-worker6 |32 |128GB |root partition {plus} 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Master |pvcecs-master |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Worker |pvcecs-worker4 |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Worker |pvcecs-worker5 |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
+|ECS-Worker |pvcecs-worker6 |32 |128GB |root partition + 2.3TB |/cdwdata 500GB, /docker 400GB, /lhdata 1TB, /var 400GB
 |===
 
 === PvC Data Service (ECS) Cluster with CML: we will be installing a 4-node cluster on VMs:
@@ -483,10 +483,10 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 |===
 |*Role* |*HostName* |*CPU* |*RAM* |*Disk* |*Partitions
 |*ECS DS CLUSTER* |*CML* | | | |
-|ECS-Master |pvcecs-master |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB *{plus} 1000GB NFS
-|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
-|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
-|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Master |pvcecs-master |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB *+ 1000GB NFS
+|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
 |===
 
 === PvC Data Service (ECS) Cluster with CDE: we will be installing a 4-node cluster on VMs:
@@ -499,14 +499,14 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 |===
 |*Role* |*HostName* |*CPU* |*RAM* |*Disk* |*Partitions
 |*ECS DS CLUSTER* |*CDE* | | | |
-|ECS-Master |pvcecs-master |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB *{plus} 500GB NFS
-|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
-|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
-|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
-|ECS-Worker |pvcecs-worker4 |32 |128GB |root partition {plus} 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Master |pvcecs-master |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB *+ 500GB NFS
+|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
+|ECS-Worker |pvcecs-worker4 |32 |128GB |root partition + 2.6TB |/docker 400GB, /lhdata 1.5TB, /var 400GB
 |===
 
-=== PvC Data Service(ECS) Cluster with CDW{plus}CDE{plus}CML: we will be installing a 11-node cluster on VMs:
+=== PvC Data Service(ECS) Cluster with CDW+CDE+CML: we will be installing a 11-node cluster on VMs:
 
 ** Specs upgraded for concurrent tests and higher data volume tests and assumes all 3 services will be deployed (CDW, CDE, CML)
 
@@ -519,18 +519,18 @@ https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc
 [width="99%",cols="14%,14%,5%,7%,16%,44%",options="header",]
 |===
 |*Role* |*HostName* |*CPU* |*RAM* |*Disk* |*Partitions
-|*ECS DS CLUSTER* |*CML{plus}CDW{plus}CDE* | | | |*{plus} 1500GB NFS
-|ECS-Master |pvcecs-master |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker4 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker5 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker6 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker7 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker8 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker9 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
-|ECS-Worker |pvcecs-worker10 |32 |128GB |root partition {plus} 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|*ECS DS CLUSTER* |*CML+CDW+CDE* | | | |*+ 1500GB NFS
+|ECS-Master |pvcecs-master |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker1 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker2 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker3 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker4 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker5 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker6 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker7 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker8 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker9 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
+|ECS-Worker |pvcecs-worker10 |32 |128GB |root partition + 2TB |/cdwdata 400GB, /docker 400GB, /lhdata 600GB, /var 400GB
 |===
 
 == Reference Architecture
@@ -884,7 +884,7 @@ ____
 
 a|
 ____
-ipaserver (OR Existing LDAP/AD {plus} DNS {plus} Kerberos {plus} KDC)
+ipaserver (OR Existing LDAP/AD + DNS + Kerberos + KDC)
 ____
 
 a|
@@ -1504,7 +1504,7 @@ image:extracted-media/media/image23.png[klist verify,width=624,height=184]
 ----
 
 ##### Access the below URL on browser, and the IPA Admin console will open.
-https://ipaserver.cdppvcds.com/ipa/ui/[[.underline]#https://ipaserver.cldrsetup.local/ipa/ui/#]
+https://ipaserver.cldrsetup.local/ipa/ui/[[.underline]#https://ipaserver.cldrsetup.local/ipa/ui/#]
 
 [arabic, start=4]
 . You will see below WebUI for IPAServer Administration. Enter the same admin credentials used for CLI authentication: *_(i.e. admin/vmware123)_
@@ -1558,7 +1558,7 @@ _*(NA in AWS EC2, need to be done manually, as right now password based authenti
 [root@ipaserver ~]# cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 
 ##### copy the entire .ssh directory to all NODES
-[root@ipaserver ~]# scp -r /root/.ssh mailto:root@cldr-mngr.cdppvcds.com[[.underline]#root@cldr-mngr.cldrsetup.local#]:/root/.
+[root@ipaserver ~]# scp -r /root/.ssh mailto:root@cldr-mngr.cldrsetup.local[[.underline]#root@cldr-mngr.cldrsetup.local#]:/root/.
 
 ##### (provide root user password when prompted)
 ##### Download the id_rsa and id_rsa.pub to your local machine by either using scp or sftp (as it will be required later)
@@ -2571,10 +2571,10 @@ Disabling Transparent Huge Pages (THP) reduces elevated CPU usage caused by THP.
 
 ##### Append the content of file thp_disable to /etc/rc.d/rc.local:
 [root@ipaserver ~]# ansible all -m shell -a "cat /root/thp_disable >> /etc/rc.d/rc.local"
-[root@ipaserver ~]# ansible all -m shell -a "chmod {plus}x /etc/rc.d/rc.local"
+[root@ipaserver ~]# ansible all -m shell -a "chmod +x /etc/rc.d/rc.local"
 [root@ipaserver ~]# ansible all -m shell -a "cat /etc/rc.d/rc.local"
 #!/bin/bash
-# Please note that you must run 'chmod {plus}x /etc/rc.d/rc.local' to ensure
+# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure
 # that this script will be executed during boot.
 touch /var/lock/subsys/local
 # Disable Transparent Huge Pages
@@ -4320,7 +4320,7 @@ image:extracted-media/media/image3.png[extracted-media/media/image3,width=657,he
 
 [root@ipaserver ~]# kinit admin@CLDRSETUP.LOCAL
 
-Password for mailto:admin@CDPPVCDS.COM[[.underline]#admin@CLDRSETUP.LOCAL#]: *_<vmware123>_
+Password for mailto:admin@cldrsetup.local[[.underline]#admin@CLDRSETUP.LOCAL#]: *_<vmware123>_
 
 [root@ipaserver ~]# klist -e
 
@@ -4342,7 +4342,7 @@ renew until 03/12/2024 21:35:07
 ##### Setup the *_Cloudera Management Services_* (need rman DB details), it will start service monitor and other services and enable charts view. If *_Cloudera Management Services_* are not installed/ enabled or not working properly, status of hosts, or installed services will not be updated on CM-UI.
 
 [loweralpha]
-. *Go to —> WebUI -> Top Right Corner -> ({plus})Add -> Add Cloudera Management Service
+. *Go to —> WebUI -> Top Right Corner -> (+)Add -> Add Cloudera Management Service
 
 image:extracted-media/media/image35.png[extracted-media/media/image35,width=585,height=317]
 
@@ -4607,7 +4607,7 @@ In this step, we will setup the Base cluster which will serve as the DataLake fo
 . Install Cloudera Private Cloud Base using the Cloudera Manager WebUI
 
 [arabic]
-. In Cloudera Manager, on the top right corner, click *_({plus}) Add > Add Cluster_*. The Select Cluster Type page appears.
+. In Cloudera Manager, on the top right corner, click *_(+) Add > Add Cluster_*. The Select Cluster Type page appears.
 
 image:extracted-media/media/image74.png[extracted-media/media/image74,width=316,height=149]
 
@@ -4869,7 +4869,7 @@ image:extracted-media/media/image188.png[A screenshot of a computer Description 
 [arabic, start=17]
 . Click *_Continue_*.
 
-===== [.underline]#Private Cloud Base Cluster (Data Lake/Control Plane) Creation#
+=== [.underline]#Private Cloud Base Cluster (Data Lake/Control Plane) Creation#
 
 [arabic, start=18]
 . After the Private Cloud Base Cluster (runtime) setup is complete, if successful, it will automatically move to add services *_(Add Cluster -Configuration)_* wizard. It will ask to *_Select Services_* i.e. (a) Data Engineering, (b) Data Warehouse/ Data Mart, © Operational Database specific or (d) Custom control plane/base cluster services i.e. HDFS, YARN, Hive, Tez, HiveOnTez, Ozone, Zookeeper, Kafka, SOLR, Ranger, Atlas, HBase, Phoenix, Impala, HUE, Spark2, Spark3, YARN Queue Manager etc. Choose from a combination or services defined or select custom services. Services required based on selection will be automatically added.
@@ -5277,19 +5277,13 @@ ansible datanodes -m shell -a "sed -i 's#aHRUaTqoQzOpGf8qA5bXlQ#rxsV4DwNRvWtIcl5
 *Service NodeManager failed in state INITED
 
 org.apache.hadoop.yarn.exceptions.YarnRuntimeException: Failed NodeManager login
-
 at org.apache.hadoop.yarn.server.nodemanager.NodeManager.serviceInit(NodeManager.java:511)
-
 at org.apache.hadoop.service.AbstractService.init(AbstractService.java:164)
-
 at org.apache.hadoop.yarn.server.nodemanager.NodeManager.initAndStartNodeManager(NodeManager.java:974)
-
 at org.apache.hadoop.yarn.server.nodemanager.NodeManager.main(NodeManager.java:1054)
-
 Caused by: org.apache.hadoop.security.KerberosAuthException: failure to login: for principal: yarn/pvcbase-worker3.cldrsetup.local@CLDRSETUP.LOCAL from keytab yarn.keytab javax.security.auth.login.LoginException: Client not found in Kerberos database (6) - CLIENT_NOT_FOUND
 
 *Solution:
-
 Regenerate kerberos creds from administration>security for yarn
 
 *==========================================================================================================
@@ -5309,7 +5303,6 @@ Fixed it by deleting /var/lib/cloudera-scm-agent/cm_guid on each node.
 *Chrony issue on during ipaserver/ipaclient installation
 
 *Solution:
-
 Stop chrnoyd and remove chrony from all hosts, then install ipa-server and then ipa-client. It will work.
 
 *==========================================================================================================
@@ -5317,27 +5310,20 @@ Stop chrnoyd and remove chrony from all hosts, then install ipa-server and then 
 *Rman db error
 
 Exception while executing ddl scripts.
-
 org.postgresql.util.PSQLException: ERROR: relation "rman_usergrouphistory_seq" already exists
-
 at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2725)
-
 at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2412)
 
 *Solution:
-
 drop and recreate db solved issues.
 
 *==========================================================================================================
 
 *Ozone Error:
-
 Found SOLR_SERVICE: ''
 
 *solution:
-
 ozone install error
-
 include solr in service dependency and restart services
 
 *==========================================================================================================
@@ -5345,19 +5331,15 @@ include solr in service dependency and restart services
 *Issue: IPASERVER failed to resolve DNS ipaservices not working
 
 *Solution:
-
 Port 53 was not open on AWS SecGrp: ipaserver was not working on aws due to it,
-
 updated secgrp added 53 rule for dns fixed issue.
 
 *==========================================================================================================
 
 *Ranger Error:
-
 Repo cm_kafka already exists ->
 
 *Solution:
-
 delete cm_kafka from ranger
 
 *==========================================================================================================
@@ -5370,54 +5352,33 @@ delete cm_kafka from ranger
 
 2024-05-14 04:41:02,379 INFO CommandPusher-1:com.cloudera.cmf.service.AbstractDbConnectionTestCommand: Command exited with code: 1
 
-2024-05-14 04:41:02,379 INFO CommandPusher-1:com.cloudera.cmf.service.AbstractDbConnectionTestCommand: {plus} MGMT_JAVA_OPTS='-Djava.net.preferIPv4Stack=true '
+2024-05-14 04:41:02,379 INFO CommandPusher-1:com.cloudera.cmf.service.AbstractDbConnectionTestCommand: + MGMT_JAVA_OPTS='-Djava.net.preferIPv4Stack=true '
 
-{plus} exec /usr/lib/jvm/java-17-openjdk-17.0.11.0.9-2.el9.x86_64/bin/java -Djava.net.preferIPv4Stack=true -Djava.security.egd=file:///dev/urandom -cp '/run/cloudera-scm-agent/process/1546336334-MGMT.REPORTSMANAGER-test-db-connection:/usr/share/java/mysql-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/opt/cloudera/cm/lib/*' com.cloudera.enterprise.dbutil.DbCommandExecutor db.properties
++ exec /usr/lib/jvm/java-17-openjdk-17.0.11.0.9-2.el9.x86_64/bin/java -Djava.net.preferIPv4Stack=true -Djava.security.egd=file:///dev/urandom -cp '/run/cloudera-scm-agent/process/1546336334-MGMT.REPORTSMANAGER-test-db-connection:/usr/share/java/mysql-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/opt/cloudera/cm/lib/*' com.cloudera.enterprise.dbutil.DbCommandExecutor db.properties
 
 Exception in thread "main" java.lang.NoClassDefFoundError: com/ongres/scram/common/stringprep/StringPreparation
-
 at org.postgresql.core.v3.ConnectionFactoryImpl.doAuthentication(ConnectionFactoryImpl.java:759)
-
 at org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:161)
-
 at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:213)
-
 at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:51)
-
 at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:225)
-
 at org.postgresql.Driver.makeConnection(Driver.java:465)
-
 at org.postgresql.Driver.connect(Driver.java:264)
-
 at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
-
 at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:229)
-
 at com.cloudera.enterprise.dbutil.DbCommandExecutor.testDbConnection(DbCommandExecutor.java:265)
-
 at com.cloudera.enterprise.dbutil.DbCommandExecutor.main(DbCommandExecutor.java:140)
-
 Caused by: java.lang.ClassNotFoundException: com.ongres.scram.common.stringprep.StringPreparation
-
 at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
-
 at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
-
 at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
-
 ... 11 more
 
 2024-05-14 04:41:02,379 ERROR CommandPusher-1:com.cloudera.cmf.model.DbCommand: Command 1546336335(RepMgrTestDatabaseConnection) has completed. finalstate:FINISHED, success:false, msg:Unexpected error. Unable to verify database connection.
-
 Caused by: java.lang.ClassNotFoundException: com.ongres.scram.common.stringprep.StringPreparation
-
 at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
-
 at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
-
 at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
-
 ... 11 more
 
 2024-05-14 04:50:38,519 ERROR CommandPusher-1:com.cloudera.cmf.model.DbCommand: Command 1546336734(OozieTestDatabaseConnection) has completed. finalstate:FINISHED, success:false, msg:Unexpected error. Unable to verify database connection.
@@ -5435,9 +5396,7 @@ Delete scm db and recreated db and restart scm server fixed the issue. This lead
 *Other:
 
 *Configure Ozone with other data services before env creation, else it will lead to CDE installation error
-
 *Configure thrift server role in hbase for hue
-
 *Knox and Atlas works with local Linux Users and Password credentials i.e. PAM
 
 *For accessing the WebUI and fixing issues for web based authentication is not working for some of the services including Knox, Atlas, HDFS (Namenode UI), Yarn (History server UI) etc.Disable Kerberos Authentication for WebUI under each service configuration section which are showing 403 or 401 error.
@@ -5471,9 +5430,7 @@ https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre
 
 ++**************************************************************************************************************++
 
-=====  +
-
-===== Additional requirements and details for Private Cloud Base Cluster services:
+==== Additional requirements and details for Private Cloud Base Cluster services:
 
 *Note: Common Data Lake Services’ URLs:
 
@@ -5485,57 +5442,57 @@ https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre
 
 [.underline]#HDFS:#
 
-*HDFS-NAMENODE UI:* https://pvcbase-master.cdppvcds.com:9871/dfshealth.html[[.underline]#https://pvcbase-master.cldrsetup.local:9871/dfshealth.html#]
+*HDFS-NAMENODE UI:* https://pvcbase-master.cldrsetup.local:9871/dfshealth.html[[.underline]#https://pvcbase-master.cldrsetup.local:9871/dfshealth.html#]
 
 [.underline]#YARN:#
 
-*HDFS-YARN JobHistory UI:* https://pvcbase-master.cdppvcds.com:19890/jobhistory[[.underline]#https://pvcbase-master.cldrsetup.local:19890/jobhistory#]
+*HDFS-YARN JobHistory UI:* https://pvcbase-master.cldrsetup.local:19890/jobhistory[[.underline]#https://pvcbase-master.cldrsetup.local:19890/jobhistory#]
 
-*YARN RM UI:* https://pvcbase-master.cdppvcds.com:8090/ui2/#/cluster-overview[[.underline]#https://pvcbase-master.cldrsetup.local:8090/ui2/#/cluster-overview#]
+*YARN RM UI:* https://pvcbase-master.cldrsetup.local:8090/ui2/#/cluster-overview[[.underline]#https://pvcbase-master.cldrsetup.local:8090/ui2/#/cluster-overview#]
 
-{empty}[.underline]#Ranger*:# https://pvcbase-master.cdppvcds.com:6182/index.html#/policymanager/resource[[.underline]#https://pvcbase-master.cldrsetup.local:6182/index.html#/policymanager/resource#]
+{empty}[.underline]#Ranger*:# https://pvcbase-master.cldrsetup.local:6182/index.html#/policymanager/resource[[.underline]#https://pvcbase-master.cldrsetup.local:6182/index.html#/policymanager/resource#]
 
-{empty}[.underline]#Atlas*:# https://pvcbase-master.cdppvcds.com:31443/login.jsp[[.underline]#https://pvcbase-master.cldrsetup.local:31443/login.jsp#]
-
-*_(Login works with PAM-Linux Server Local User Credentials)_
-
-{empty}[.underline]#Knox*:# https://pvcbase-master.cdppvcds.com:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cdppvcds.com:8443/gateway/homepage/home/?profile=token[[.underline]#https://pvcbase-master.cldrsetup.local:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cldrsetup.local:8443/gateway/homepage/home/?profile=token#]
+{empty}[.underline]#Atlas*:# https://pvcbase-master.cldrsetup.local:31443/login.jsp[[.underline]#https://pvcbase-master.cldrsetup.local:31443/login.jsp#]
 
 *_(Login works with PAM-Linux Server Local User Credentials)_
 
-{empty}[.underline]#HiveServer2 UI*:# https://pvcbase-master.cdppvcds.com:10002/[[.underline]#https://pvcbase-master.cldrsetup.local:10002/#]
+{empty}[.underline]#Knox*:# https://pvcbase-master.cldrsetup.local:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cldrsetup.local:8443/gateway/homepage/home/?profile=token[[.underline]#https://pvcbase-master.cldrsetup.local:8443/gateway/knoxsso/knoxauth/login.html?originalUrl=https://pvcbase-master.cldrsetup.local:8443/gateway/homepage/home/?profile=token#]
 
-[.underline]#HUE#: https://pvcbase-master.cdppvcds.com:8889/hue/editor/?type=hive[[.underline]#https://pvcbase-master.cldrsetup.local:8889/hue/editor/?type=hive#]
+*_(Login works with PAM-Linux Server Local User Credentials)_
 
-[.underline]#HBASE#: https://pvcbase-master.cdppvcds.com:16010/master-status[[.underline]#https://pvcbase-master.cldrsetup.local:16010/master-status#]
+{empty}[.underline]#HiveServer2 UI*:# https://pvcbase-master.cldrsetup.local:10002/[[.underline]#https://pvcbase-master.cldrsetup.local:10002/#]
+
+[.underline]#HUE#: https://pvcbase-master.cldrsetup.local:8889/hue/editor/?type=hive[[.underline]#https://pvcbase-master.cldrsetup.local:8889/hue/editor/?type=hive#]
+
+[.underline]#HBASE#: https://pvcbase-master.cldrsetup.local:16010/master-status[[.underline]#https://pvcbase-master.cldrsetup.local:16010/master-status#]
 
 [.underline]#Ozone#:
 
-*Ozone Recon:* https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:9889/#/Overview#]
+*Ozone Recon:* https://pvcbase-master.cldrsetup.local:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:9889/#/Overview#]
 
-*Ozone SCM:* https://pvcbase-master.cdppvcds.com:9877/#!/[[.underline]#https://pvcbase-master.cldrsetup.local:9877/#!/#]
+*Ozone SCM:* https://pvcbase-master.cldrsetup.local:9877/#!/[[.underline]#https://pvcbase-master.cldrsetup.local:9877/#!/#]
 
-*Ozone Manager*: https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:#]
+*Ozone Manager*: https://pvcbase-master.cldrsetup.local:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:#]
 
-*S3 Gateway:* https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:#]
+*S3 Gateway:* https://pvcbase-master.cldrsetup.local:9889/#/Overview[[.underline]#https://pvcbase-master.cldrsetup.local:#]
 
-*Gateway:* https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-workter1.cldrsetup.local:#]
+*Gateway:* https://pvcbase-master.cldrsetup.local:9889/#/Overview[[.underline]#https://pvcbase-workter1.cldrsetup.local:#]
 
-*OzoneDataNode:* https://pvcbase-master.cdppvcds.com:9889/#/Overview[[.underline]#https://pvcbase-worker1.cldrsetup.local:#]
+*OzoneDataNode:* https://pvcbase-master.cldrsetup.local:9889/#/Overview[[.underline]#https://pvcbase-worker1.cldrsetup.local:#]
 
 [.underline]#Spark JobHistory Server:#
 
-*Spark2:* https://pvcbase-master.cdppvcds.com:18488/[[.underline]#https://pvcbase-master.cldrsetup.local:18488/#]
+*Spark2:* https://pvcbase-master.cldrsetup.local:18488/[[.underline]#https://pvcbase-master.cldrsetup.local:18488/#]
 
-*Spark3:* https://pvcbase-master.cdppvcds.com:18489/[[.underline]#https://pvcbase-master.cldrsetup.local:18489/#]
+*Spark3:* https://pvcbase-master.cldrsetup.local:18489/[[.underline]#https://pvcbase-master.cldrsetup.local:18489/#]
 
 [.underline]#Impala*:#
 
-*Impala Catalog:* https://pvcbase-master.cdppvcds.com:25020/[[.underline]#https://pvcbase-master.cldrsetup.local:25020/#]
+*Impala Catalog:* https://pvcbase-master.cldrsetup.local:25020/[[.underline]#https://pvcbase-master.cldrsetup.local:25020/#]
 
-*Impala Statestore:* https://pvcbase-master.cdppvcds.com:25010/[[.underline]#https://pvcbase-master.cldrsetup.local:25010/#]
+*Impala Statestore:* https://pvcbase-master.cldrsetup.local:25010/[[.underline]#https://pvcbase-master.cldrsetup.local:25010/#]
 
-##### [.underline]#Job History Server:# https://pvcbase-master.cdppvcds.com:9991/[[.underline]#https://pvcbase-master.cldrsetup.local:9991/#]
+##### [.underline]#Job History Server:# https://pvcbase-master.cldrsetup.local:9991/[[.underline]#https://pvcbase-master.cldrsetup.local:9991/#]
 
 [arabic]
 . *Port requirements for different services on PvC Base Cluster/Data Services (ECS) Cluster:
@@ -5716,9 +5673,7 @@ Let *APPDOMAIN* be the base app domain for the ECS cluster. For example, if your
 
 ++**************************************************************************************************************++
 
-===== 
-
-===== Configure Ranger with SSL/TLS enabled PostgreSQL Database
+==== Configure Ranger with SSL/TLS enabled PostgreSQL Database
 
 Login to Cloudera Manager Web Console. Go to *_Ranger > Configuration._
 
@@ -5835,9 +5790,9 @@ ____
 
 a|
 ____
-http://<ranger_host>:6080 http://pvcbase-master.cdppvcds.com:6080[[.underline]#http://pvcbase-master.cldrsetup.local:6080#]
+http://<ranger_host>:6080 http://pvcbase-master.cldrsetup.local:6080[[.underline]#http://pvcbase-master.cldrsetup.local:6080#]
 
-https://<ranger_host>:6182 https://pvcbase-master.cdppvcds.com:6182[[.underline]#https://pvcbase-master.cldrsetup.local:6182#]
+https://<ranger_host>:6182 https://pvcbase-master.cldrsetup.local:6182[[.underline]#https://pvcbase-master.cldrsetup.local:6182#]
 ____
 
 |===
@@ -5853,7 +5808,7 @@ image:extracted-media/media/image72.png[extracted-media/media/image72,width=691,
 
 ++**************************************************************************************************************++
 
-===== Configure Hive metastore with SSL/TLS enabled PostgreSQL Database (Mandatory Step for CDW)
+=== Configure Hive metastore with SSL/TLS enabled PostgreSQL Database (Mandatory Step for CDW)
 
 In the Cloudera Manager Web console; go to *_Hive > Configuration > Hive Metastore Database JDBC URL Override_*.
 
@@ -5873,7 +5828,7 @@ image:extracted-media/media/image88.png[extracted-media/media/image88,width=666,
 
 ++**************************************************************************************************************++
 
-===== Scale the Cluster (Optional– Skip this step)
+==== Scale the Cluster (Optional– Skip this step)
 
 The role assignment recommendation above is for clusters with at least 64 servers and in High Availability. For smaller clusters running without High Availability the recommendation is to dedicate one server for Name Node and a second server for secondary name node and YARN Resource Manager. For larger clusters larger than 16 nodes the recommendation is to dedicate one server each for name node, YARN Resource Manager and one more for running both Name Node (High Availability) and Resource Manager (High Availability) as in the table (no Secondary Name Node when in High Availability).
 
@@ -5884,7 +5839,7 @@ This implies that there will be at least 3 master nodes, running the Name Node, 
 
 All the three nodes will also need to run zookeeper and quorum journal node services. It is also recommended to have a minimum of 8 Data Nodes in a cluster. Please refer to the next section for details on how to enable HA.
 
-===== Enable High Availability (Optional– Skip this step)
+==== Enable High Availability (Optional– Skip this step)
 
 [arabic, start=39]
 . Setting up High Availability is done after the Cloudera Installation is completed. https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/managing-clusters/topics/cm-high-availability.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/managing-clusters/topics/cm-high-availability.html#]
@@ -5894,7 +5849,7 @@ All the three nodes will also need to run zookeeper and quorum journal node serv
 [arabic, start=40]
 . To enable specific web browsers to use SPNEGO to negotiate Kerberos authentication, please visit: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/security-how-to-guides/topics/cm-security-browser-access-kerberos-protected-url.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/security-how-to-guides/topics/cm-security-browser-access-kerberos-protected-url.html#]
 
-===== CDP Private Cloud Base checklist
+==== CDP Private Cloud Base checklist
 
 https://supportmatrix.cloudera.com/[[.underline]#Cloudera support matrix#] lists the supported software for the CDP Private Cloud Base cluster and the CDP Private Cloud Data Services containerized cluster.
 
@@ -5906,7 +5861,7 @@ image:extracted-media/media/image154.png[A screenshot of a computer Description 
 
 ++**************************************************************************************************************++
 
-===== Configure Ranger authentication for LDAP (Optional– Skip this Step)
+=== Configure Ranger authentication for LDAP (Optional– Skip this Step)
 
 Follow steps below to configure Ranger for LDAP authentication.
 
@@ -6284,7 +6239,7 @@ For more details: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/securit
 
 ++**************************************************************************************************************++
 
-===== Configure Hue for LDAP Authentication (Optional– Skip this Step)
+=== Configure Hue for LDAP Authentication (Optional– Skip this Step)
 
 Configuring Hue for Lightweight Directory Access Protocol (LDAP) enables you to import users and groups from a directory service, synchronize group membership manually or automatically at login, and authenticate with an LDAP server. Hue supports Microsoft Active Directory (AD) and open standard LDAP such as OpenLDAP and Forgerock OpenDJ Directory Services.
 
@@ -6458,7 +6413,7 @@ For more details: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/securin
 
 ++**************************************************************************************************************++
 
-===== Configure Atlas for LDAP authentication (Optional– Skip this Step)
+=== Configure Atlas for LDAP authentication (Optional– Skip this Step)
 
 Follow steps below to configure Atlas authentication for LDAP. (*_If LDAP is not integrated for Atlas, we need to use local OS users present on the node where Atlas server is installed i.e. base-master)_
 
@@ -6645,7 +6600,7 @@ ____
 
 ++**************************************************************************************************************++
 
-===== Configure Hive for LDAP Authentication (Optional– Skip this Step)
+=== Configure Hive for LDAP Authentication (Optional– Skip this Step)
 
 image:extracted-media/media/image28.png[extracted-media/media/image28,width=566,height=509]
 
@@ -6748,7 +6703,7 @@ ____
 
 ++**************************************************************************************************************++
 
-===== Configure HDFS properties to optimize log collection (Optional– Skip this Step)
+=== Configure HDFS properties to optimize log collection (Optional– Skip this Step)
 
 CDP uses “out_webhdfs” Fluentd output plugin to write records into HDFS, in the form of log files, which are then used by different Data Services to generate diagnostic bundles. Over time, these log files can grow in size. To optimize the size of logs that are captured and stored on HDFS, you must update certain HDFS configurations in the hdfs-site.xml file using Cloudera Manager.
 
@@ -6986,7 +6941,7 @@ TLS: Manual self signed (not recommended) xxx
 
 |*Kerberos Admin Account* |CM is setup with Kerberos admin account (cloudera-scm account & password).
 |*ECS Installer Prerequisites Checker* |IMPORTANT! CM ECS installer now has an Enforcing prerequisites checker, install will fail if your infra does not meet requirements outlined in docs. https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs/topics/cdppvc-installation-ecs-steps.html[[.underline]#See item 14&#44; in doc#].
-|*Runtime Version* |7.1.9 (CHF6{plus}) is installed & configured. See https://supportmatrix.cloudera.com/[[.underline]#support matrix#]
+|*Runtime Version* |7.1.9 (CHF6+) is installed & configured. See https://supportmatrix.cloudera.com/[[.underline]#support matrix#]
 |*New Changes with 1.5.4* |
 |*Minimum Required Components* |Zookeeper, HDFS, Ozone, HBase, Hive Metastore, Kafka, Solr-Infra, Ranger, Atlas, YARN (optional for CDW, but required for Spark pushdown in CDE, CML).
 |*Base Components TLS* |All Base components configured with TLS.
@@ -6997,7 +6952,7 @@ CDW - Base HMS, mTLS can be used instead of user/password.
 If using CDW, the Base Cluster HMS is configured to allow TLS connections (set to allow TLS, but not forced to require it).
 
 |*Wildcard DNS Record* a|
-*CRITICAL*: A wildcard subdomain (called app_domain in cm) has been created in DNS. For AD this usually means a subdomain folder {plus} an "A record" with name = "_" pointing to the ECS host and a CNAME record. The "A record" does not need a reverse PTR._
+*CRITICAL*: A wildcard subdomain (called app_domain in cm) has been created in DNS. For AD this usually means a subdomain folder + an "A record" with name = "_" pointing to the ECS host and a CNAME record. The "A record" does not need a reverse PTR._
 
 _*AD Example:* If corp domain is "company.com", then create a new subdomain folder called "ecs-dev", then within that create AD another called "apps", then create a "A record" inside that folder, its name is "_", its IP will be the IP of the host you will install ECS Server onto.
 
@@ -7034,7 +6989,7 @@ Look for "ANSWER" section in the result.
 |*Time Service* |Host has chronyd or NTP running.
 |*DNS Resolving* |Each ECS host is forward and reverse DNS resolvable.
 |*DNS Forward and Reverse* |Each ECS host can forward and reverse DNS resolve each base host.
-|*SELinux and System Settings* |SELinux off or set to Permissive, vm.swappiness = 1, Transparent Huge Pages Off (1.3.4{plus} support SELinux, see docs).
+|*SELinux and System Settings* |SELinux off or set to Permissive, vm.swappiness = 1, Transparent Huge Pages Off (1.3.4+ support SELinux, see docs).
 |*NFS Requirements* |Linux package "nfs-utils" must be installed for CML & CDE.
 |*GPU Requirements & Config* |See docs for GPU requirements & config for CML.
 |*3rd Party Software* a|
@@ -7089,7 +7044,7 @@ In CM7.10.1, CM generated "local to auth" krb5 rules include embedded "\Q" and "
 |*Docker Storage Requirements* |Docker storage must have 200GB.
 |*vCores Requirements* |Min 16 vcores required (on Masters too? Yes).
 |*iptables-save* |iptables-save to /var/lib/ecs/iptables.save (we don't need to flush IPtables upon reinstall anymore).
-|*Oracle HMS* |Oracle HMS is now GA. This can get complicated as many Oracle customers use TLS {plus} Client cert auth, which we don't support. We support TLS {plus} user password auth only. Contact for workaround.
+|*Oracle HMS* |Oracle HMS is now GA. This can get complicated as many Oracle customers use TLS + Client cert auth, which we don't support. We support TLS + user password auth only. Contact for workaround.
 |*Data Viz* |Data Viz is GA.
 |*Ozone for CDW* |Ozone for CDW is Tech Preview.
 |*Impala Custom Pod Sizes* |Impala Custom pod sizes now GA. See https://docs.cloudera.com/data-warehouse/1.4.1/administration/topics/dw-private-cloud-create-custom-pod-configs-impala-vw.html[[.underline]#Impala Pod Configs#].
@@ -7135,7 +7090,7 @@ Follow the steps in this topic to install CDP Private Cloud Data Services with t
 RHEL 7.x support on ECS has been dropped in CDP Private Cloud Data Services 1.5.4 and higher versions. If you are running RHEL 7.x, you must upgrade to a higher version before installing CDP Private Cloud Data Services.
 
 [arabic]
-. In the *_Cloudera Manager WebUI_* console, go to the *_Data Services_* page by clicking on the *_Data Services_* link on the Pane located at the Left Hand side of the browser window. Alternatively, you can also click *({plus}) _Add > Add Cluster_* at the top right in Cloudera Manager, then select *_Private Cloud Containerized Cluster_* as the cluster type.
+. In the *_Cloudera Manager WebUI_* console, go to the *_Data Services_* page by clicking on the *_Data Services_* link on the Pane located at the Left Hand side of the browser window. Alternatively, you can also click *(+) _Add > Add Cluster_* at the top right in Cloudera Manager, then select *_Private Cloud Containerized Cluster_* as the cluster type.
 
 image:extracted-media/media/image41.png[extracted-media/media/image41,width=432,height=265]
 
@@ -7144,7 +7099,7 @@ image:extracted-media/media/image41.png[extracted-media/media/image41,width=432,
 
 image:extracted-media/media/image13.png[extracted-media/media/image13,width=564,height=373]
 
-*Note*: Alternatively, you can also click *_({plus}) Add > Add Cluster_* at the *_top right_* in *_Cloudera Manager_*, then select *_Private Cloud Containerized Cluster_* as the *_cluster type_*, then click *_Continue_*. +
+*Note*: Alternatively, you can also click *_(+) Add > Add Cluster_* at the *_top right_* in *_Cloudera Manager_*, then select *_Private Cloud Containerized Cluster_* as the *_cluster type_*, then click *_Continue_*. +
 image:extracted-media/media/image74.png[extracted-media/media/image74,width=230,height=109] +
 image:extracted-media/media/image132.png[extracted-media/media/image132,width=611,height=397]
 
@@ -7166,7 +7121,7 @@ image:extracted-media/media/image40.png[extracted-media/media/image40,width=476,
 
 image:extracted-media/media/image8.png[extracted-media/media/image8,width=624,height=114]
 
-Add the additional URL by *({plus})* and click on *_Save Changes._
+Add the additional URL by *(+)* and click on *_Save Changes._
 
 image:extracted-media/media/image192.png[extracted-media/media/image192,width=551,height=167]
 
@@ -7249,7 +7204,7 @@ image:extracted-media/media/image138.png[extracted-media/media/image138,width=66
 [arabic, start=12]
 . On the *_Select JDK_* page, select any one from the below options:
 
-* *Manually manage JDK (Select this option)* (manual installation of JDK11/17 with CDH 7.1.9{plus}).
+* *Manually manage JDK (Select this option)* (manual installation of JDK11/17 with CDH 7.1.9+).
 * Install a Cloudera-provided version of OpenJDK
 * Install a system-provided version of OpenJDK
 
@@ -8616,7 +8571,7 @@ image:extracted-media/media/image143.png[A screenshot of a computer Description 
 [arabic, start=11]
 . For more details and how to review projects section in ML workspace: https://docs.cloudera.com/machine-learning/cloud/projects/index.html[[.underline]#https://docs.cloudera.com/machine-learning/cloud/projects/index.html#]
 
-===== Creation of Project in CML Workspace:
+=== Creation of Project in CML Workspace:
 
 [arabic, start=12]
 . At the middle right, you will find the New Project button. Click on it. New Project page appears. Enter the details as described below. Enter project name and select type of initial setup.
@@ -8747,7 +8702,7 @@ image:extracted-media/media/image161.png[low res mode,width=498,height=157]
 
 image:extracted-media/media/image78.png[default dbc,width=379,height=214]
 
-* Once the *_database catalog_* is created, click on *_{plus}_* icon next to *_Virtual Warehouses_*.
+* Once the *_database catalog_* is created, click on *_+_* icon next to *_Virtual Warehouses_*.
 
 image:extracted-media/media/image102.png[crt vwh,width=426,height=126]
 
@@ -8785,7 +8740,7 @@ image:extracted-media/media/image73.png[open cde,width=305,height=268]
 
 image:extracted-media/media/image49.png[cde home,width=550,height=186]
 
-* Click on *_{plus}_* icon as shown below which will allow you to *_enable CDE service_* post which you can *_create Virtual Clusters_*.
+* Click on *_+_* icon as shown below which will allow you to *_enable CDE service_* post which you can *_create Virtual Clusters_*.
 
 image:extracted-media/media/image135.png[enable cde,width=99,height=60]
 
@@ -8813,7 +8768,7 @@ image:extracted-media/media/image20.png[cde svc,width=571,height=185]
 
 When you *_enable CDE service_*, by default a new *_Virtual cluster with Spark2.4_* will be created. If you have not enabled this option earlier, then you need to create a virtual cluster again.
 
-* On the *_CDE Home page_*, click on the *_{plus}_* icon next to *_Virtual clusters_* as shown below.
+* On the *_CDE Home page_*, click on the *_+_* icon next to *_Virtual clusters_* as shown below.
 
 image:extracted-media/media/image166.png[crt vc,width=624,height=46]
 
@@ -8850,7 +8805,7 @@ Every time a *_new virtual cluster_* is created, there are a few *_manual steps_
 
 * Add execute permission to this script.
 
-[root@pvcecs-master ~]# chmod {plus}x /tmp/cde-latest/cdp-cde-utils.sh
+[root@pvcecs-master ~]# chmod +x /tmp/cde-latest/cdp-cde-utils.sh
 
 * Identify the *_virtual cluster endpoint_*:
 
@@ -9823,7 +9778,7 @@ systemctl daemon-reload
 
 #rm -rvf /var/lib/pgsql/14/data/
 
-mv -v /var/lib/pgsql/14/data/ /var/lib/pgsql/14/data_bkp_$(date {plus}%Y%m%d)
+mv -v /var/lib/pgsql/14/data/ /var/lib/pgsql/14/data_bkp_$(date +%Y%m%d)
 
 ##### Cleanup CDP-CM, Base Master and Worker nodes
 
@@ -10099,9 +10054,7 @@ CM > Hive > Action > Create hive dir
 ##### YARN queue manager error:
 
 [root@pvcbase-master ~]# sudo mkdir /var/lib/hadoop-yarn/
-
-[root@pvcbase-master ~]# sudo chmod {plus}077 /var/lib/hadoop-yarn/
-
+[root@pvcbase-master ~]# sudo chmod +077 /var/lib/hadoop-yarn/
 [root@pvcbase-master ~]# sudo chown yarn:hadoop /var/lib/hadoop-yarn/
 
 ++**************************************************************************************************************++
@@ -10148,62 +10101,47 @@ Cleanup ozone directories before redeployment.
 
 [source,bash]
 ----
-
-[root@pvcbase-master ~]# sudo -u postgres psql -U postgres -p 5432 -h $(hostname)
-
-Password for user postgres:
-
+[root@pvcbase-master ~]# sudo -u postgres psql -U postgres -p 5432 -h $(hostname) 
+Password for user postgres: 
 psql (14.11)
-
 SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
-
 Type "help" for help.
 
 postgres=# \q
 
 [root@pvcbasemaster data]# echo -n 'Sahu@123{admin}' | md5sum
+c94251c29cd07ed2daf0b6edcf843362  -
 
-c94251c29cd07ed2daf0b6edcf843362 -
-
-[root@pvcbasemaster data]# sudo -u postgres psql -U postgres -p 5432 -h $(hostname)
-
-Password for user postgres:
-
+[root@pvcbasemaster data]# sudo -u postgres psql -U postgres -p 5432 -h $(hostname) 
+Password for user postgres: 
 psql (14.11)
-
 SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
-
 Type "help" for help.
 
 postgres=# \c ranger
-
 SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
-
 You are now connected to database "ranger" as user "postgres".
-
 ranger=# update x_portal_user set password = '9746e519adb14ec3ffbf4aff051f104d' where login_id = 'admin';
-
 UPDATE 1
-
-ranger=#
-
+ranger=# 
 ranger=# select * from x_portal_user where login_id = 'admin';
-
-id | create_time | update_time | added_by_id | upd_by_id | first_name | last_name | pub_scr_name | login_id |
-
-password | email | status | user_src | notes | other_attributes | sync_source | old_passwords | password_updated_time
-
-----{plus}----------------------------{plus}-------------------------{plus}-------------{plus}-----------{plus}------------{plus}-----------{plus}--------------{plus}----------{plus}----------------------------------{plus}-------{plus}--------{plus}----------{plus}-------{plus}------------------{plus}-------------{plus}---------------{plus}-----------------------
-
-1 | 2024-03-17 12:15:27.272988 | 2024-03-17 19:15:43.854 | | | Admin | | Admin | admin | c94251c29cd07ed2daf0b6edcf843362 | | 1 | 0 | | | | |
-
+ id |        create_time         |       update_time       | added_by_id | upd_by_id | first_name | last_name | pub_scr_name | login_id |         
+    password             | email | status | user_src | notes | other_attributes | sync_source | old_passwords | password_updated_time 
+----+----------------------------+-------------------------+-------------+-----------+------------+-----------+--------------+----------+----------------------------------+-------+--------+----------+-------+------------------+-------------+---------------+-----------------------
+  1 | 2024-03-17 12:15:27.272988 | 2024-03-17 19:15:43.854 |             |           | Admin      |           | Admin        | admin    | c94251c29cd07ed2daf0b6edcf843362 |       |      1 |        0 |       |                  |             |               | 
 (1 row)
-
 ranger=# \q
+-------------------------------------------------------------------------------------------------------
 
+[root@pvcbasemaster data]# sudo -u postgres psql -U rangeradmin -p 5432 -d ranger -h $(hostname) 
+Password for user rangeradmin: 
+psql (14.11)
+SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
+Type "help" for help.
+ranger=> \q
 ----
 
--------------------------------------------------------------------------------------------------------
+++**************************************************************************************************************++
 
 [source,bash]
 ----
@@ -10331,33 +10269,20 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.0/upgrade-ecs/cdpp
 
 *Solution:* kubeconfig error
 
-
 [source, bash]
 ----
-
 [root@pvcecs-master ~]# journalctl -xeu kubelet
-
 [root@pvcecs-master ~]# mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
-
 [root@pvcecs-master ~]# mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
-
 [root@pvcecs-master ~]# kubectl get pods
-
 -bash: kubectl: command not found
-
 [root@pvcecs-master ~]# export PATH=/var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/:$PATH
-
 [root@pvcecs-master ~]# kubectl get pods
-
 No resources found in the default namespace.
-
 [root@pvcecs-master ~]# kubectl get all
-
-NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE
-
-service/kubernetes ClusterIP 10.43.0.1 <none> 443/TCP 13h
-
-[root@pvcecs-master ~]#
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.43.0.1    <none>        443/TCP   13h
+[root@pvcecs-master ~]# 
 ----
 
 ++**************************************************************************************************************++
@@ -10372,7 +10297,7 @@ kubectl -n kubernetes-dashboard get secret/admin-user-secret -o 'jsonpath={.meta
 
 ++**************************************************************************************************************++
 
-{plus} /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml -n kubernetes-dashboard get secret -o 'go-template={{.data.token | base64decode}}'
++ /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml -n kubernetes-dashboard get secret -o 'go-template={{.data.token | base64decode}}'
 
 error: error executing template "{{.data.token | base64decode}}": template: output:1:16: executing "output" at <base64decode>: invalid value; expected string
 
@@ -10384,9 +10309,9 @@ kubectl get secret -n kubernetes-dashboard admin-user-secret -o 'go-template={{.
 
 *Error: INSTALLATION FAILED: cannot re-use a name that is still in use
 
-{plus}{plus} K8S_DASHBOARD_CHART_FILE_NAME=kubernetes-dashboard-5.10.0.tgz
+++ K8S_DASHBOARD_CHART_FILE_NAME=kubernetes-dashboard-5.10.0.tgz
 
-{plus}{plus} /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/../installer/install/bin/linux/helm install kubernetes-dashboard /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-5.10.0.tgz -n kubernetes-dashboard --create-namespace -f /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-overrides.yaml
+++ /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/../installer/install/bin/linux/helm install kubernetes-dashboard /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-5.10.0.tgz -n kubernetes-dashboard --create-namespace -f /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-overrides.yaml
 
 *Solution:
 
@@ -10426,7 +10351,7 @@ cp: overwrite ‘/root/.kube/config’? Yes
 
 NAME STATUS ROLES AGE VERSION
 
-pvcecsmaster.cldrsetup.local Ready control-plane,etcd,master 61s v1.26.10{plus}rke2r1
+pvcecsmaster.cldrsetup.local Ready control-plane,etcd,master 61s v1.26.10+rke2r1
 
 [root@pvcecsmaster opt]# cp /tmp/ecs_util.sh /opt/cloudera/cm-agent/service/ecs/ecs_util.sh
 
@@ -10436,28 +10361,22 @@ pvcecsmaster.cldrsetup.local Ready control-plane,etcd,master 61s v1.26.10{plus}r
 
 *Error: INSTALLATION FAILED: cannot re-use a name that is still in use
 
-{plus}{plus} /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/../installer/install/bin/linux/helm install kubernetes-dashboard /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-5.10.0.tgz -n kubernetes-dashboard --create-namespace -f /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-overrides.yaml
+++ /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/../installer/install/bin/linux/helm install kubernetes-dashboard /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-5.10.0.tgz -n kubernetes-dashboard --create-namespace -f /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-overrides.yaml
 
 *Solution*:
 
-
 [source, bash]
 ----
-
 [root@pvcecs-master ~]# k get pods -A|grep dashboard
-
 kubernetes-dashboard kubernetes-dashboard-68876b7cb8-fl58c 1/1 Running 0 4m13s
 
 [root@pvcecsmaster ~]# k delete pod kubernetes-dashboard
-
 Error from server (NotFound): pods "kubernetes-dashboard" not found
 
 [root@pvcecsmaster ~]# k delete pod kubernetes-dashboard-68876b7cb8-fl58c -n kubernetes-dashboard
-
 pod "kubernetes-dashboard-68876b7cb8-fl58c" deleted
 
 [root@pvcecsmaster ~]#
-
 [root@pvcecsmaster ~]# k delete ns kubernetes-dashboard
 ----
 
@@ -10473,52 +10392,29 @@ HTTPSConnectionPool(host='console-cdp.apps.cldrsetup.local', port=443): Max retr
 
 [source, bash]
 ----
-
-k edit cm rke2-coredns-rke2-coredns -n kube-system -o yaml
-
+k edit cm rke2-coredns-rke2-coredns  -n kube-system -o yaml
 apiVersion: v1
-
 data:
-
-Corefile: |
-
-.:53 {
-
-errors
-
-health {
-
-lameduck 5s
-
-}
-
-ready
-
-kubernetes cluster.local cluster.local in-addr.arpa ip6.arpa {
-
-pods insecure
-
-fallthrough in-addr.arpa ip6.arpa
-
-ttl 30
-
-}
-
-prometheus 0.0.0.0:9153
-
-#forward . /etc/resolv.conf
-
-forward . 172.16.31.226
-
-cache 30
-
-loop
-
-reload
-
-loadbalance
-
-}
+  Corefile: |
+    .:53 {
+      errors
+      health {
+          lameduck 5s
+      }
+      ready
+      kubernetes cluster.local cluster.local in-addr.arpa ip6.arpa {
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+          ttl 30
+      }
+      prometheus 0.0.0.0:9153
+      #forward . /etc/resolv.conf
+      forward . 172.16.31.226
+      cache 30
+      loop
+      reload
+      loadbalance
+    }
 ----
 
 *Possible Cause and Solution:
@@ -10545,69 +10441,39 @@ Cleanup not done properly.
 
 [source, bash]
 ----
-
 export PATH=$PATH:/var/lib/rancher/rke2/bin
-
 echo "alias helm='/opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/installer/install/bin/linux/helm'" >> ~/.bashrc
-
 echo "alias docker='/opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/docker/docker'" >> ~/.bashrc
-
 echo "alias helm='/opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/installer/install/bin/linux/helm'" >> ~/.bashrc
-
 echo "alias kubectl="sudo -E /var/lib/rancher/rke2/data/v1.26.10-rke2r1-e58e49f33617/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml'" >> ~/.bashrc
-
 alias k=kubectl
-
 . ~/.bashrc
 
-kubectl get|describe|delete|create all|pods|nodes|ns|namespaces|svc|service|pv|pvc|rb|rolebinding|sa|roles|csr|secret|hpa|netpol|statefulset|replicaset|crd -n vault-system | -A
-
+kubectl 	get|describe|delete|create 		all|pods|nodes|ns|namespaces|svc|service|pv|pvc|rb|rolebinding|sa|roles|csr|secret|hpa|netpol|statefulset|replicaset|crd		-n vault-system | -A
 kubectl get namespace vault-system -o json|yaml > tmp.json
-
 helm list -n vault-system
-
-kubectl api-resources --namespaced=true -o name | xargs -n 1 kubectl get -n vault-system
-
+kubectl api-resources  --namespaced=true -o name | xargs -n 1 kubectl get -n vault-system
 k delete ns vault-system --force
-
 k get pods -A -o wide |grep dash
-
 k get sa kubernetes-dashboard -n kubernetes-dashboard -o yaml
-
 kubectl delete pods -n kube-system -l k8s-app=kube-dns
-
 kubectl port-forward deployment.apps/kubernetes-dashboard 8443:https -n kubernetes-dashboard
-
 kubectl port-forward deployment.apps/kubernetes-dashboard 8443:443 -n kubernetes-dashboard
-
 k logs -n cdp cdp-release-dssapp-6b5b68bcfd-b9rdd
-
 k apply -f secret.yaml
-
 k create token default
-
 kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get -n vault-system --kubeconfig /etc/rancher/rke2/rke2.yaml
+helm list -n kubernetes-dashboard
+k get|delete|describe|edit	 helmcharts.helm.cattle.io	 -n vault-system
 
 helm list -n kubernetes-dashboard
-
-k get|delete|describe|edit helmcharts.helm.cattle.io -n vault-system
-
-helm list -n kubernetes-dashboard
-
 helm list -A
-
-helm upgrade --install kubernetes-dashboard /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-5.10.0.tgz -n kubernetes-dashboard -f /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-overrides.yaml --dry-run | grep admin
-
+helm upgrade --install kubernetes-dashboard /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-5.10.0.tgz -n kubernetes-dashboard  -f /opt/cloudera/parcels/ECS-1.5.4-b99-ecs-1.5.4-b99.p0.50802651/kubernetes-dashboard/kubernetes-dashboard-overrides.yaml --dry-run | grep admin
 find / -name kubernetes-dashboard*.tgz
-
 netstat -lntup|grep 6443
-
 openssl s_client -connect pvcbasemaster.cldrsetup.local:5432 -debug -msg
-
 cp /etc/rancher/rke2/rke2.yaml .kube/config
-
 envsubst
-
 ----
 
 ++**************************************************************************************************************++
