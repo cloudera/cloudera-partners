@@ -1,0 +1,62 @@
+= パートナー様・ユーザー企業様向けのClouderaレポジトリ
+
+パートナー様・ユーザー企業様向けの Cloudera レポジトリへようこそ！
+このレポジトリは、Cloudera データプラットフォームに必要なすべてのリソース、ツールおよびハンズオンラボを提供します。
+以下はこのレポジトリのディレクトリの詳細説明です。必要なリソースを探すのに役立つでしょう。
+
+== フォルダ概要
+
+https://github.com/cloudera/cloudera-partners/ 配下と同様のフォルダ構造で内容を日本語化したものを、https://github.com/cloudera/cloudera-partners/ja 配下に配置します。
+日本での利用頻度の高いものから、随時配置していきます。
+
+=== 1. PartnerResources
+*説明:*
+Cloudera のパートナー様向けの包括的なガイドです。このフォルダには、Cloudera のパートナーになるために必要なすべての情報が含まれています。たとえば、パートナーポータルの登録方法、開発ライセンスの取得方法、販売および技術的な認定、ブログ、およびリソース等です。
+
+*いつ使うべきか:*
+- Cloudera のパートナーリソースの全体を知るために
+- Cloudera の主要な情報を手早く知りたいときに
+
+=== 2. ClouderaSetup
+*説明:*
+このフォルダは、Cloudera のデータプラットフォームのオンボーディングのための自動スクリプトとドキュメントを含みます。
+`AWS`, `Azure`, `GCP`を含む Cloudera on Cloud および  `VMware` や `Openshift` のようなオンプレミスのプラットフォームの両者を含みます。
+デプロイのプロセスを簡略化し、円滑なセットアップ体験を提供します。
+
+*いつ使うべきか:*
+- Cloudera を Cloud もしくはオンプレミスで最初にセットアップするとき
+- Cloud オンボーディングのハンズオンやワークショップの参照資料として
+
+=== 3. DataServicesLabs
+*説明:*
+Cloudera の各 Data Service のハンズオン資料を含みます。 `Cloudera Data Flow`, `Cloudera Data Engineering`, `Cloudera Data Warehouse`, `Cloudera AI` (以前の名称は `Cloudera Machine Learning`)を含みます。
+
+*いつ使うべきか:*
+- Cloudera の個々の Data Service について学び、触ってみたいとき
+- 特定のサービスの実用的な経験を得るために理想的です
+
+=== 4. EndToEndLabs
+*説明:*
+このフォルダは Cloudera の複数の Data Services を利用した統合ワークフローを体験するために設計された、包括的なエンドツーエンドのハンズオンラボを含みます。
+これらのハンズオンラボは、データ収集、加工から分析および可視化に至るまでのデータ処理の総合的な知見を与え、現実的なシナリオを模倣しています。
+
+*いつ使うべきか:*
+- Cloudera の Data Services を組み合わせて統合的なワークフローとして使ったときに、どのような違いがあるかを知りたいとき
+- 上級のハンズオンセッション、ワークショップや、現実社会のシナリオの探求に理想的です
+
+== レポジトリの歩き方
+
+=== 目標を決めましょう:
+- パートナー向けのリソースを探していますか？ `link:./PartnerResources[**PartnerResources**]` を開きましょう。
+- Cloudera のセットアップをしたいですか？ `link:./ClouderaSetup[**ClouderaSetup**]` を開きましょう。
+- Data Service を知りたいですか？ `link:./DataServicesLabs[**DataServicesLabs**]` から始めましょう。
+- ハンズオンで練習したいですか？ `link:./EndToEndLabs[**EndToEndLabs**]` をチェックしましょう。
+
+=== ドキュメントを読みましょう:
+各フォルダは、そのコンテンツのガイドとなる詳細なドキュメントを含んでいます。
+
+=== 助けが必要なときは:
+支援が必要な際は、レポジトリの管理者までご連絡ください。
+
+このレポジトリが、Cloudera を最大限有効活用する助けになることを願います。
+Happy learning and collaboration! 😊
