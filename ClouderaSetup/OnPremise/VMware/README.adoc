@@ -5250,7 +5250,7 @@ image:extracted-media/media/image96.png[extracted-media/media/image96,width=693,
 
 **Solution:**resolved by regenerate key tab
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Kafka error:
 
@@ -5266,7 +5266,7 @@ https://gautambangalore.medium.com/resolved-error-fatal-error-during-kafkaserver
 
 ansible datanodes -m shell -a "sed -i 's#aHRUaTqoQzOpGf8qA5bXlQ#rxsV4DwNRvWtIcl5ejG-IA#g'
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Service NodeManager failed in state INITED
 
@@ -5280,7 +5280,7 @@ Caused by: org.apache.hadoop.security.KerberosAuthException: failure to login: f
 *Solution:
 Regenerate kerberos creds from administration>security for yarn
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *YARN issue
 
@@ -5292,14 +5292,14 @@ https://community.cloudera.com/t5/Support-Questions/CDH-6-1-Installation-Issues-
 
 Fixed it by deleting /var/lib/cloudera-scm-agent/cm_guid on each node.
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Chrony issue on during ipaserver/ipaclient installation
 
 *Solution:
 Stop chrnoyd and remove chrony from all hosts, then install ipa-server and then ipa-client. It will work.
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Rman db error
 
@@ -5311,7 +5311,7 @@ at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.jav
 *Solution:
 drop and recreate db solved issues.
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Ozone Error:
 Found SOLR_SERVICE: ''
@@ -5320,7 +5320,7 @@ Found SOLR_SERVICE: ''
 ozone install error
 include solr in service dependency and restart services
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Issue: IPASERVER failed to resolve DNS ipaservices not working
 
@@ -5328,7 +5328,7 @@ include solr in service dependency and restart services
 Port 53 was not open on AWS SecGrp: ipaserver was not working on aws due to it,
 updated secgrp added 53 rule for dns fixed issue.
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Ranger Error:
 Repo cm_kafka already exists ->
@@ -5336,7 +5336,7 @@ Repo cm_kafka already exists ->
 *Solution:
 delete cm_kafka from ranger
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *CM Not able to login
 
@@ -5385,7 +5385,7 @@ Caused after change in hostssl parameter for Postgres (suspected)
 
 Delete scm db and recreated db and restart scm server fixed the issue. This lead to reinstall entire base and ecs clusters as metadata deleted from scm db
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Other:
 
@@ -8074,7 +8074,7 @@ _The http response code is 200_
 
 _Environment was successfully created_
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Failed to reconcile with temporary etcd:
 
@@ -8084,7 +8084,7 @@ bootstrap data already found and encrypted with different token rke error
 
 rm -vf /var/lib/rancher/k3s/server/node-token
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Update k8s cordons and rollout
 
@@ -8096,7 +8096,7 @@ https://www.reddit.com/r/k3s/comments/p3rdap/lost_bootstrap_data_already_found_a
 
 rm -rvf /var/lib/rancher/ /etc/rancher
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *X509 error-
 
@@ -8104,7 +8104,7 @@ rm -rvf /var/lib/rancher/ /etc/rancher
 
 do cleanup for ECS properly
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Unable to connect 6443
 
@@ -8112,7 +8112,7 @@ do cleanup for ECS properly
 
 mkdir -p ~/.kube && cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Aws_key_id error in cde cluster creation
 
@@ -8122,13 +8122,13 @@ Configure ozone with other data services before env creation
 
 https://community.cloudera.com/t5/Support-Questions/Unable-to-create-Data-Engineering-Cluster-in-CDP-Private/m-p/377969[[.underline]#https://community.cloudera.com/t5/Support-Questions/Unable-to-create-Data-Engineering-Cluster-in-CDP-Private/m-p/377969#]
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *Other:
 
 https://repost.aws/knowledge-center/create-lv-on-ebs-partition[[.underline]#https://repost.aws/knowledge-center/create-lv-on-ebs-partition#]
 
-*==========================================================================================================
+++==========================================================================================================++
 
 *UNRESOLVED: CDE Error
 
