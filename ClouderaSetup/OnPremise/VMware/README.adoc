@@ -24,8 +24,6 @@ This document describes the architecture, installation, configuration, and valid
 
 ---
 
-++**************************************************************************************************************++
-
 == Table of Contents
 
 link:#table-of-contents[[.underline]#Table of Contents#]
@@ -182,8 +180,6 @@ link:#acknowledgements[[.underline]#Acknowledgements#]
 
 ---
 
-++**************************************************************************************************************++
-
 == Author History
 
 [width="100%",cols="31%,28%,41%",options="header",]
@@ -220,8 +216,6 @@ ____
 
 |===
 
-++**************************************************************************************************************++
-
 ---
 
 == CDP PvC Installation and Configuration on VMware Infrastructure Platform:
@@ -250,7 +244,7 @@ https://dennislee22.github.io/docs/cdppvc[[.underline]#https://dennislee22.githu
 
 https://docs.google.com/document/d/1OSKBChSTbc8NhuQ8YXRN-YxFnaVBj47Lz4cWro-zTVs/edit[[.underline]#https://docs.google.com/document/d/1OSKBChSTbc8NhuQ8YXRN-YxFnaVBj47Lz4cWro-zTVs/edit#]
 
-*=================================================================================
+++=================================================================================++
 
 === [.underline]#Introduction#:
 
@@ -4368,7 +4362,7 @@ image:extracted-media/media/image82.png[extracted-media/media/image82,width=621,
 
 ++**************************************************************************************************************++
 
-==== Configure Cloudera Manager for external authentication using LDAP (LDAP integration):
+=== Configure Cloudera Manager for external authentication using LDAP (LDAP integration):
 
 An LDAP-compliant identity/directory service, such as OpenLDAP/FreeIPA, provides different options for enabling Cloudera Manager to look-up user accounts and groups in the directory:
 
@@ -4599,7 +4593,7 @@ image:extracted-media/media/image202.png[extracted-media/media/image202,width=66
 
 ++**************************************************************************************************************++
 
-==== [.underline]#Setup Private Cloud (PvC) Base Cluster#
+=== [.underline]#Setup Private Cloud (PvC) Base Cluster#
 
 In this step, we will setup the Base cluster which will serve as the DataLake for the CDP Data Services that need the SDK capabilities for the cluster wide features like lineage, governance, security etc..,
 
@@ -5430,7 +5424,7 @@ https://github.com/cloudera-labs/toolkits/tree/main/data_services-toolkit/DS_Pre
 
 ++**************************************************************************************************************++
 
-==== Additional requirements and details for Private Cloud Base Cluster services:
+=== Additional requirements and details for Private Cloud Base Cluster services:
 
 *Note: Common Data Lake Services’ URLs:
 
@@ -5673,7 +5667,7 @@ Let *APPDOMAIN* be the base app domain for the ECS cluster. For example, if your
 
 ++**************************************************************************************************************++
 
-==== Configure Ranger with SSL/TLS enabled PostgreSQL Database
+=== Configure Ranger with SSL/TLS enabled PostgreSQL Database
 
 Login to Cloudera Manager Web Console. Go to *_Ranger > Configuration._
 
@@ -5828,7 +5822,7 @@ image:extracted-media/media/image88.png[extracted-media/media/image88,width=666,
 
 ++**************************************************************************************************************++
 
-==== Scale the Cluster (Optional– Skip this step)
+=== Scale the Cluster (Optional– Skip this step)
 
 The role assignment recommendation above is for clusters with at least 64 servers and in High Availability. For smaller clusters running without High Availability the recommendation is to dedicate one server for Name Node and a second server for secondary name node and YARN Resource Manager. For larger clusters larger than 16 nodes the recommendation is to dedicate one server each for name node, YARN Resource Manager and one more for running both Name Node (High Availability) and Resource Manager (High Availability) as in the table (no Secondary Name Node when in High Availability).
 
@@ -5839,7 +5833,7 @@ This implies that there will be at least 3 master nodes, running the Name Node, 
 
 All the three nodes will also need to run zookeeper and quorum journal node services. It is also recommended to have a minimum of 8 Data Nodes in a cluster. Please refer to the next section for details on how to enable HA.
 
-==== Enable High Availability (Optional– Skip this step)
+=== Enable High Availability (Optional– Skip this step)
 
 [arabic, start=39]
 . Setting up High Availability is done after the Cloudera Installation is completed. https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/managing-clusters/topics/cm-high-availability.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/managing-clusters/topics/cm-high-availability.html#]
@@ -5849,7 +5843,7 @@ All the three nodes will also need to run zookeeper and quorum journal node serv
 [arabic, start=40]
 . To enable specific web browsers to use SPNEGO to negotiate Kerberos authentication, please visit: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/security-how-to-guides/topics/cm-security-browser-access-kerberos-protected-url.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/security-how-to-guides/topics/cm-security-browser-access-kerberos-protected-url.html#]
 
-==== CDP Private Cloud Base checklist
+=== CDP Private Cloud Base checklist
 
 https://supportmatrix.cloudera.com/[[.underline]#Cloudera support matrix#] lists the supported software for the CDP Private Cloud Base cluster and the CDP Private Cloud Data Services containerized cluster.
 
@@ -6747,7 +6741,7 @@ CDP Private Cloud Base provides the following components and services that are u
 * Powerful and open-source Cloudera Runtime services such as Ranger, Atlas, Hive Metastore (HMS), etc.
 * Networking infrastructure that supports network traffic between storage and compute environments.
 
-==== Embedded Container Service (ECS) checklist
+=== Embedded Container Service (ECS) checklist
 
 Use the checklist for Embedded Container Service (ECS) for CDP Private Cloud Data Services: https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs/topics/cdppvc-installation-ds-checklist.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/installation-ecs/topics/cdppvc-installation-ds-checklist.html#]
 
@@ -7058,9 +7052,9 @@ In CM7.10.1, CM generated "local to auth" krb5 rules include embedded "\Q" and "
 
 ++**************************************************************************************************************++
 
-====  +
 
-==== Installing CDP Private Cloud Data Services using ECS
+
+=== Installing CDP Private Cloud Data Services using ECS
 
 Follow the steps here to install CDP Private Cloud Data Services with the *_Embedded Container Service (ECS)_*.
 
@@ -7079,9 +7073,9 @@ https://docs.cloudera.com/cdp-private-cloud-data-services/1.5.4/index.html[[.und
 
 ++**************************************************************************************************************++
 
-====  +
 
-==== Installing ECS Cluster
+
+=== Installing ECS Cluster
 
 Follow the steps in this topic to install CDP Private Cloud Data Services with the Embedded Container Service (ECS).
 
@@ -8189,7 +8183,7 @@ image:extracted-media/media/image6.png[extracted-media/media/image6,width=635,he
 
 ++**************************************************************************************************************++
 
-==== Additional Steps for ECS Cluster Setup: _(Optional, Skip this step)_
+=== Additional Steps for ECS Cluster Setup: _(Optional, Skip this step)_
 
 *Note:* If nvgfd-gpu-feature-discovery-xxxx pods remain in crashlookbackoff please apply patch to fix the issue.
 
@@ -8217,9 +8211,9 @@ image:extracted-media/media/image46.png[A screenshot of a computer Description a
 
 ++**************************************************************************************************************++
 
-====  +
 
-==== Dedicating ECS nodes for specific workloads _(Optional, Skip this step)_
+
+=== Dedicating ECS nodes for specific workloads _(Optional, Skip this step)_
 
 You use Cloudera Manager to dedicate Embedded Container Service (ECS) cluster nodes for specific workloads. You can dedicate GPU nodes for CML workloads, and NVME nodes for CDW workloads.
 
@@ -8255,7 +8249,7 @@ image:extracted-media/media/image100.png[extracted-media/media/image100,width=48
 
 ++**************************************************************************************************************++
 
-===  +
+
 
 === Accessing CDP Private Cloud
 
@@ -8478,7 +8472,7 @@ image:extracted-media/media/image19.png[A screenshot of a computer Description a
 
 ++**************************************************************************************************************++
 
-===  +
+
 
 === CDP Private Cloud Machine Learning (CML)
 
@@ -8490,7 +8484,7 @@ For more details on CML workspace and how to steps, visit: https://docs.cloudera
 
 https://docs.cloudera.com/machine-learning/1.5.4/workspaces-privatecloud/topics/ml-pvc-provision-ml-workspace.html[[.underline]#https://docs.cloudera.com/machine-learning/1.5.4/workspaces-privatecloud/topics/ml-pvc-provision-ml-workspace.html#]
 
-==== ML Workspace Creation:
+=== ML Workspace Creation:
 
 To get started with CML follow steps below:
 
@@ -8681,7 +8675,7 @@ https://docs.cloudera.com/machine-learning/cloud/product/topics/ml-product-overv
 
 https://docs.cloudera.com/data-warehouse/1.5.4/private-cloud-getting-started/topics/dw-private-cloud-create-virtual-warehouse-openshift-overview.html[[.underline]#https://docs.cloudera.com/data-warehouse/1.5.4/private-cloud-getting-started/topics/dw-private-cloud-create-virtual-warehouse-openshift-overview.html#]
 
-==== Enable CDW environment and creation of Database Catalog
+=== Enable CDW environment and creation of Database Catalog
 
 * Open *_CDP Data Services_* page.
 * Click on *_Data Warehouse_*.
@@ -8696,7 +8690,7 @@ image:extracted-media/media/image93.png[activate cdw,width=324,height=199]
 
 image:extracted-media/media/image161.png[low res mode,width=498,height=157]
 
-==== Create Virtual Warehouse
+=== Create Virtual Warehouse
 
 * Once the *_environment_* is *_activated_*, a *_default Database Catalog_* gets created automatically.
 
@@ -8726,11 +8720,11 @@ image:extracted-media/media/image164.png[vw hue,width=512,height=176]
 
 https://docs.cloudera.com/data-engineering/1.5.4/enable-data-engineering/topics/cde-private-cloud-add-cde-service.html[[.underline]#https://docs.cloudera.com/data-engineering/1.5.4/enable-data-engineering/topics/cde-private-cloud-add-cde-service.html#]
 
-==== CDP Base cluster requirements:
+=== CDP Base cluster requirements:
 
 The *_Cloudera Data Engineering (CDE)_* service requires proper configuration of *_Ozone_* service in the Base cluster. Ensure that *_Ozone_* is running properly otherwise you will end up with issues while enabling CDE.
 
-==== Enabling CDE Service:
+=== Enabling CDE Service:
 
 * From the *_CDP console page_*, click on *_Data Engineering_*.
 
@@ -8764,7 +8758,7 @@ If you are unable to see the service, then the chances are that the default virt
 
 image:extracted-media/media/image20.png[cde svc,width=571,height=185]
 
-==== Create Virtual Cluster:
+=== Create Virtual Cluster:
 
 When you *_enable CDE service_*, by default a new *_Virtual cluster with Spark2.4_* will be created. If you have not enabled this option earlier, then you need to create a virtual cluster again.
 
@@ -8790,7 +8784,7 @@ image:extracted-media/media/image141.png[vc clust details,width=483,height=197]
 
 image:extracted-media/media/image91.png[vc clust logs,width=488,height=168]
 
-==== [.underline]#Initializing Virtual Cluster#
+=== [.underline]#Initializing Virtual Cluster#
 
 Every time a *_new virtual cluster_* is created, there are a few *_manual steps_* that must be performed.
 
@@ -8839,7 +8833,7 @@ For the example host we used above, this command will be as below.
 
 * These steps must be performed for each virtual cluster you create.
 
-==== [.underline]#Configuring LDAP Users on CDE#
+=== [.underline]#Configuring LDAP Users on CDE#
 
 This step is required to submit the jobs to CDE from the LDAP users.
 
@@ -8900,7 +8894,7 @@ For the above example, the command would be below.
 
 This appendix contains the following:
 
-==== Appendix A – References Used in Guide 
+=== Appendix A – References Used in Guide 
 
 *Cloudera Private Cloud Base Getting Started Guide:
 
@@ -8922,7 +8916,7 @@ https://docs.cloudera.com/data-engineering/1.5.4/index.html[[.underline]#https:/
 
 https://docs.cloudera.com/data-warehouse/1.5.4/index.html[[.underline]#https://docs.cloudera.com/data-warehouse/1.5.4/index.html#]
 
-==== Appendix B – Glossary of Terms
+=== Appendix B – Glossary of Terms
 
 This glossary addresses some terms used in this document, for the purposes of aiding understanding. This is not a complete list of all multi cloud terminology. Some VMware product links are supplied here also, where considered useful for the purposes of clarity, but this is by no means intended to be a complete list of all applicable VMware products.
 
@@ -9138,7 +9132,7 @@ ____
 
 |===
 
-==== Appendix C – Glossary of Acronyms
+=== Appendix C – Glossary of Acronyms
 
 *ACL*—Access-Control List
 
@@ -9206,7 +9200,7 @@ Cloudera Data Platform Private Cloud Data Services installation on Embedded Cont
 
 https://www.devopszones.com/2020/03/how-to-add-freeipa-user-in-cli-and-web.html[[.underline]#https://www.devopszones.com/2020/03/how-to-add-freeipa-user-in-cli-and-web.html#]
 
-==== Add users on FreeIPA
+=== Add users on FreeIPA
 
 * Log in to the IPA server and run kinit with admin and enter the password: *_kinit admin_
 
