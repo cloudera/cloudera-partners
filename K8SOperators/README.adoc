@@ -31,6 +31,10 @@ The canonical documentation is https://docs.cloudera.com/?tab=kubernetes-operato
 .. Request a https://github.com/cloudera/cloudera-partners/tree/main/PartnerResources#partner-developer-license-program[Free Partner Developer License]
 
 == Installation
+[NOTE]
+====
+📝 All `**yaml**` files used for deploying various resources can be found in the link:./overrides[`**overrides**` folder].
+====
 
 . Get the latest updates
 +
