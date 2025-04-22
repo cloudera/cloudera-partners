@@ -55,6 +55,7 @@ validating_variables() {
          "ENABLE_DATA_SERVICES"
          "DOMAIN"
          "HOSTEDZONEID"
+         "KEYCLOAK_HTTPS"
       )
       echo "Provision_keycloak: $provision_keycloak"
       # Conditionally add Keycloak keys based on PROVISION_KEYCLOAK
@@ -212,6 +213,17 @@ validating_variables() {
             ;;
          WORKSHOP_USER_DEFAULT_PASSWORD)
             workshop_user_default_password=$value
+            ;;
+         KEYCLOAK_HTTPS)
+            if [[ "$value" =~ ^(true|yes|false|no)$ ]]; then
+               keycloak_https=$(echo $value | tr '[:upper:]' '[:lower:]')
+            else
+               echo "=================================================================================="
+               echo "FATAL: Invalid value for KEYCLOAK_HTTPS. Allowed values are 'true' or 'false'."
+               echo "Please update the 'configfile' and try again."
+               echo "=================================================================================="
+               exit 1
+            fi
             ;;
          # New domain and hostedzoneid fields
          DOMAIN)
@@ -591,59 +603,81 @@ setup_keycloak_ec2() {
    cd /userconfig/.$USER_NAMESPACE/keycloak_terraform_config
 
    ########## SSL Certs Genertaion Logic
-   # DOMAIN=$domain               # Base domain (e.g., example.com)
-   # HOSTED_ZONE_ID=$hostedzoneid # Route53 Hosted Zone ID
-   # CERT_EMAIL=admin@$domain     # Email for Let's Encrypt (e.g., admin@example.com)
-   # Check if required variables are provided
-   if [[ -z "$workshop_name" || -z "$domain" || -z "$hostedzoneid" ]]; then
-      echo "Missing Values for required parameters for SSL Certs"
-      exit 1
-   fi
-   # Derived Variables
-   SUBDOMAIN="$workshop_name.$domain"
-   echo "=== Subdomain: $SUBDOMAIN for HostedZoneId: $hostedzoneid ==="
-   CERT_PATH="/etc/letsencrypt/live/$domain"
-   echo "=== Generating Wildcard SSL Certificates ==="
-   # Install Certbot if not installed
-   if ! command -v certbot &>/dev/null; then
-      echo "Certbot not found. Installing..."
-      export DEBIAN_FRONTEND=noninteractive
-      apt-get update >/dev/null 2>&1 && apt-get install -y certbot python3-certbot-dns-route53 >/dev/null 2>&1
-   fi
-
-   SSL_MOUNT_PATH=/userconfig/sslcerts/$domain
-   mkdir -p $SSL_MOUNT_PATH
-   # Check if certificates are already generated for the same domain name
-   if [[ ! -f "$SSL_MOUNT_PATH/fullchain.pem" && ! -f "$SSL_MOUNT_PATH/privkey.pem" ]]; then
-      echo "SSL certificates doesn't exists. Starting certs generation process for Wildcard Domain: *.$domain..."
-      # Generate Wildcard SSL Certificates
-      certbot certonly \
-         --dns-route53 \
-         -d "*.$domain" \
-         --non-interactive \
-         --agree-tos \
-         -m "admin@$domain"
-      # Check if certificates were generated successfully
-      if [[ ! -f "$CERT_PATH/fullchain.pem" || ! -f "$CERT_PATH/privkey.pem" ]]; then
-         echo "Error: SSL certificates not generated. Exiting."
+   if [[ "$keycloak_https" == "true" ]]; then
+      # DOMAIN=$domain               # Base domain (e.g., example.com)
+      # HOSTED_ZONE_ID=$hostedzoneid # Route53 Hosted Zone ID
+      # CERT_EMAIL=admin@$domain     # Email for Let's Encrypt (e.g., admin@example.com)
+      # Check if required variables are provided
+      if [[ -z "$workshop_name" || -z "$domain" || -z "$hostedzoneid" ]]; then
+         echo "Missing Values for required parameters for SSL Certs"
          exit 1
       fi
-      echo "SSL certificates successfully generated for *.$domain"
-      for file in /etc/letsencrypt/archive/$domain/*1.pem; do cp -v "$file" "$SSL_MOUNT_PATH/$(basename "$file" 1.pem).pem"; done
-   else
-      echo "SSL certificates already exists. Skipping certs generation process for Wildcard Domain: *.$domain..."
+      # Derived Variables
+      SUBDOMAIN="$workshop_name.$domain"
+      echo "=== Subdomain: $SUBDOMAIN for HostedZoneId: $hostedzoneid ==="
+      CERT_PATH="/etc/letsencrypt/live/$domain"
+      echo "=== Generating Wildcard SSL Certificates ==="
+      # Install Certbot if not installed
+      if ! command -v certbot &>/dev/null; then
+         echo "Certbot not found. Installing..."
+         export DEBIAN_FRONTEND=noninteractive
+         apt-get update >/dev/null 2>&1 && apt-get install -y certbot python3-certbot-dns-route53 >/dev/null 2>&1
+      fi
+
+      SSL_MOUNT_PATH=/userconfig/sslcerts/$domain
+      mkdir -p $SSL_MOUNT_PATH
+      # Check if certificates are already generated for the same domain name
+      if [[ ! -f "$SSL_MOUNT_PATH/fullchain.pem" && ! -f "$SSL_MOUNT_PATH/privkey.pem" ]]; then
+         echo "SSL certificates doesn't exist. Starting certs generation process for Wildcard Domain: *.$domain..."
+         # Generate Wildcard SSL Certificates
+         certbot certonly \
+            --dns-route53 \
+            -d "*.$domain" \
+            --non-interactive \
+            --agree-tos \
+            -m "admin@$domain"
+         # Check if certificates were generated successfully
+         if [[ ! -f "$CERT_PATH/fullchain.pem" || ! -f "$CERT_PATH/privkey.pem" ]]; then
+            echo "Error: SSL certificates not generated. Exiting."
+            exit 1
+         fi
+         echo "SSL certificates successfully generated for *.$domain"
+         for file in /etc/letsencrypt/archive/$domain/*1.pem; do cp -v "$file" "$SSL_MOUNT_PATH/$(basename "$file" 1.pem).pem"; done
+      else
+         echo "SSL certificates already exist. Skipping certs generation process for Wildcard Domain: *.$domain..."
+      fi
+
+      # Encode SSL Certificates in Base64 (for Terraform user_data)
+      FULLCHAIN=$(cat "$SSL_MOUNT_PATH/fullchain.pem" | base64 -w 0)
+      PRIVKEY=$(cat "$SSL_MOUNT_PATH/privkey.pem" | base64 -w 0)
+
+      echo -e "\n=== Updating DNS Record for Route53 ==="
+      # Update Route53 DNS record to map subdomain to instance IP
+      aws route53 change-resource-record-sets --hosted-zone-id "$hostedzoneid" \
+         --change-batch '{
+           "Changes": [{
+               "Action": "UPSERT",
+               "ResourceRecordSet": {
+                   "Name": "'"$SUBDOMAIN"'",
+                   "Type": "A",
+                   "TTL": 300,
+                   "ResourceRecords": [{"Value": "'"$KEYCLOAK_SERVER_IP"'"}]
+               }
+           }]
+       }'
+      if [[ $? -ne 0 ]]; then
+         echo "Error: Failed to update DNS record. Exiting."
+         exit 1
+      fi
+      echo "DNS record updated: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
    fi
-
-   # Encode SSL Certificates in Base64 (for Terraform user_data)
-   FULLCHAIN=$(cat "$SSL_MOUNT_PATH/fullchain.pem" | base64 -w 0)
-   PRIVKEY=$(cat "$SSL_MOUNT_PATH/privkey.pem" | base64 -w 0)
-
+   ########## End of SSL Certs Genertaion Logic
    #######
 
    #local sg_name="$1"
    local sg_name="$workshop_name-keyc-sg"
 
-   echo -e "\n=== Running Terraform ===\n" 
+   echo -e "\n=== Running Terraform ===\n"
    # Run Terraform to provision Keycloak instance
    if check_aws_sg_exists "$sg_name"; then
       echo "EC2 Security Group with the same name already exists. Updating Security Group name to $sg_name-$workshop_name-sg"
@@ -680,25 +714,27 @@ setup_keycloak_ec2() {
    fi
 
    echo "Keycloak instance public IP: $KEYCLOAK_SERVER_IP"
-   echo -e "\n=== Updating DNS Record for Route53 ==="
-   # Update Route53 DNS record to map subdomain to instance IP
-   aws route53 change-resource-record-sets --hosted-zone-id "$hostedzoneid" \
-      --change-batch '{
-        "Changes": [{
-            "Action": "UPSERT",
-            "ResourceRecordSet": {
-                "Name": "'"$SUBDOMAIN"'",
-                "Type": "A",
-                "TTL": 300,
-                "ResourceRecords": [{"Value": "'"$KEYCLOAK_SERVER_IP"'"}]
-            }
-        }]
-    }'
-   if [[ $? -ne 0 ]]; then
-      echo "Error: Failed to update DNS record. Exiting."
-      exit 1
+   if [[ "$keycloak_https" == "true" ]]; then
+      echo -e "\n=== Updating DNS Record for Route53 ==="
+      # Update Route53 DNS record to map subdomain to instance IP
+      aws route53 change-resource-record-sets --hosted-zone-id "$hostedzoneid" \
+         --change-batch '{
+           "Changes": [{
+               "Action": "UPSERT",
+               "ResourceRecordSet": {
+                   "Name": "'"$SUBDOMAIN"'",
+                   "Type": "A",
+                   "TTL": 300,
+                   "ResourceRecords": [{"Value": "'"$KEYCLOAK_SERVER_IP"'"}]
+               }
+           }]
+       }'
+      if [[ $? -ne 0 ]]; then
+         echo "Error: Failed to update DNS record. Exiting."
+         exit 1
+      fi
+      echo "DNS record updated: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
    fi
-   echo "DNS record updated: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
    echo -e "\n=== Keycloak Setup Completed Successfully ==="
 
 }
@@ -711,21 +747,25 @@ destroy_keycloak() {
    terraform init
    echo "=== Wait for 30 seconds... ==="
    sleep 30
-   echo "=== Deleting DNS Record ==="
-   # Delete Route53 DNS record to unmap subdomain to instance IP
-   aws route53 change-resource-record-sets --hosted-zone-id "$hostedzoneid" \
-      --change-batch '{
-        "Changes": [{
-            "Action": "DELETE",
-            "ResourceRecordSet": {
-                "Name": "'"$workshop_name.$domain"'",
-                "Type": "A",
-                "TTL": 300,
-                "ResourceRecords": [{"Value": "'"$(terraform output -raw elastic_ip)"'"}]
-            }
-        }]
-    }'
-   echo "DNS record deleted: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
+
+   if [[ "$keycloak_https" == "true" ]]; then
+      echo "=== Deleting DNS Record ==="
+      # Delete Route53 DNS record to unmap subdomain to instance IP
+      aws route53 change-resource-record-sets --hosted-zone-id "$hostedzoneid" \
+         --change-batch '{
+           "Changes": [{
+               "Action": "DELETE",
+               "ResourceRecordSet": {
+                   "Name": "'"$workshop_name.$domain"'",
+                   "Type": "A",
+                   "TTL": 300,
+                   "ResourceRecords": [{"Value": "'"$(terraform output -raw elastic_ip)"'"}]
+               }
+           }]
+       }'
+      echo "DNS record deleted: $SUBDOMAIN -> $KEYCLOAK_SERVER_IP"
+   fi
+
    terraform destroy -auto-approve \
       -var "workshop_name=$workshop_name" \
       -var "local_ip=$local_ip" \
@@ -858,10 +898,10 @@ aws_enhancements() {
    fi
 
    cd /userconfig/.$USER_NAMESPACE/aws_enhancements/s3_enhancements
-     terraform init
-     terraform apply -auto-approve \
-         -var="log_bucket_name=$BUCKET_NAME" \
-         -var="aws_region=$aws_region"
+   terraform init
+   terraform apply -auto-approve \
+      -var="log_bucket_name=$BUCKET_NAME" \
+      -var="aws_region=$aws_region"
 }
 #--------------------------------------------------------------------------------------------------#
 # Update the User Group.
