@@ -10,20 +10,12 @@
   tasks:
     - name: Check and print variable status
       debug:
-<<<<<<< HEAD
         msg:
           - "cdp_env_name: {{ cdp_env_name }}"
           - "env_lb_public_subnet: {{ env_lb_public_subnet }}"
           - "env_wrkr_private_subnet: {{ env_wrkr_private_subnet }}"
           - "vw_size: {{ vw_size }}"
           - "cdvc_size: {{ cdvc_size }}"
-=======
-        msg: |
-          env_lb_public_subnet: {{ env_lb_public_subnet }}
-          env_wrkr_private_subnet: {{ env_wrkr_private_subnet }}
-          vw_size: {{ vw_size }}
-          cdvc_size: {{ cdvc_size }}
->>>>>>> bba5a28 (Update enable-cdw.yml : Formatting variable print in new line)
 
     - name: Activating CDW cluster
       cloudera.cloud.dw_cluster:
