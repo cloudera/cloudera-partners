@@ -55,7 +55,6 @@ validating_variables() {
          "ENABLE_DATA_SERVICES"
          "DOMAIN"
          "HOSTEDZONEID"
-         "KEYCLOAK_HTTPS"
       )
       echo "Provision_keycloak: $provision_keycloak"
       # Conditionally add Keycloak keys based on PROVISION_KEYCLOAK
@@ -63,7 +62,8 @@ validating_variables() {
          REQUIRED_KEYS+=(
             # "KEYCLOAK_SERVER_NAME"
             "KEYCLOAK_ADMIN_PASSWORD"
-            #"KEYCLOAK_SECURITY_GROUP_NAME"
+            # "KEYCLOAK_SECURITY_GROUP_NAME"
+            # "KEYCLOAK_HTTPS"
          )
       fi
 
@@ -217,12 +217,18 @@ validating_variables() {
          KEYCLOAK_HTTPS)
             if [[ "$value" =~ ^(true|yes|false|no)$ ]]; then
                keycloak_https=$(echo $value | tr '[:upper:]' '[:lower:]')
-            else
-               echo "=================================================================================="
-               echo "FATAL: Invalid value for KEYCLOAK_HTTPS. Allowed values are 'true' or 'false'."
-               echo "Please update the 'configfile' and try again."
-               echo "=================================================================================="
-               exit 1
+               DEFAULT_KEYCLOAK_HTTPS=true
+
+               export keycloak_https="${keycloak_https:-$DEFAULT_KEYCLOAK_HTTPS}"
+
+               # Print Assigned Values for keycloak_https
+               echo "keycloak_https: $keycloak_https"
+            # else
+            #    echo "=================================================================================="
+            #    echo "FATAL: Invalid value for KEYCLOAK_HTTPS. Allowed values are 'true' or 'false'."
+            #    echo "Please update the 'configfile' and try again."
+            #    echo "=================================================================================="
+            #    exit 1
             fi
             ;;
          # New domain and hostedzoneid fields
