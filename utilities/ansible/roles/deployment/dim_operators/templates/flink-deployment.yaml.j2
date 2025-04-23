@@ -1,0 +1,23 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: demo-flink
+spec:
+  image: container.repository.cloudera.com/cloudera/flink:1.19.2-csaop1.2.0-b27
+  flinkVersion: v1_19
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "4"
+  serviceAccount: flink
+  mode: native
+  jobManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  podTemplate:
+    spec:
+      imagePullSecrets:
+        - name: docker-pull-secret

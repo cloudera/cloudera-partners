@@ -19,6 +19,7 @@ variable "vpc_id" {
 variable "key_name" {
   description = "AWS key pair name to use for SSH access"
   type        = string
+  default     = ""
 }
 
 variable "local_ip" {
@@ -30,4 +31,9 @@ variable "instance_type" {
   description = "EC2 instance type"
   type        = string
   default     = "m5.2xlarge"
+}
+variable "instance_name" {
+  description = "name of the EC2 instance"
+  type        = string
+  default     = "DIM_Operatorstest"
 }

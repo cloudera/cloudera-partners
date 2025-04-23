@@ -1,0 +1,85 @@
+---
+- name: Check if kubectl is already installed
+  stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_bin
+
+- name: Download latest kubectl binary
+  shell: |
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  args:
+    chdir: /tmp
+  when: not kubectl_bin.stat.exists
+
+- name: Install kubectl
+  copy:
+    src: /tmp/kubectl
+    dest: /usr/local/bin/kubectl
+    remote_src: yes
+    mode: '0755'
+  when: not kubectl_bin.stat.exists
+
+- name: Remove kubectl binary from tmp
+  file:
+    path: /tmp/kubectl
+    state: absent
+  when: not kubectl_bin.stat.exists
+
+- name: Check if k9s is already installed
+  stat:
+    path: /usr/bin/k9s
+  register: k9s_bin
+
+- name: Download latest k9s .deb package
+  get_url:
+    url: https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.deb
+    dest: /tmp/k9s_Linux_amd64.deb
+    mode: '0644'
+  when: not k9s_bin.stat.exists
+
+- name: Install k9s utility
+  apt:
+    deb: /tmp/k9s_Linux_amd64.deb
+  when: not k9s_bin.stat.exists
+
+- name: Clean up k9s .deb file
+  file:
+    path: /tmp/k9s_Linux_amd64.deb
+    state: absent
+  when: not k9s_bin.stat.exists
+
+- name: Check if Helm is already installed
+  stat:
+    path: /usr/local/bin/helm
+  register: helm_bin
+
+- name: Install Helm
+  shell: curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  when: not helm_bin.stat.exists
+
+- name: Add OpenLDAP Helm repo
+  become_user: "{{ ansible_user }}"
+  shell: helm repo add helm-openldap https://jp-gouin.github.io/helm-openldap/
+  register: helm_repo_add
+  changed_when: "'has been added' in helm_repo_add.stdout"
+
+- name: Render and copy Jinja2 template to /tmp
+  template:
+    src: openldap-values.yaml.j2
+    dest: /tmp/openldap-values.yaml
+    mode: '0644'
+
+# Step 1: Check if OpenLDAP is already deployed using Helm
+- name: Check if OpenLDAP is already deployed
+  become_user: "{{ ansible_user }}"
+  command: helm list -n openldap --filter '^openldap$' -q
+  register: ldap_helm_status
+  changed_when: false
+  failed_when: false
+
+# Step 2: Deploy OpenLDAP with Helm if not already deployed
+- name: Deploy OpenLDAP with Helm
+  become_user: "{{ ansible_user }}"
+  shell: >
+    helm upgrade -i openldap helm-openldap/openldap-stack-ha
+    --create-namespace --namespace openldap -f /tmp/openldap-values.yaml

@@ -1,0 +1,14 @@
+all:
+  vars:
+    ssh_private_key_file: "{{ ssh_private_key_file }}"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+  hosts:
+    installationhost:
+      ansible_host: "{{ lookup('env', 'INSTALLATION_HOST') | default('localhost') }}"
+      ansible_connection: "{{ 'local' if lookup('env', 'INSTALLATION_HOST') in ['localhost', '127.0.0.1'] else 'ssh' }}"
+      ansible_user: >-
+        {{ lookup('env', 'INSTALLATION_USER') 
+           if lookup('env', 'INSTALLATION_USER') 
+           else ('ubuntu' if lookup('env', 'INSTALLATION_HOST') not in ['localhost', '127.0.0.1'] else omit) }}
+      ansible_ssh_private_key_file: "{{ ssh_private_key_file }}"
+

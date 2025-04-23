@@ -27,7 +27,7 @@ resource "tls_private_key" "generated" {
 }
 
 resource "aws_key_pair" "generated" {
-  key_name   = "auto-key-${replace(uuid(), "-", "")}"
+  key_name   = "generated-${var.instance_name}"
   public_key = tls_private_key.generated[0].public_key_openssh
   count      = var.key_name == "" ? 1 : 0
 }
@@ -35,7 +35,7 @@ resource "aws_key_pair" "generated" {
 # Save private key locally (e.g., to use via Ansible or SSH)
 resource "local_file" "private_key" {
   content  = tls_private_key.generated[0].private_key_pem
-  filename = "${path.module}/generated-ec2-key.pem"
+  filename = "${path.module}/generated-${var.instance_name}.pem"
   file_permission = "0600"
   count    = var.key_name == "" ? 1 : 0
 }
@@ -91,7 +91,7 @@ resource "aws_instance" "my_instance" {
   subnet_id              = data.aws_subnets.available.ids[0]
   vpc_security_group_ids = [aws_security_group.ssh.id]
   tags = {
-    "Name" = "var.instance_name"
+    "Name" = var.instance_name
   }
 }
 

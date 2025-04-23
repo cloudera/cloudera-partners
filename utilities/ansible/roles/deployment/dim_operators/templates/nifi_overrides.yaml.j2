@@ -1,0 +1,77 @@
+apiVersion: cfm.cloudera.com/v1alpha1
+kind: Nifi
+metadata:
+  name: demonifi
+spec:
+  replicas: 1
+  image:
+    repository: container.repository.cloudera.com/cloudera/cfm-nifi-k8s
+    tag: "{{ nifi_image_tag }}"
+    pullSecret: docker-pull-secret
+    pullPolicy: IfNotPresent
+  tiniImage:
+    repository: container.repository.cloudera.com/cloudera/cfm-tini
+    tag: "{{ nifi_tini_image }}"
+    pullSecret: docker-pull-secret
+    pullPolicy: IfNotPresent
+  hostName: demonifi.dimoperators.clouderapartners.click
+  uiConnection:
+    type: Ingress
+    ingressConfig:
+      ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/affinity: cookie
+      nginx.ingress.kubernetes.io/affinity-mode: persistent
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      nginx.ingress.kubernetes.io/proxy-body-size: "700m"
+      nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+  security:
+    nodeCertGen:
+      issuerRef:
+        name: self-signed-ca-issuer
+        kind: ClusterIssuer
+    ldap:
+      authenticationStrategy: SIMPLE
+      managerDN: "cn=admin,dc=example,dc=org"
+      secretName: openldap-creds
+      referralStrategy: FOLLOW
+      connectTimeout: 3 secs
+      readTimeout: 10 secs
+      url: ldap://openldap.openldap.svc.cluster.local:389
+      userSearchBase: "dc=example,dc=org"
+      userSearchFilter: "(uid={0})"
+      identityStrategy: USE_USERNAME
+      authenticationExpiration: 12 hours
+      sync:
+        interval: 1 min
+        userObjectClass: inetOrgPerson
+        userSearchScope: SUBTREE
+        userIdentityAttribute: cn
+        userGroupNameAttribute: ou
+        userGroupNameReferencedGroupAttribute: ou
+        groupSearchBase: "dc=example,dc=org"
+        groupObjectClass: organizationalUnit
+        groupSearchScope: OBJECT
+        groupNameAttribute: ou
+    initialAdminIdentity: nifiadmin
+  resources:
+    nifi:
+      requests:
+        cpu: "1000m"
+        memory: "4Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+    log:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
+  persistence:
+    size: 1Gi
+    contentRepo:
+      size: 1Gi
+    flowfileRepo:
+      size: 1Gi
+    provenanceRepo:
+      size: 2Gi
+    data: {}

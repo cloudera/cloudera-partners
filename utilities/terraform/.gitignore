@@ -1,0 +1,5 @@
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+ec2/generated-DIM_Operatorstest.pem

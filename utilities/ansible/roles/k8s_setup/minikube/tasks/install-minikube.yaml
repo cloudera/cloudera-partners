@@ -1,0 +1,71 @@
+---
+# Step 1: Check if Minikube binary exists
+- name: Check if Minikube is already installed
+  stat:
+    path: /usr/local/bin/minikube
+  register: minikube_bin
+
+# Step 2: Download Minikube binary if not installed
+- name: Download Minikube binary
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /tmp/minikube-linux-amd64
+    mode: '0755'
+  when: not minikube_bin.stat.exists
+
+# Step 3: Install Minikube binary
+- name: Install Minikube binary
+  copy:
+    src: /tmp/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
+    remote_src: yes 
+    mode: '0755'
+  when: not minikube_bin.stat.exists
+
+- name: Change permissions on Docker socket temporarily
+  become: true
+  file:
+    path: /var/run/docker.sock
+    mode: '0666'
+
+# Step 4: Check current status of Minikube
+- name: Check current Minikube status
+  become_user: "{{ ansible_user }}"
+  command: minikube status
+  register: minikube_status
+  changed_when: false
+  failed_when: false
+
+- name: Debug Minikube status
+  debug:
+    msg: "{{ minikube_status.stdout_lines }}"
+
+# Step 5: Start Minikube if not running
+- name: Start Minikube
+  become_user: "{{ ansible_user }}"
+  shell: sg docker -c "minikube start --cpus 8 --memory 30000"
+  register: minikube_start
+  when: "'host: Running' not in minikube_status.stdout_lines"
+
+
+- name: Wait for Minikube to be running
+  become_user: "{{ ansible_user }}"
+  command: >
+    minikube status
+  register: minikube_status_check
+  until: "'host: Running' in minikube_status_check.stdout_lines"
+  retries: 20
+  delay: 15
+
+# Step 7: Remove temporary binary file
+- name: Remove downloaded Minikube binary from /tmp
+  file:
+    path: /tmp/minikube-linux-amd64
+    state: absent
+  when: not minikube_bin.stat.exists
+
+- name: Restore Docker socket permission
+  become: true
+  file:
+    path: /var/run/docker.sock
+    mode: '0660'

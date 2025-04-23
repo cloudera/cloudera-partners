@@ -1,0 +1,9 @@
+---
+ldapadmin_password: "{{ ldapadmin_password }}"
+Cloudera_username: "{{ Cloudera_username }}"
+Cloudera_password: "{{ Cloudera_password }}"
+cfm_operator_version: "{{ cfm_operator_version }}"
+nifi_image_tag: 2.9.0-b96-nifi_1.27.0.2.3.14.0-14
+nifi_tini_image: 2.9.0-b96
+nifiregistry_image_tag: 2.8.0-b94-nifi_1.25.0.2.3.13.0-36
+nifiregistry_tini_image: 2.8.0-b94

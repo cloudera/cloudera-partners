@@ -1,0 +1,42 @@
+- name: Copy Cloudera license file to remote host
+  copy:
+    src: cloudera_license.txt
+    dest: /tmp/cloudera_license.txt
+    mode: '0600'
+
+- name: Create license secret for CFM Operator
+      shell: |
+        kubectl create secret generic cfm-operator-license \
+          --from-file=license.txt=/tmp/cloudera_license.txt \
+          -n cfm-operator-system \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Download CFM Operator tarball
+      shell: >
+        curl -u "{{ Cloudera_username }}:{{ Cloudera_password }}" \
+        -O https://archive.cloudera.com/p/cfm-operator/cfm-operator-{{ cfm_operator_version }}.tgz
+      args:
+        chdir: /tmp
+
+    - name: Extract CFM Operator package
+      shell: tar -xvzf cfm-operator-{{ cfm_operator_version }}.tgz
+      args:
+        chdir: /tmp
+
+    - name: Install CFM Operator via Helm
+      shell: |
+        helm install cfm-operator ./cfm-operator \
+          --create-namespace \
+          --namespace cfm-operator-system \
+          --set installCRDs=true \
+          --set image.repository=container.repository.cloudera.com/cloudera/cfm-operator \
+          --set image.tag={{ cfm_operator_version }} \
+          --set licenseSecret=cfm-operator-license
+      args:
+        chdir: /tmp
+
+    - name: Apply NiFi configuration
+      shell: kubectl apply -f /tmp/nifi_overrides.yaml -n demo-nifi
+
+    - name: Apply NiFi Registry configuration
+      shell: kubectl apply -f /tmp/nifiregistry.yaml -n demo-nifi-registry

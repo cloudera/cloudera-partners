@@ -1,7 +1,7 @@
 variable "instance_name" {
   description = "name of the EC2 instance"
   type        = string
-  default     = "DIM_Operators"
+  default     = "DIM_Operatorstest"
 }
 
 variable "instance_type" {
@@ -13,6 +13,7 @@ variable "instance_type" {
 variable "key_name" {
   description = "SSH key pair name"
   type        = string
+  default     = ""
 }
 
 variable "vpc_id" {

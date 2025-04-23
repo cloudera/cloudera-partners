@@ -1,0 +1,20 @@
+---
+- name: Setup host Kubernetes
+  hosts: installationhost
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - ../common_vars.yaml
+    
+  vars:
+    k8s_distribution: minikube  # or eks
+
+  roles:
+    - role: k8s_setup/minikube
+      when: k8s_distribution == "minikube"
+
+    - role: k8s_setup/eks
+      when: k8s_distribution == "eks"
+  
+  #  - role: deployment/dim_operators

@@ -1,0 +1,9 @@
+---
+- name: Install Docker
+  include_tasks: install-docker.yaml
+
+- name: Install Minikube
+  include_tasks: install-minikube.yaml
+
+- name: Install k8sutilitise
+  include_tasks: install-k8sutilitise.yaml
