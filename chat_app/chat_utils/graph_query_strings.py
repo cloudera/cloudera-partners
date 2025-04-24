@@ -1,4 +1,3 @@
-
 GET_DEMO_CUSTOMER_IDS="MATCH (c:Customer)-[:placed]->(o)-[r:has_item]->(p:Product) RETURN c.customer_id AS id"
 
 GET_TIER="""
@@ -30,9 +29,9 @@ END AS tier
 """
 
 GET_PROMOTIONS_FOR_ALL_TIERS="""
-MATCH (d:Tier_Diamond)
-MATCH (g:Tier_Gold)
-MATCH (s:Tier_Silver)
+MATCH (d:TierDiamond)
+MATCH (g:TierGold)
+MATCH (s:TierSilver)
 RETURN d.discount AS diamond, g.discount AS gold, s.discount AS silver, "" AS member
 """
 
