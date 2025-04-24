@@ -1,107 +1,46 @@
-# RAG-based AI Agents with Cloudera AI
+# AI Agents with Cloudera AI
 
-The goal of this hands-on-lab is to explore Cloudera AI through the lens of the Agentic [Retreival Augmented Generation](https://arxiv.org/abs/2312.10997) (RAG) architecture approach. Starting from a simple Jupyter notebook and finishing with a complete chatbot application, participants will get to know some of the key Cloudera AI features and advantages. In a real-world scenario, changing business requirements and technology advancements requires agility and Cloudera AI is a great tool to enable Data Science practitioners to build use cases quickly.
+The goal of this hands-on-lab is to explore Cloudera AI and how it can be used to build AI Agents and Agentic [Retreival Augmented Generation](https://arxiv.org/abs/2312.10997) (RAG) applications. Starting with a low-code approach with Cloudera AI's Agent Studio and finishing with a complete chatbot application, participants will get to know some of the key Cloudera AI features and advantages. In a real-world scenario, changing business requirements and technology advancements requires agility and Cloudera AI is a great tool to enable Data Science practitioners to build use cases quickly.
 
-Because the applications of LLMs can be quite broad across industries, we will hone in on a particular use case for the purposes of this lab.
-
-> **Lab use case:** An ECommerce vendor is looking to pilot a LLM based chat to answer customer questions related to company policies and promotions. 
- 
 ## Lab Flow
 
-In this lab, you will interact with the knowledge base that has been loaded into a Pinecone vector database. You will explore how customer and product relationships are stored in a Graph Database to create a rich agentic workflow application to service an E-Commerce Chat application
+In this lab, you will start by building your own agents first. Next, you will interact with a multi-agent workflow that talks to a Pinecone vector database and a Neo4j Graph Database as part of an E-Commerce Chat application
 
-There are currently 4 exercises in the lab. It is important to follow the exercise order, as there are dependencies between different stages. 
-  - [0. Getting into Cloudera AI](#0-getting-into-cloudera-ai)
-  - [1. Exploring Amazon Bedrock through Cloudera AI](#1-exploring-amazon-bedrock-through-cloudera-ai)
-  - [2. Explore your data via Pinecone DB](#2-explore-your-data-via-pinecone-db)
-  - [3. Intro to Crew AI](#3-intro-to-crew-ai-intro)
-  - [4. Deploy a Agentic Chat application](#4-deploy-a-cloudera-ai--application)
+There are currently 3 exercises in the lab. It is important to follow the exercise order. 
+  - [0. Getting into Cloudera AI](#module-0-getting-into-cloudera-ai)
+  - [1. Single Agent Workflow](./docs/Agent%20Studio%20HOL%20-%20Participant%20Guide%20-%204-24%20External%20Lab.pdf)
+  - [2. Sequential Agent Workflow](./docs/Agent%20Studio%20HOL%20-%20Participant%20Guide%20-%204-24%20External%20Lab.pdf)
+  - [3. Deploy a Agentic Chat application](#module-3-deploy-a-cloudera-ai-application)
 
-## 0. Getting into Cloudera AI
+## Module 0: Getting into Cloudera AI
 
 After login, you will be taken to the home screen of Cloudera Data Platform. Some of you may be asked to "Try the new UI...". Make sure to click **Enable New UI**. From here you can access Cloudera AI - one of its Data Services.
 
 > **0a.** Click on the "Cloudera AI" icon.
 ![Control Plane to CML](./assets/new-home-page.png)
 
-> **0b.** Then click on ML Workspace called _agentic-ai-cml-ws_.
+> **0b.** Then click on ML Workspace provided to you by your facilitator. Alternatively, you can directly use the workspace link assigned to you.
 ![CML Home Page](./assets/ML_Workspaces_Home.png)
 
 If you are new to Cloudera AI, take a moment to explore the dashboard.
 
-Cloudera uses the concept of _projects_ to organize the workspace. Each project is typically linked to a remote repository (e.g. git) and can have multiple collaborators working on it. In the interest of time, a _Hands on Lab with RAG Agents_ project has already been created for you and you are the sole _Owner_ of that project.
+Cloudera uses the concept of _projects_ to organize the workspace. Each project is typically linked to a remote repository (e.g. git) and can have multiple collaborators working on it.
 
-> **0c.** When ready click into the project:
+## Modules 2 & 3 Build Agents using Cloudera Agent Studio
+
+Go to the PDF provided for Modules 1 and 2 [here](./docs/Agent%20Studio%20HOL%20-%20Participant%20Guide%20-%204-24%20External%20Lab.pdf)
+
+## Module 3: Deploy a Cloudera AI application
+
+> **Lab use case:** An ECommerce vendor is looking to pilot a LLM based chat to answer customer questions related to company policies and promotions. 
+
+In the interest of time, a _Hands on Lab with RAG Agents_ project has already been created for you and you are the sole _Owner_ of that project.
+
+When ready click into the project:
 ![Workspace Home](./assets/Workspace_Home.png)
 
 Take a moment to familiarize yourself with the project page. Notice that your project now has all required files (your code base), a readme below, project specific options in the left hand column, plus more. Throughout the lab you will use many of the features listed here.
 ![Project Home](./assets/Project_Home.png)
-
-## 1. Exploring Amazon Bedrock through Cloudera AI
-
-In this first section, we'll interact with a model (Anthropic's Claude v2) via Amazon's Bedrock service. To do this we will start a _Session_ with a Jupyter notebook UI. 
-
->**1a.** Start a session by clicking _New Session_ in the top right corner. Alternatively you can click on _Sessions_ in the sidebar and click _New Session_ there.
-![Session Button](./assets/Session_Button.png)
-
->**1b.** Give you session a name (e.g. "Jupyter Rocks!"). 
->* For **Editor** select _JupyterLab_ 
->* For **Kernel** select _Python 3.10_
->* For **Version** select _2024.10_
->* For **Edition** select _Standard_ 
->* Leave the other settings as is.
->![Session setup UI](./assets/Session_Create.png)
-
->**1c.** Click _Start Session_ in the bottom right.
-
->**1d.** After a few seconds your isolated compute pod, running Jupyter UI, with Python 3.10 Kernel will be ready. 
-
->**1e.** A pop-up will open suggesting data connection code snippets to get started. This is useful to connect to data sources available in the same environment. You can select _Don't show me this again_ and close the pop-up window.
-
-> **1f.** You will now see a familiar Jupyter notebook interface. In the left navigation panel go to ```1_bedrock_intro``` folder and open ```prototype_with_aws_bedrock.ipynb``` by double-clicking it.
-![Alt text](./assets/bedrock-file.png)
-
->**1g.** As you walk through the notebook review the explanations and run each cell (you can use ```Shift + Enter``` or ```Command + Enter```). Alternatively, you can click on the "Play" button at the tom of the notebook. When you are finished going through the notebook come back to this guide. 
-
-![Alt text](./assets/bedrock-lab-completed.png)
-
-:pencil2: You have now gotten familiar with creating a Cloudera AI session, working with JupyterLab editor and interacted with a 3rd party LLM provider. All within an isolated and secure compute pod.
-
-
-## 2. Explore your data via Pinecone DB
-
-In this exercise you will interact with the knowledge base that has been loaded in a Pinecone vector database in advance of this lab. 
-
->**2a.** Click on _Sessions_ in the left sidebar. If the session you've created before has expired, click _New Session_ in the top right and follow the steps in **1b**. Otherwise, click on your session to return to it. 
-![Select Existing Session](./assets/Existing_Session.png)
-
->**2b.**  Once Jupyter UI comes up, open file ```2_query_vector_db/pinecone_vectordb_query.ipynb``` by double clicking it.
-![Interact with Pinecone](./assets/pinecone-notebook.png)
-
->**2c.** Work through the notebook by running each cell. When you are finished come back to this guide.
-
-## 3. Intro to CrewAI Intro 
-
-In this exercise, you will learn the basics of CrewAI, a framework used for orchestrating AI Agents.
-
-Unlike LLM-based chatbots or inference endpoints that you may be familiar with, AI Agents generally have 3 ingredients:
-- **Foundational LLM:** We leverage one or more LLMs to take on different roles, understand the task and determine what action to take at each step
-- **APIs:** These can be used to accomplish various CRUD operations, to talk to other systems, and to use a RAG architecture to augment agents
-- **Agent Orchestration Framework:** We leverage a framework to facilitate communication and collaboration between multiple LLM-based agents, to enable agents to take actions by leveraging the APIs and to set up controls so that agents stay on track with the task they are assigned
-
->**3a.** Click on _Sessions_ in the left sidebar. If the session you've created before has expired, click _New Session_ in the top right and follow the steps in **1b**. Otherwise, click on your session to return to it. 
-![Select Existing Session](./assets/Existing_Session.png)
-
-
->**3b.**  Once Jupyter UI comes up, open file ```3_crewai_intro/intro_to_crewai.ipynb``` by double clicking it.
-![Interact with Pinecone](./assets/crewai-intro.png)
-
->**3c.** Work through the notebook by running each cell. Notice here that the base LLM is hosted by the AI Inference Service. When you are finished come back to this guide.
-
-:pencil2: You have all of the starting building blocks for building a full RAG-based, ECommerce Chat application.
-
-
-## 4. Deploy a Cloudera AI  application
 
 So far we have interacted with our models and vector database through a Jupyter notebook. Now lets see how a user might interact with an LLM solution through a Cloudera AI application. Cloudera AI can be used to deploy UI applications based on popular frameworks (e.g. [flask](https://flask.palletsprojects.com/en/3.0.x/), [streamlit](https://streamlit.io/), [gradio](https://www.gradio.app/)) for deploying applications. In this lab we'll be deploying a gradio app to interact with the model using a chat interface. 
 
@@ -110,7 +49,7 @@ The exercise will walk you through the steps to deploy the application using the
 **Agentic Workflow Architecture**
 ![Alt text](./assets/agentic-workflow1.png)
 
->**4a.** Go back to your project screen, by clicking ![<-- Project](./assets/project-btn.png) in the top bar of your session. 
+>**4a.** Go to your project screen. 
 
 >**4b.** In the left sidebar click on _Applications_. 
 ![Alt-text](./assets/deploy-cml-app-button.png)
