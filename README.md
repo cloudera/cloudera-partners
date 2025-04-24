@@ -49,40 +49,40 @@ The exercise will walk you through the steps to deploy the application using the
 **Agentic Workflow Architecture**
 ![Alt text](./assets/agentic-workflow1.png)
 
->**4a.** Go to your project screen. 
+>**3a.** Go to your project screen. 
 
->**4b.** In the left sidebar click on _Applications_. 
+>**3b.** In the left sidebar click on _Applications_. 
 ![Alt-text](./assets/deploy-cml-app-button.png)
 
->**4c.** Press _New Application_ in the middle of the screen.
+>**3c.** Press _New Application_ in the middle of the screen.
 
->**4d.** Name your application. Here we name it ```Agentic AI Chat App```
+>**3d.** Name your application. Here we name it ```Agentic AI Chat App```
 
->**4e.** Provide a creative subdomain name. This has to be **unique**.
+>**3e.** Provide a creative subdomain name. This has to be **unique**.
 
->**4f.** Select the following path for your application **Script**:
+>**3f.** Select the following path for your application **Script**:
 ```chat_app/agents_app_launch.py```
 
->**4g.** Ensure you have selected the right container settings for the application, per below:
+>**3g.** Ensure you have selected the right container settings for the application, per below:
 >* For **Editor** select _JupyterLab_ 
 >* For **Kernel** select _Python 3.10_
 >* For **Version** select _2024.10_
 >* For **Edition** select _Standard_ 
 
->**4h.** For resource profile, select _2 vCPU / 4 GB Memory_. Overall, aside for the subdomain, settings should look like the below screenshot.
+>**3h.** For resource profile, select _2 vCPU / 4 GB Memory_. Overall, aside for the subdomain, settings should look like the below screenshot.
 ![Alt text](./assets/image_app.png)
 
->**4i.** Click _Create Application_ at the bottom of the page.
+>**3i.** Click _Create Application_ at the bottom of the page.
 
 ### Interacting with an Application
 The application will take a couple of miuntes to start, once it does you can click on its card to open the UI. While it's starting you can review the code in the ```chat_app``` directory.
 
 You will notice that we have folders for ```crew_agents``` and ```tools```, where we define the agents and tools for the application. The ```chat_utils``` folder is used to host utility functions that make it easier to interact with Pinecone and Neo4j. We store the application's global state using the ```app_config``` folder. You will notice the reliance on some environment variables. These have been setup at the ML Workspace level and can be shared accross all projects. Alternatively, environment variables can be specific to a Project or even a session, job, or application.
 
->**4j.** Check to confirm your app has deployed successfuly. You should see a message confirming this. 
+>**3j.** Check to confirm your app has deployed successfuly. You should see a message confirming this. 
 ![Alt-text](./assets/image-click-on-app.png)
 
->**4k.** Click on the App's URL to navigate to the Gradio UI. In a new tab you should see the appliction open:
+>**3k.** Click on the App's URL to navigate to the Gradio UI. In a new tab you should see the appliction open:
 ![alt text](.assets/../assets/chat-app-1.png)
 
 Take some time to ask different questions about CML. Some examples to get you started... 
