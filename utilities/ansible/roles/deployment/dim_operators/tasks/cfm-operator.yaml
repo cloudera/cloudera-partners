@@ -1,42 +1,89 @@
+- name: Check if CFM Operator version is already downloaded
+  stat:
+    path: /tmp/cfm-operator-{{ cfm_operator_version }}.tgz
+  register: cfm_operator_stat
+  changed_when: false
+  failed_when: false
+
 - name: Copy Cloudera license file to remote host
+  become_user: "{{ ansible_user }}"
   copy:
     src: cloudera_license.txt
     dest: /tmp/cloudera_license.txt
     mode: '0600'
 
 - name: Create license secret for CFM Operator
-      shell: |
-        kubectl create secret generic cfm-operator-license \
-          --from-file=license.txt=/tmp/cloudera_license.txt \
-          -n cfm-operator-system \
-          --dry-run=client -o yaml | kubectl apply -f -
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl create secret generic cfm-operator-license \
+      --from-file=license.txt=/tmp/cloudera_license.txt \
+      -n cfm-operator-system \
+      --dry-run=client -o yaml | kubectl apply -f -
+  register: license_secret_create
+  failed_when: license_secret_create.rc != 0
+  changed_when: "'created' in license_secret_create.stdout or 'configured' in license_secret_create.stdout"
 
-    - name: Download CFM Operator tarball
-      shell: >
-        curl -u "{{ Cloudera_username }}:{{ Cloudera_password }}" \
-        -O https://archive.cloudera.com/p/cfm-operator/cfm-operator-{{ cfm_operator_version }}.tgz
-      args:
-        chdir: /tmp
+- name: Download CFM Operator tarball if version is changed
+  shell: >
+    curl -u "{{ Cloudera_username }}:{{ Cloudera_password }}" \
+    -O https://archive.cloudera.com/p/cfm-operator/cfm-operator-{{ cfm_operator_version }}.tgz
+  args:
+    chdir: /tmp
+  when: cfm_operator_stat.stat.exists == false  # Only download if not already present
+  failed_when: false
+  changed_when: true
 
-    - name: Extract CFM Operator package
-      shell: tar -xvzf cfm-operator-{{ cfm_operator_version }}.tgz
-      args:
-        chdir: /tmp
+- name: Extract CFM Operator package if tarball has changed
+  shell: tar -xvzf cfm-operator-{{ cfm_operator_version }}.tgz
+  args:
+    chdir: /tmp
+  when: cfm_operator_stat.stat.exists == false  # Only extract if the tarball was downloaded
+  failed_when: false  # handle extraction issue as needed
+  changed_when: true
 
-    - name: Install CFM Operator via Helm
-      shell: |
-        helm install cfm-operator ./cfm-operator \
-          --create-namespace \
-          --namespace cfm-operator-system \
-          --set installCRDs=true \
-          --set image.repository=container.repository.cloudera.com/cloudera/cfm-operator \
-          --set image.tag={{ cfm_operator_version }} \
-          --set licenseSecret=cfm-operator-license
-      args:
-        chdir: /tmp
+- name: Check if CFM Operator is already installed via Helm
+  become_user: "{{ ansible_user }}"
+  shell: helm list -n cfm-operator-system --filter ^cfm-operator$ | grep cfm-operator || true
+  register: cfm_operator_installed
+  changed_when: false
+  failed_when: false
 
-    - name: Apply NiFi configuration
-      shell: kubectl apply -f /tmp/nifi_overrides.yaml -n demo-nifi
+- name: Install CFM Operator via Helm if not already installed
+  become_user: "{{ ansible_user }}"
+  shell: |
+    helm install cfm-operator ./cfm-operator \
+      --create-namespace \
+      --namespace cfm-operator-system \
+      --set installCRDs=true \
+      --set image.repository=container.repository.cloudera.com/cloudera/cfm-operator \
+      --set image.tag={{ cfm_operator_version }} \
+      --set licenseSecret=cfm-operator-license
+  args:
+    chdir: /tmp
+  when: cfm_operator_installed.stdout == ""
+  register: install_cfm_operator_result
+  changed_when: "'has been added' in install_cfm_operator_result.stdout"
 
-    - name: Apply NiFi Registry configuration
-      shell: kubectl apply -f /tmp/nifiregistry.yaml -n demo-nifi-registry
+- name: Wait for pods to be running in cfm-operator-system namespace
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl get pods -n cfm-operator-system | grep -E 'cfm-operator' | awk '{print $3}' | grep -v 'Running'
+  register: pod_status
+  until: pod_status.stdout == ""
+  retries: 10
+  delay: 30
+  failed_when: false
+
+- name: Apply NiFi configuration
+  become_user: "{{ ansible_user }}"
+  shell: kubectl apply -f /tmp/nifi_overrides.yaml -n demo-nifi
+  register: nifi_apply
+  changed_when: "'created' in nifi_apply.stdout or 'configured' in nifi_apply.stdout"
+  failed_when: nifi_apply.rc != 0
+
+- name: Apply NiFi Registry configuration
+  become_user: "{{ ansible_user }}"
+  shell: kubectl apply -f /tmp/nifiregistry.yaml -n demo-nifi-registry
+  register: nifi_registry_apply
+  changed_when: "'created' in nifi_registry_apply.stdout or 'configured' in nifi_registry_apply.stdout"
+  failed_when: nifi_registry_apply.rc != 0

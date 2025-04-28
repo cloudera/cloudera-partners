@@ -1,7 +1,6 @@
 variable "instance_name" {
   description = "name of the EC2 instance"
   type        = string
-  default     = "DIM_Operatorstest"
 }
 
 variable "instance_type" {

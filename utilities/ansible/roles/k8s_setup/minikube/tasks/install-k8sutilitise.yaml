@@ -69,17 +69,18 @@
     dest: /tmp/openldap-values.yaml
     mode: '0644'
 
-# Step 1: Check if OpenLDAP is already deployed using Helm
-- name: Check if OpenLDAP is already deployed
+- name: Check if OpenLDAP is already installed
   become_user: "{{ ansible_user }}"
-  command: helm list -n openldap --filter '^openldap$' -q
-  register: ldap_helm_status
+  shell: helm list -n openldap --filter ^openldap$ | grep openldap || true
+  register: openldap_installed
   changed_when: false
-  failed_when: false
 
-# Step 2: Deploy OpenLDAP with Helm if not already deployed
-- name: Deploy OpenLDAP with Helm
+# Deploy OpenLDAP with Helm if not already deployed
+- name: Deploy OpenLDAP with Helm if not already installed
   become_user: "{{ ansible_user }}"
   shell: >
     helm upgrade -i openldap helm-openldap/openldap-stack-ha
     --create-namespace --namespace openldap -f /tmp/openldap-values.yaml
+  when: openldap_installed.stdout == ""
+  register: install_openldap_result
+  changed_when: "'has been added' in install_openldap_result.stdout"

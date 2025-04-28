@@ -1,0 +1,19 @@
+---
+- name: Split install_operators into list
+  set_fact:
+    install_operators_list: "{{ install_operators.split(',') | map('upper') | list }}"
+
+- name: Run common steps for DIM operators deployment
+  include_tasks: common-steps.yaml
+
+- name: Install CFM operator
+  include_tasks: cfm-operator.yaml
+  when: "'CFM' in install_operators_list or 'All' in install_operators_list"
+
+- name: Install CSA operator
+  include_tasks: csa-operator.yaml
+  when: "'CSA' in install_operators_list or 'All' in install_operators_list"
+
+- name: Install CSM operator
+  include_tasks: csm-operator.yaml
+  when: "'CSM' in install_operators_list or 'All' in install_operators_list"

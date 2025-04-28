@@ -27,6 +27,7 @@
   file:
     path: /var/run/docker.sock
     mode: '0666'
+  when: not minikube_bin.stat.exists
 
 # Step 4: Check current status of Minikube
 - name: Check current Minikube status
@@ -69,3 +70,4 @@
   file:
     path: /var/run/docker.sock
     mode: '0660'
+  when: not minikube_bin.stat.exists

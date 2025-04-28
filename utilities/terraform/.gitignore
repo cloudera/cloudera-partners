@@ -2,4 +2,6 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform/
 .terraform.lock.hcl
-ec2/generated-DIM_Operatorstest.pem
+.terraform.tfstate.lock.info
+ec2/generated-DIM_Operatorstest2.pem
+../ansible/roles/deployment/dim_operators/files/cloudera_license.txt

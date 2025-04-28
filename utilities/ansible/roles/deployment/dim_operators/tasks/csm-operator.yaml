@@ -1,0 +1,77 @@
+---
+- name: Set environment variables for Cloudera credentials
+  become_user: "{{ ansible_user }}"
+  set_fact:
+    env_vars:
+      Cloudera_username: "{{ Cloudera_username }}"
+      Cloudera_password: "{{ Cloudera_password }}"
+
+- name: Log in to Cloudera registry using Helm
+  become_user: "{{ ansible_user }}"
+  shell: |
+    echo "{{ Cloudera_password }}" | helm registry login container.repository.cloudera.com \
+    --username "{{ Cloudera_username }}" \
+    --password-stdin
+
+- name: Check if Cloudera license file already exists
+  stat:
+    path: /tmp/cloudera_license.txt
+  register: cloudera_license_stat
+  changed_when: false
+  failed_when: false
+
+- name: Copy Cloudera license file to remote host if not already present
+  become_user: "{{ ansible_user }}"
+  copy:
+    src: cloudera_license.txt
+    dest: /tmp/cloudera_license.txt
+    mode: '0600'
+  when: cloudera_license_stat.stat.exists == false
+
+- name: Check if Strimzi Kafka Operator is already installed via Helm
+  become_user: "{{ ansible_user }}"
+  shell: helm list -n csm-operator-system --filter ^strimzi-cluster-operator$ | grep strimzi-cluster-operator || true
+  register: csm_operator_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install Strimzi Kafka Operator using Helm
+  become_user: "{{ ansible_user }}"
+  shell: |
+    helm install strimzi-cluster-operator \
+      --namespace csm-operator-system \
+      --set 'image.imagePullSecrets[0].name=docker-pull-secret' \
+      --set-file clouderaLicense.fileContent=/tmp/cloudera_license.txt \
+      --set watchAnyNamespace=true \
+      oci://container.repository.cloudera.com/cloudera-helm/csm-operator/strimzi-kafka-operator \
+      --version {{ strimzi_kafka_operator_version }}
+  when: csm_operator_installed.stdout == ""
+  register: install_csm_operator_result
+  changed_when: "'has been added' in install_csm_operator_result.stdout"
+
+- name: Wait for pods to be running in csm-operator-system namespace
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl get pods -n csm-operator-system | grep -E 'strimzi-cluster-operator' | awk '{print $3}' | grep -v 'Running'
+  register: pod_status
+  until: pod_status.stdout == ""
+  retries: 10
+  delay: 30
+  failed_when: false
+
+
+- name: Verify CSM operator deployment
+  become_user: "{{ ansible_user }}"
+  shell: kubectl get deployments --namespace csm-operator-system
+
+- name: Verify CSM operator pods
+  become_user: "{{ ansible_user }}"
+  shell: kubectl get pods --namespace csm-operator-system
+
+- name: Apply Kafka configurations
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl apply --filename /tmp/kafka.yaml,/tmp/nodepool-broker.yaml,/tmp/nodepool-controller.yaml -n cloudera-kafka-demo
+  register: kubectl_apply
+  changed_when: "'created' in kubectl_apply.stdout or 'configured' in kubectl_apply.stdout"
+  failed_when: kubectl_apply.rc != 0

@@ -5,7 +5,7 @@
   gather_facts: true
 
   vars_files:
-    - ../common_vars.yaml
+    - common_vars.yaml
     
   vars:
     k8s_distribution: minikube  # or eks
@@ -17,4 +17,4 @@
     - role: k8s_setup/eks
       when: k8s_distribution == "eks"
   
-  #  - role: deployment/dim_operators
+    - role: deployment/dim_operators

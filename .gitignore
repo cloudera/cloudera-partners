@@ -1,3 +1,7 @@
 .DS_Store
 .vscode/
 .idea/
+utilities/run.sh
+utilities/cloudera_license.txt
+utilities/ansible/roles/deployment/dim_operators/files
+utilities/terraform/ec2/generated-DIM_Operatorstest2.pem

@@ -1,0 +1,130 @@
+---
+- name: Split install_operators into list
+  set_fact:
+    install_operators_list: "{{ install_operators.split(',') | map('upper') | list }}"
+
+- name: Set docker_secret_namespaces and openldap_secret_namespaces based on selected operator(s)
+  set_fact:
+    docker_secret_namespaces: "{{ (
+      [] +
+      (['cfm-operator-system', 'demo-nifi', 'demo-nifi-registry'] if 'CFM' in install_operators_list else []) +
+      (['csa-operator-system'] if 'CSA' in install_operators_list else []) +
+      (['csm-operator-system', 'cloudera-kafka-demo'] if 'CSM' in install_operators_list else [])) | unique }}"
+    openldap_secret_namespaces: "{{ (
+      [] +
+      (['demo-nifi', 'demo-nifi-registry'] if 'CFM' in install_operators_list else [])) | unique }}"
+
+# Debug tasks to check namespaces
+- name: Debug docker_secret_namespaces
+  debug:
+    var: docker_secret_namespaces
+  changed_when: false
+  failed_when: false
+
+- name: Debug openldap_secret_namespaces
+  debug:
+    var: openldap_secret_namespaces
+  changed_when: false
+  failed_when: false
+
+# Add Jetstack Helm repo
+- name: Add Jetstack Helm repo
+  become_user: "{{ ansible_user }}"
+  shell: helm repo add jetstack https://charts.jetstack.io --force-update
+  register: helm_repo_add
+  changed_when: "'has been added' in helm_repo_add.stdout"
+
+# Check if cert-manager is already installed
+- name: Check if cert-manager is already installed
+  become_user: "{{ ansible_user }}"
+  shell: helm list -n cert-manager --filter ^cert-manager$ | grep cert-manager || true
+  register: cert_manager_installed
+  changed_when: false
+  failed_when: false
+
+# Install cert-manager with CRDs if not installed
+- name: Install cert-manager with CRDs if not installed
+  become_user: "{{ ansible_user }}"
+  shell: |
+    helm install cert-manager jetstack/cert-manager \
+      --namespace cert-manager \
+      --create-namespace \
+      --set crds.enabled=true
+  when: cert_manager_installed.stdout == ""
+  register: install_cert_manager_result
+  changed_when: "'has been added' in install_cert_manager_result.stdout"
+
+# Deploy ClusterIssuer for cert-manager
+- name: Deploy ClusterIssuer for cert-manager
+  copy:
+    dest: /tmp/clusterissuer.yaml
+    content: |
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: self-signed-ca-issuer
+      spec:
+        selfSigned: {}
+
+# Apply ClusterIssuer
+- name: Apply ClusterIssuer
+  become_user: "{{ ansible_user }}"
+  shell: kubectl apply -f /tmp/clusterissuer.yaml
+  changed_when: false
+  failed_when: false
+
+# Ensure required namespaces exist
+- name: Ensure required namespaces exist
+  become_user: "{{ ansible_user }}"
+  shell: kubectl create namespace {{ item }} --dry-run=client -o yaml | kubectl apply -f -
+  loop: "{{ docker_secret_namespaces }}"
+  changed_when: false
+  failed_when: false
+
+# Create Docker registry secrets in required namespaces
+- name: Create Docker registry secrets in required namespaces
+  become_user: "{{ ansible_user }}"
+  shell: >
+    kubectl create secret docker-registry docker-pull-secret
+    --namespace {{ item }}
+    --docker-server=container.repository.cloudera.com
+    --docker-username={{ Cloudera_username }}
+    --docker-password={{ Cloudera_password }}
+    --dry-run=client -o yaml | kubectl apply -f -
+  loop: "{{ docker_secret_namespaces }}"
+  changed_when: false
+  failed_when: false
+
+# Create OpenLDAP secret in openldap_secret_namespaces
+- name: Create OpenLDAP secret in openldap_secret_namespaces
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl create secret generic openldap-creds \
+      --from-literal=managerPassword={{ ldapadmin_password }} \
+      --namespace {{ item }} \
+      --dry-run=client -o yaml | kubectl apply -f -
+  loop: "{{ openldap_secret_namespaces }}"
+  when: "'CFM' in install_operators_list or 'ALL' in install_operators_list"
+  changed_when: false
+  failed_when: false
+
+# Dynamically set the list of templates to copy based on selected operators
+- name: Set template list to copy based on selected operator(s)
+  set_fact:
+    templates_to_copy: >-
+      {{
+        [] +
+        (['nifi_overrides.yaml.j2', 'nifiregistry.yaml.j2'] if 'CFM' in install_operators_list or 'ALL' in install_operators_list else []) +
+        (['flink-deployment.yaml.j2'] if 'CSA' in install_operators_list or 'ALL' in install_operators_list else []) +
+        (['kafka.yaml.j2', 'nodepool-broker.yaml.j2', 'nodepool-controller.yaml.j2'] if 'CSM' in install_operators_list or 'ALL' in install_operators_list else [])
+      }}
+
+# Render and copy selected Jinja2 templates
+- name: Render and copy selected Jinja2 templates
+  template:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item | regex_replace('.j2$', '') }}"
+    mode: '0644'
+  loop: "{{ templates_to_copy }}"
+  changed_when: false
+  failed_when: false

@@ -93,5 +93,12 @@ resource "aws_instance" "my_instance" {
   tags = {
     "Name" = var.instance_name
   }
+
+  # Block device mapping to create a 100 GB volume
+  root_block_device {
+    volume_size           = 100
+    volume_type           = "gp2"
+    delete_on_termination = true
+  }
 }
 
