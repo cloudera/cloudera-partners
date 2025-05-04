@@ -299,10 +299,16 @@ sh """
                 
                     // Initialize a list to hold error messages
                     def errorMessages = []
+
                     // Match multiple occurrences of error messages
                     def fatalPattern = ~/fatal: .*?"(?:stderr|error)": ".*?(An error occurred: .*?)"/
                     def matcher = fatalPattern.matcher(logOutput)
-        
+
+                    // Define fatal patterns to ignore
+                    def ignoredFatalPatterns = [
+                        ~/fatal: detected dubious ownership in repository.*/
+                    ]
+
                     // Check for specific failure messages
                     if (logOutput.contains('Workspace Provisioning Got Failed.')) {
                         errorMessages.add("CML Data service provisioning failed.")
@@ -319,10 +325,18 @@ sh """
                     if (logOutput.contains('Cluster deletion failed.')) {
                         errorMessages.add("While destroying, CDW data service deletion failed.")
                     }
-                    if (logOutput.toLowerCase().contains('fatal')) {
-                        errorMessages.add("Job failed with error code 'fatal'.")
+
+                    // Check each line for 'fatal', skipping ignored patterns
+                    logOutput.eachLine { line ->
+                        if (line.toLowerCase().contains('fatal')) {
+                            def isIgnored = ignoredFatalPatterns.any { pattern -> line ==~ pattern }
+                            if (!isIgnored) {
+                                errorMessages.add("Job failed with error code 'fatal': ${line.trim()}")
+                            }
+                        }
                     }
 
+                    // Extract structured fatal error messages from JSON blobs
                     while (matcher.find()) {
                         def errorMessage = matcher.group(1).replaceAll("\\\\n", "\n").trim() // Replace escaped \n with actual newline
                         errorMessages.add("\nJob failed: 'FATAL': \n${errorMessage}")
@@ -332,19 +346,13 @@ sh """
                     if (!errorMessages.isEmpty()) {
                         currentBuild.result = 'FAILURE'
                         println errorMessages.join("\n") // Separate multiple errors with a newline
-                    // }
 
-                    // // If there are any error messages, fail the job with the collected messages
-                    // if (!errorMessages.isEmpty()) {
-                    //     currentBuild.result = 'FAILURE'
-                        
                         // Save error messages in build variable for use in post section
                         currentBuild.description = errorMessages.join('\n')
-        
+
                         // Send an email with the error logs
 
-                         // Mark the build as failed with the error messages
-                        
+                        // Mark the build as failed with the error messages
                     }
                 }
             }
@@ -494,6 +502,22 @@ sh """
         failure {
             script {
                 def errorLog = currentBuild.description ?: "Unknown error occurred."
+
+                env.WORKSHOP_NAME_LOWER = params.WORKSHOP_NAME.toLowerCase()
+                if (params.ACTION == 'provision') {
+                    sh """
+                        cd /home/holautosa/HOL_AUTO_EXEC_DIR/userconfig/ && sudo chown -R jenkins:jenkins . && \
+                        sudo cp -p ${env.WORKSHOP_NAME_LOWER}.txt configfile .${env.WORKSHOP_NAME_LOWER}/${env.WORKSHOP_NAME_LOWER}-keypair.pem ${WORKSPACE} 2>/dev/null || true
+                    """
+                }
+                archiveArtifacts artifacts: "${env.WORKSHOP_NAME_LOWER}.txt,configfile", allowEmptyArchive: true
+                def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem,hol-provisioner-${BUILD_NUMBER}.log"
+
+                // Debug: Verify email and files
+                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
+                sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
+                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
+
                 emailext(
                     to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
                     subject: "❌ Jenkins Build Failed: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
@@ -556,7 +580,8 @@ sh """
                         </html>
                     """,
                     mimeType: 'text/html',
-                    attachmentsPattern: "hol-provisioner-${BUILD_NUMBER}.log,configfile",  // Attach log and config file
+                    // attachmentsPattern: "hol-provisioner-${BUILD_NUMBER}.log,configfile",  // Attach log and config file
+                    attachmentsPattern: attachments,  // Attach artifacts in failure
                     from: 'psejenkins@cloudera.com'
                 )
             }
