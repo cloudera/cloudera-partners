@@ -1,9 +1,10 @@
 # Setup Guide for the AI Agents with Partners HOL
 
 ### Key Links:
-- [GitHub Repo](https://github.com/shreshtab/ai-agents-hol-cai)
+- [GitHub Repo](https://github.com/shreshtab/ai-agents-hol-cai/tree/v1.1.0)
 - [SKO Deck](https://docs.google.com/presentation/d/1_-HRgb4PiycIPvH6YiAETImpGhvSE9bjEHCKwfZxE6Y/edit#slide=id.g32053a21050_0_0)
 
+Note: This setup guide is only for v1.1 of the Lab as linked above. In case of updates, this guide will also be updated.
 
 ### Prerequisites
 - Cloudera on Cloud Environment (Setup has only been tested with AWS)
