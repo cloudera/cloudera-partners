@@ -378,39 +378,46 @@ sh """
                     export CDP_ENV_CRN=$(cdp environments describe-environment --environment-name ${CDP_ENV_NAME} | jq -r .environment.crn)
                     
                     export RESOURCE_ROLES=(EnvironmentAdmin Owner)
-                    
-                    # Function: Get Resource Roles CRN
-                    get_crn_resource_role () {
-                       CDP_RESOURCE_ROLE_NAME=$1
-                       CDP_RESOURCE_ROLE_CRN=$(cdp iam list-resource-roles |jq --arg CDP_RESOURCE_ROLE_NAME "$CDP_RESOURCE_ROLE_NAME" \'.resourceRoles[] | select(.crn | endswith(":" + $CDP_RESOURCE_ROLE_NAME))| .crn\')
-                       echo $CDP_RESOURCE_ROLE_CRN | tr -d \'"\'
-                    }
-
-                    # Set Resource Roles with error handling
-                    for role_name in "${RESOURCE_ROLES[@]}"; do
-                        # Assign the resource role and capture output + exit status
-                        output=$(cdp iam assign-user-resource-role --user "${CDP_USER_CRN}" \
-                            --resource-role-crn "$(get_crn_resource_role "${role_name}")" \
-                            --resource-crn "${CDP_ENV_CRN}" 2>&1)
-                        exit_status=$?
-
-                        if [ $exit_status -eq 0 ]; then
-                            echo "Role '$role_name' assigned successfully to CDP User '${CDP_USER_CRN}'."
-                        elif echo "$output" | grep -q "ALREADY_EXISTS"; then
-                            echo "Role '$role_name' is already assigned to CDP User '${CDP_USER_CRN}'. Skipping..."
-                        else
-                            echo "Error assigning role '$role_name':"
-                            echo "$output"
-                        fi
-                    done
-                    
-                    # Synchronize users
-                    cdp environments sync-all-users \
-                    --environment-name $CDP_ENV_NAME
-                    
-                    # Synchronize IDBroker Mappings
-                    cdp environments sync-id-broker-mappings \
-                    --environment-name $CDP_ENV_NAME'''
+			
+			# Function: Get Resource Role CRN from its name
+			get_crn_resource_role () {
+			  local role_name="$1"
+			  cdp iam list-resource-roles | jq -r \
+			    --arg role "$role_name" \
+			    '.resourceRoles[] | select(.crn | endswith(":" + $role)) | .crn'
+			}
+			
+			# Assign resource roles to the user
+			for role_name in "${RESOURCE_ROLES[@]}"; do
+			  role_crn=$(get_crn_resource_role "$role_name")
+			
+			  if [ -z "$role_crn" ]; then
+			    echo "❌ Could not find CRN for role '$role_name'. Skipping..."
+			    continue
+			  fi
+			
+			  echo "➡️  Assigning role '$role_name' to user '${CDP_USER_CRN}'..."
+			
+			  output=$(cdp iam assign-user-resource-role \
+			    --user "$CDP_USER_CRN" \
+			    --resource-role-crn "$role_crn" \
+			    --resource-crn "$CDP_ENV_CRN" 2>&1)
+			  exit_status=$?
+			
+			  if [ $exit_status -eq 0 ]; then
+			    echo "✅ Role '$role_name' assigned successfully."
+			  elif echo "$output" | grep -q "ALREADY_EXISTS"; then
+			    echo "ℹ️  Role '$role_name' is already assigned. Skipping..."
+			  else
+			    echo "❌ Error assigning role '$role_name':"
+			    echo "$output"
+			  fi
+			done
+			
+			# Synchronize CDP user data
+			cdp environments sync-all-users --environment-name "$CDP_ENV_NAME"
+			cdp environments sync-id-broker-mappings --environment-name "$CDP_ENV_NAME"
+'''
                 }
             }
         }
