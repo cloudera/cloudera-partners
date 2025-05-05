@@ -327,14 +327,15 @@ sh """
                     }
 
                     // Check each line for 'fatal', skipping ignored patterns
-                    logOutput.eachLine { line ->
-                        if (line.toLowerCase().contains('fatal')) {
-                            def isIgnored = ignoredFatalPatterns.any { pattern -> line ==~ pattern }
-                            if (!isIgnored) {
-                                errorMessages.add("Job failed with error code 'fatal': ${line.trim()}")
-                            }
-                        }
-                    }
+			def lines = logOutput.readLines()
+			for (line in lines) {
+			    if (line.toLowerCase().contains('fatal')) {
+			        def isIgnored = ignoredFatalPatterns.any { pattern -> line ==~ pattern }
+			        if (!isIgnored) {
+			            errorMessages.add("Job failed with error code 'fatal': ${line.trim()}")
+			        }
+			    }
+			}
 
                     // Extract structured fatal error messages from JSON blobs
                     while (matcher.find()) {
