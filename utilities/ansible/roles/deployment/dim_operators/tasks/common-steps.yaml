@@ -7,12 +7,12 @@
   set_fact:
     docker_secret_namespaces: "{{ (
       [] +
-      (['cfm-operator-system', 'demo-nifi', 'demo-nifi-registry'] if 'CFM' in install_operators_list else []) +
-      (['csa-operator-system'] if 'CSA' in install_operators_list else []) +
-      (['csm-operator-system', 'cloudera-kafka-demo'] if 'CSM' in install_operators_list else [])) | unique }}"
+      (['cfm-operator-system', 'demo-nifi', 'demo-nifi-registry'] if 'CFM' in install_operators_list or 'ALL' in install_operators_list else []) +
+      (['csa-operator-system'] if 'CSA' in install_operators_list or 'ALL' in install_operators_list else []) +
+      (['csm-operator-system', 'cloudera-kafka-demo'] if 'CSM' in install_operators_list or 'ALL' in install_operators_list else [])) | unique }}"
     openldap_secret_namespaces: "{{ (
       [] +
-      (['demo-nifi', 'demo-nifi-registry'] if 'CFM' in install_operators_list else [])) | unique }}"
+      (['demo-nifi', 'demo-nifi-registry'] if 'CFM' in install_operators_list or 'ALL' in install_operators_list else [])) | unique }}"
 
 # Debug tasks to check namespaces
 - name: Debug docker_secret_namespaces
@@ -54,6 +54,16 @@
   register: install_cert_manager_result
   changed_when: "'has been added' in install_cert_manager_result.stdout"
 
+- name: Wait for pods to be running in cert-manager namespace
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl get pods -n cert-manager | grep -E 'cert-manager' | awk '{print $3}' | grep -v 'Running'
+  register: pod_status
+  until: pod_status.stdout == ""
+  retries: 10
+  delay: 30
+  failed_when: false
+
 # Deploy ClusterIssuer for cert-manager
 - name: Deploy ClusterIssuer for cert-manager
   copy:
@@ -72,6 +82,15 @@
   shell: kubectl apply -f /tmp/clusterissuer.yaml
   changed_when: false
   failed_when: false
+
+- name: Wait for ClusterIssuer to be ready
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl get clusterissuer self-signed-ca-issuer -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+  register: issuer_status
+  retries: 10
+  delay: 10
+  until: issuer_status.stdout == "True"
 
 # Ensure required namespaces exist
 - name: Ensure required namespaces exist
@@ -100,7 +119,7 @@
   become_user: "{{ ansible_user }}"
   shell: |
     kubectl create secret generic openldap-creds \
-      --from-literal=managerPassword={{ ldapadmin_password }} \
+      --from-literal=managerPassword={{ nifiadmin_password }} \
       --namespace {{ item }} \
       --dry-run=client -o yaml | kubectl apply -f -
   loop: "{{ openldap_secret_namespaces }}"

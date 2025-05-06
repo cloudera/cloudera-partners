@@ -1,6 +1,7 @@
 ---
 install_operators: ""
 ldapadmin_password: ""
+nifiadmin_password: ""
 Cloudera_username: ""
 Cloudera_password: ""
 cfm_operator_version: 2.9.0-b96
@@ -10,3 +11,12 @@ nifi_image_tag: 2.9.0-b96-nifi_1.27.0.2.3.14.0-14
 nifi_tini_image: 2.9.0-b96
 nifiregistry_image_tag: 2.8.0-b94-nifi_1.25.0.2.3.13.0-36
 nifiregistry_tini_image: 2.8.0-b94
+
+#eks
+cluster_name: k8soperator-eks-cluster
+region: ""
+node_type: m5.xlarge
+desired_nodes: 1
+max_nodes: 2
+min_nodes: 1
+eksctl_version: "latest"

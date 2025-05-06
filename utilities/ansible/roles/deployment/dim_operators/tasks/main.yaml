@@ -8,12 +8,12 @@
 
 - name: Install CFM operator
   include_tasks: cfm-operator.yaml
-  when: "'CFM' in install_operators_list or 'All' in install_operators_list"
+  when: "'CFM' in install_operators_list or 'ALL' in install_operators_list"
 
 - name: Install CSA operator
   include_tasks: csa-operator.yaml
-  when: "'CSA' in install_operators_list or 'All' in install_operators_list"
+  when: "'CSA' in install_operators_list or 'ALL' in install_operators_list"
 
 - name: Install CSM operator
   include_tasks: csm-operator.yaml
-  when: "'CSM' in install_operators_list or 'All' in install_operators_list"
+  when: "'CSM' in install_operators_list or 'ALL' in install_operators_list"

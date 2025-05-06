@@ -4,7 +4,7 @@ all:
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   hosts:
     installationhost:
-      ansible_host: "{{ lookup('env', 'INSTALLATION_HOST') | default('localhost') }}"
+      ansible_host: "{{ INSTALLATION_HOST | default('localhost')  }}"
       ansible_connection: "{{ 'local' if lookup('env', 'INSTALLATION_HOST') in ['localhost', '127.0.0.1'] else 'ssh' }}"
       ansible_user: >-
         {{ lookup('env', 'INSTALLATION_USER') 

@@ -1,5 +1,5 @@
 global:
-  adminPassword: "{{ ldapadmin_password }}"   #update admin password
+  adminPassword: "{{ nifiadmin_password }}"
 persistence:
   enabled: false
 phpldapadmin:
@@ -35,7 +35,7 @@ customLdifFiles:
     dn: ou=users,dc=example,dc=org
     objectclass: organizationalUnit
     ou: users
-
+    
     # Entry 3: cn=nifi,ou=users,dc=example,dc=org
     dn: cn=nifi,ou=users,dc=example,dc=org
     cn: nifi
@@ -55,39 +55,12 @@ customLdifFiles:
     sn: nifiadmin
     uid: nifiadmin
     uidnumber: 1002
-    userpassword: {{ ldapadmin_password }}  #update user password
-
-#    # Entry 5: cn=readers,ou=users,dc=example,dc=org
-#    dn: cn=readers,ou=users,dc=example,dc=org
-#    cn: readers
-#    member: cn=user01,ou=users,dc=example,dc=org
-#    member: cn=user02,ou=users,dc=example,dc=org
-#    objectclass: groupOfNames
-#
-#    # Entry 6: cn=user01,ou=users,dc=example,dc=org
-#    dn: cn=user01,ou=users,dc=example,dc=org
-#    cn: User1
-#    cn: user01
-#    gidnumber: 1000
-#    homedirectory: /home/user01
-#    objectclass: inetOrgPerson
-#    objectclass: posixAccount
-#    objectclass: shadowAccount
-#    sn: Bar1
-#    uid: user01
-#    uidnumber: 1000
-#    userpassword: <updatepassword>
-#
-#    # Entry 7: cn=user02,ou=users,dc=example,dc=org
-#    dn: cn=user02,ou=users,dc=example,dc=org
-#    cn: User2
-#    cn: user02
-#    gidnumber: 1001
-#    homedirectory: /home/user02
-#    objectclass: inetOrgPerson
-#    objectclass: posixAccount
-#    objectclass: shadowAccount
-#    sn: Bar2
-#    uid: user02
-#    uidnumber: 1001
-#    userpassword: <updatePassword>
+    userpassword: {{ nifiadmin_password }}
+  
+    # Entry 5: cn=admin,dc=example,dc=org
+    dn: cn=admin,ou=users,dc=example,dc=org
+    cn: admin
+    objectClass: simpleSecurityObject
+    objectClass: organizationalRole
+    userPassword: {{ nifiadmin_password }}
+    description: LDAP administrator

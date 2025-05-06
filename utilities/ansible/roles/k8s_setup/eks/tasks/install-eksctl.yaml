@@ -1,0 +1,60 @@
+- name: Ensure AWS CLI is installed
+  package:
+    name: awscli
+    state: present
+
+- name: Download eksctl binary
+  get_url:
+    url: "https://github.com/eksctl-io/eksctl/releases/{{ eksctl_version }}/download/eksctl_{{ ansible_system | lower }}_amd64.tar.gz"
+    dest: /tmp/eksctl.tar.gz
+    mode: '0644'
+    force: no
+
+- name: Extract eksctl only if not already extracted
+  unarchive:
+    src: /tmp/eksctl.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  args:
+    creates: /tmp/eksctl
+
+- name: Move eksctl binary to /usr/local/bin
+  become: true
+  copy:
+    src: /tmp/eksctl
+    dest: /usr/local/bin/eksctl
+    mode: '0755'
+    remote_src: yes
+
+- name: Check if kubeconfig exists
+  stat:
+    path: ~/.kube/config
+  register: kubeconfig_file
+
+- name: Backup kubeconfig if it exists
+  copy:
+    src: ~/.kube/config
+    dest: "~/.kube/config.backup_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+    remote_src: yes
+  when: kubeconfig_file.stat.exists
+
+- name: Create EKS Cluster using eksctl
+  shell: |
+    eksctl create cluster \
+      --name {{ cluster_name }} \
+      --version 1.27 \
+      --region {{ region }} \
+      --nodegroup-name standard-workers \
+      --node-type {{ node_type }} \
+      --nodes {{ desired_nodes }} \
+      --nodes-min {{ min_nodes }} \
+      --nodes-max {{ max_nodes }} \
+      --managed
+  register: eksctl_output
+  environment:
+    AWS_REGION: "{{ region }}"
+  changed_when: "'created' in eksctl_output.stdout"
+
+- name: Display eksctl output
+  debug:
+    msg: "{{ eksctl_output.stdout_lines }}"

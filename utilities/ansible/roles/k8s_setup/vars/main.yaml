@@ -1,5 +1,6 @@
 ---
 ldapadmin_password: "{{ ldapadmin_password }}"
+nifiadmin_password: "{{ nifiadmin_password }}"
 Cloudera_username: "{{ Cloudera_username }}"
 Cloudera_password: "{{ Cloudera_password }}"
 cfm_operator_version: "{{ cfm_operator_version }}"
