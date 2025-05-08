@@ -1,0 +1,66 @@
+# MAINTAINER Avanish Tiwari <aktiwari@cloudera.com>
+
+FROM ubuntu:24.04
+
+ARG TF_VER=1.10.5
+
+# Directory for storing scripts.
+RUN mkdir -p /opt/automation
+
+# Setting Up Environment Variable.
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    HOME_DIR="/opt/automation" 
+
+# Install packages
+RUN apt-get update && apt-get install -y \
+    curl wget unzip git make jq \
+    openssh-client sudo \
+    python3.12 python3-pip \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# install dependencies
+RUN python3 -m pip config set global.break-system-packages true && \
+pip3 install setuptools_rust ansible-core==2.16.8 jmespath==1.0.1
+
+# Install AWS CLI based on architecture
+RUN arch=$(dpkg --print-architecture) && \
+    if [ "$arch" = "amd64" ]; then \
+        curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip; \
+    elif [ "$arch" = "arm64" ]; then \
+        curl -s "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o awscliv2.zip; \
+    else \
+        echo "Unsupported architecture: $arch" && exit 1; \
+    fi && \
+    unzip awscliv2.zip && ./aws/install && \
+    rm -rf aws awscliv2.zip
+
+# Install Terraform
+#RUN curl -s "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip" -o terraform.zip && \
+#    unzip terraform.zip -d /usr/local/bin/ && rm -f terraform.zip
+
+# Install Terraform based on system architecture
+RUN arch=$(dpkg --print-architecture) && \
+    if [ "$arch" = "amd64" ]; then \
+        TARCH="amd64"; \
+    elif [ "$arch" = "arm64" ]; then \
+        TARCH="arm64"; \
+    else \
+        echo "Unsupported architecture: $arch" && exit 1; \
+    fi && \
+    curl -s "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_${TARCH}.zip" -o "/tmp/terraform_${TF_VER}_linux_${TARCH}.zip" && \
+    unzip "/tmp/terraform_${TF_VER}_linux_${TARCH}.zip" -d /usr/local/bin/ && \
+    rm -rf "/tmp/terraform_${TF_VER}_linux_${TARCH}.zip"
+
+# Create working directory
+WORKDIR /opt/automation
+
+# Copy the entire content
+COPY . /opt/automation/
+
+RUN chmod +x /opt/automation/run.sh
+
+ENTRYPOINT ["/opt/automation/run.sh"]
+#CMD ["/bin/bash"]

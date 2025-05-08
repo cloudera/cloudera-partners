@@ -1,23 +1,9 @@
 - name: Check if CFM Operator version is already downloaded
   stat:
-    path: /tmp/cfmctl
-  register: cfmctl_stat
+    path: /tmp/cfm-operator-{{ cfm_operator_version }}.tgz
+  register: cfm_operator_stat
   changed_when: false
   failed_when: false
-
-- name: Set environment variables for Cloudera credentials
-  become_user: "{{ ansible_user }}"
-  set_fact:
-    env_vars:
-      Cloudera_username: "{{ Cloudera_username }}"
-      Cloudera_password: "{{ Cloudera_password }}"
-
-- name: Log in to Cloudera registry using Helm
-  become_user: "{{ ansible_user }}"
-  shell: |
-    echo "{{ Cloudera_password }}" | helm registry login container.repository.cloudera.com \
-    --username "{{ Cloudera_username }}" \
-    --password-stdin
 
 - name: Copy Cloudera license file to remote host
   become_user: "{{ ansible_user }}"
@@ -37,23 +23,21 @@
   failed_when: license_secret_create.rc != 0
   changed_when: "'created' in license_secret_create.stdout or 'configured' in license_secret_create.stdout"
 
-- name: Download cfmctl binary
+- name: Download CFM Operator tarball if version is changed
   shell: >
     curl -u "{{ Cloudera_username }}:{{ Cloudera_password }}" \
-      -o cfmctl-linux-amd64 https://archive.cloudera.com/p/cfm-operator/cfmctl-linux-amd64
+    -O https://archive.cloudera.com/p/cfm-operator/cfm-operator-{{ cfm_operator_version }}.tgz
   args:
     chdir: /tmp
-  when: cfmctl_stat.stat.exists == false  # Only download if not already present
+  when: cfm_operator_stat.stat.exists == false  # Only download if not already present
   failed_when: false
   changed_when: true
 
-- name: Make cfmctl executable and rename it
-  ansible.builtin.shell: |
-    chmod +x cfmctl-linux-amd64
-    mv cfmctl-linux-amd64 cfmctl
+- name: Extract CFM Operator package if tarball has changed
+  shell: tar -xvzf cfm-operator-{{ cfm_operator_version }}.tgz
   args:
     chdir: /tmp
-  when: cfmctl_stat.stat.exists == false 
+  when: cfm_operator_stat.stat.exists == false  # Only extract if the tarball was downloaded
   failed_when: false  # handle extraction issue as needed
   changed_when: true
 
@@ -64,14 +48,16 @@
   changed_when: false
   failed_when: false
 
-- name: Install CFM Operator via cfmctl if not already installed
+- name: Install CFM Operator via Helm if not already installed
   become_user: "{{ ansible_user }}"
   shell: |
-    ./cfmctl install \
-    --license ./cloudera_license.txt \
-    --image-repository container.repository.cloudera.com/cloudera/cfm-operator \
-    --image-tag {{ cfm_operator_version }} \
-    --namespace cfm-operator-system
+    helm install cfm-operator ./cfm-operator \
+      --create-namespace \
+      --namespace cfm-operator-system \
+      --set installCRDs=true \
+      --set image.repository=container.repository.cloudera.com/cloudera/cfm-operator \
+      --set image.tag={{ cfm_operator_version }} \
+      --set licenseSecret=cfm-operator-license
   args:
     chdir: /tmp
   when: cfm_operator_installed.stdout == ""

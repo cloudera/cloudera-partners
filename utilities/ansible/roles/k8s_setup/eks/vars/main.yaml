@@ -1,5 +1,6 @@
 eksctl_version: "latest"
 cluster_name: ""
+k8s_version: ""      
 region: ""
 node_type: ""
 desired_nodes: 1

@@ -49,14 +49,14 @@
   register: install_csa_operator_result
   changed_when: "'has been added' in install_csa_operator_result.stdout"
 
-- name: Wait for pods to be running in csa-operator-system namespace
+- name: Wait for all containers in pods to be Ready in csa-operator-system
   become_user: "{{ ansible_user }}"
   shell: |
-    kubectl get pods -n csa-operator-system | grep -E 'ssb-sse|ssb-postgresql|flink-kubernetes-operator' | awk '{print $3}' | grep -v 'Running'
-  register: pod_status
-  until: pod_status.stdout == ""
+    kubectl get pods -n csa-operator-system --no-headers | awk '{print $2}' | grep -vE '([0-9]+)/\1'
+  register: not_ready
+  until: not_ready.stdout == ""
   retries: 20
-  delay: 30
+  delay: 15
   failed_when: false
 
 - name: Deploy Flink session cluster

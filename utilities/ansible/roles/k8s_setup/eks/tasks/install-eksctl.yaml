@@ -42,7 +42,7 @@
   shell: |
     eksctl create cluster \
       --name {{ cluster_name }} \
-      --version 1.27 \
+      --version {{ k8s_version }}\
       --region {{ region }} \
       --nodegroup-name standard-workers \
       --node-type {{ node_type }} \
