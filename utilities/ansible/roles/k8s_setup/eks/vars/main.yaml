@@ -1,8 +1,7 @@
 eksctl_version: "latest"
-cluster_name: ""
-k8s_version: ""      
-region: ""
-node_type: ""
+cluster_name: "{{ cluster_name }}"
+k8s_version: "{{ k8s_version }}"      
+node_type: "{{ node_type }}"
 desired_nodes: 1
 min_nodes: 1
 max_nodes: 2

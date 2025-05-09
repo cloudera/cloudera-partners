@@ -6,9 +6,6 @@
 
   vars_files:
     - common_vars.yaml
-    
-  vars:
-    k8s_distribution: minikube  # or eks
 
   roles:
     - role: k8s_setup/minikube

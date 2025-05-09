@@ -1,9 +1,39 @@
-- name: Ensure AWS CLI is installed
-  package:
-    name: awscli
-    state: present
+- name: Fail if not Ubuntu amd64
+  fail:
+    msg: "This playbook only works on Ubuntu with amd64 architecture"
+  when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['architecture'] != "x86_64"
+
+- name: Check if AWS CLI is installed
+  command: aws --version
+  register: awscli_check
+  ignore_errors: yes
+
+- name: Fail if AWS CLI is not installed
+  become_user: "{{ ansible_user }}"
+  fail:
+    msg: "'aws' CLI is not installed. Please install and configure it before running this playbook."
+  when: awscli_check.rc != 0
+
+- name: Check if AWS CLI is configured
+  become_user: "{{ ansible_user }}"
+  command: aws sts get-caller-identity
+  register: aws_config_check
+  ignore_errors: yes
+
+- name: Fail if AWS CLI is not configured or can't connect
+  fail:
+    msg: |
+      AWS CLI is installed but not properly configured or lacks permissions.
+      Make sure your credentials are set (via ~/.aws/credentials, environment variables, or IAM role)
+      and that you can access the AWS account where you plan to create the EKS cluster.
+  when: aws_config_check.rc != 0
+
+- name: Notify user AWS CLI is installed and configured
+  debug:
+    msg: "✅ AWS CLI is installed and configured. Ready to proceed with EKS cluster setup."
 
 - name: Download eksctl binary
+  become_user: "{{ ansible_user }}"
   get_url:
     url: "https://github.com/eksctl-io/eksctl/releases/{{ eksctl_version }}/download/eksctl_{{ ansible_system | lower }}_amd64.tar.gz"
     dest: /tmp/eksctl.tar.gz
@@ -11,6 +41,7 @@
     force: no
 
 - name: Extract eksctl only if not already extracted
+  become_user: "{{ ansible_user }}"
   unarchive:
     src: /tmp/eksctl.tar.gz
     dest: /tmp/
@@ -27,11 +58,13 @@
     remote_src: yes
 
 - name: Check if kubeconfig exists
+  become_user: "{{ ansible_user }}"
   stat:
     path: ~/.kube/config
   register: kubeconfig_file
 
 - name: Backup kubeconfig if it exists
+  become_user: "{{ ansible_user }}"
   copy:
     src: ~/.kube/config
     dest: "~/.kube/config.backup_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
@@ -39,10 +72,11 @@
   when: kubeconfig_file.stat.exists
 
 - name: Create EKS Cluster using eksctl
+  become_user: "{{ ansible_user }}"
   shell: |
     eksctl create cluster \
       --name {{ cluster_name }} \
-      --version {{ k8s_version }}\
+      --version {{ k8s_version }} \
       --region {{ region }} \
       --nodegroup-name standard-workers \
       --node-type {{ node_type }} \

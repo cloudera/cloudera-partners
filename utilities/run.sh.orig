@@ -250,8 +250,11 @@ destroy_ec2() {
 }
 deploy_k8soperators() {
   echo "INSTALLATION HOST IP: $installation_host"
-  [ -z "$instance_name" ] && instance_name=$(cat "$AUTOMATION_DIR/.instance_name")
 
+# Only read instance_name from file if EC2 is provisioned 
+  if [ "$provision_ec2" == "true" ]; then
+  [ -z "$instance_name" ] && instance_name=$(cat "$AUTOMATION_DIR/.instance_name")
+  fi
 
   if [ -f "$AUTOMATION_DIR/$aws_key_pair.pem" ]; then
       ssh_private_key_file="$AUTOMATION_DIR/$aws_key_pair.pem"
@@ -276,6 +279,26 @@ deploy_k8soperators() {
                   
 }
 
+destroy_eks() {
+  echo "INSTALLATION HOST IP: $installation_host"
+
+  if [ "$provision_ec2" == "true" ]; then
+  [ -z "$instance_name" ] && instance_name=$(cat "$AUTOMATION_DIR/.instance_name")
+  fi
+# Only read instance_name from file if EC2 is provisioned 
+  if [ -f "$AUTOMATION_DIR/$aws_key_pair.pem" ]; then
+      ssh_private_key_file="$AUTOMATION_DIR/$aws_key_pair.pem"
+  else
+      ssh_private_key_file="$AUTOMATION_DIR/generated-$instance_name.pem"
+  fi
+   ansible-playbook -vv -i ansible/inventory.yaml ansible/destroy_eks_cluster.yaml \
+     --extra-vars "INSTALLATION_HOST=$installation_host \
+                   ssh_private_key_file=$ssh_private_key_file \
+                   cluster_name=k8soperator-eks-cluster \
+                   region=$aws_region"
+
+}
+
 case $USER_ACTION in
 provision)
 # Run functions
@@ -296,7 +319,12 @@ provision)
     ;;
 destroy)
     validating_variables
+    if [ "$provision_ec2" == "yes" ]; then
     destroy_ec2
+    fi
+    if [ "$k8s_distribution" == "eks" ]; then
+    destroy_eks
+    fi
     ;;
 *)
     echo "Invalid Input. Valid values are 'provision' or 'destroy'"

@@ -163,6 +163,9 @@ Exiting......"
          INSTANCE_TYPE)
             instance_type=$(echo "$value" | tr '[:upper:]' '[:lower:]')
             ;;
+         CLUSTER_NAME)
+            cluster_name=$value
+            ;;
          esac
          # Print the key-value except for sensitive fields
          case "$key" in
@@ -294,11 +297,34 @@ deploy_dimoperators() {
                   Cloudera_username=$cloudera_username \
                   Cloudera_password=$cloudera_password \
                   install_operators=$install_operators \
+                  cluster_name=$cluster_name \
                   node_type=$instance_type \
                   region=$aws_region"
                   
 }
 
+destroy_eks() {
+  cd /k8soperators/ansible
+
+  echo "INSTALLATION HOST IP: $installation_host"
+
+  # Only read instance_name from file if EC2 is provisioned 
+  if [ "$provision_ec2" == "true" ]; then
+  [ -z "$instance_name" ] && instance_name=$(cat "/k8soperators/.instance_name")
+  fi
+
+  if [ -f "/k8soperators/$aws_key_pair.pem" ]; then
+      ssh_private_key_file="/k8soperators/$aws_key_pair.pem"
+  else
+      ssh_private_key_file="/k8soperators/generated-$instance_name.pem"
+  fi
+   ansible-playbook -vv -i inventory.yaml destroy_eks_cluster.yaml \
+     --extra-vars "INSTALLATION_HOST=$installation_host \
+                   ssh_private_key_file=$ssh_private_key_file \
+                   cluster_name=$cluster_name \
+                   region=$aws_region"
+
+}
 case $USER_ACTION in
 provision)
 # Run functions
@@ -321,6 +347,9 @@ destroy)
     validating_variables
     if [ "$provision_ec2" == "yes" ]; then
     destroy_ec2
+    fi
+    if [ "$k8s_distribution" == "eks" ]; then
+    destroy_eks
     fi
     ;;
 *)

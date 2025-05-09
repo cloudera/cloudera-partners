@@ -1,0 +1,56 @@
+---
+- name: Setup host Kubernetes
+  hosts: installationhost
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - common_vars.yaml
+
+  tasks:
+    - name: Delete EKS Cluster using eksctl
+      become_user: "{{ ansible_user }}"
+      shell: |
+        eksctl delete cluster \
+          --name {{ cluster_name }} \
+          --region {{ region }}
+      register: eksctl_delete_output
+      environment:
+        AWS_REGION: "{{ region }}"
+      changed_when: "'deleted' in eksctl_delete_output.stdout"
+
+    - name: Display eksctl deletion output
+      debug:
+        msg: "{{ eksctl_delete_output.stdout_lines }}"
+
+    - name: Clean up eksctl binary
+      file:
+        path: /usr/local/bin/eksctl
+        state: absent
+
+    - name: Clean up eksctl tarball
+      file:
+        path: /tmp/eksctl.tar.gz
+        state: absent
+
+    - name: Clean up eksctl extracted binary
+      file:
+        path: /tmp/eksctl
+        state: absent
+
+    - name: Find latest kubeconfig backup
+      become_user: "{{ ansible_user }}"
+      find:
+        paths: "~/.kube"
+        patterns: "config.backup_*"
+        recurse: no
+      register: kubeconfig_backups
+
+    - name: Restore the latest kubeconfig backup
+      become_user: "{{ ansible_user }}"
+      copy:
+        src: "{{ (kubeconfig_backups.files | sort(attribute='mtime', reverse=true) | first).path }}"
+        dest: "~/.kube/config"
+        remote_src: yes
+      when: kubeconfig_backups.matched > 0
+

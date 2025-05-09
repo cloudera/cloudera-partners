@@ -1,0 +1,3 @@
+---
+- name: install eksctl
+  include_tasks: install-eksctl.yaml
