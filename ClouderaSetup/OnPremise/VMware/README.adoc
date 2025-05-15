@@ -1,4 +1,16 @@
 = CDP Private Cloud (PvC) :: Deployment Guide
+v0.1, 2025-04-10: Draft
+:description: *Installation instructions for Cloudera OnPrem Cluster*
+:toc: left
+:toc-title: Table of Contents
+:toclevels: 2
+:sectnums:
+:source-highlighter: highlightjs
+:icons: font
+:imagesdir: ./images
+:keywords: Cloudera, Automation
+:hide-uri-scheme:
+:homepage: https://github.com/kuldeepsahu1105/cdp-onprem-automation
 
 **Installation & Setup on VMWare Infrastructure**
 
