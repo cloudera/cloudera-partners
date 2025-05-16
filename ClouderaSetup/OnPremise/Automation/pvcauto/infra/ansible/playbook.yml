@@ -1,0 +1,18 @@
+- hosts: ec2_instances
+  gather_facts: false
+  tasks:
+    - name: Ping hosts
+      ping:
+
+    - name: Install Nginx
+      become: yes
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start Nginx
+      become: yes
+      service:
+        name: nginx
+        state: started
+        enabled: true

@@ -1,0 +1,76 @@
+deployments:
+  - name: "Demo deloyment mode"
+    ami_id: "ami-06d753822bd94c64e"
+    instance_count: 1
+    vpc_id: "vpc-9d9385fa"                # empty → create or default
+    required_elastic_ip: false
+
+    master:
+      count: 1
+      prefix: "master-"
+      type: "t2.medium"
+
+    worker:
+      count: 2
+      prefix: "worker-"
+      type: "t2.small"
+
+    data_service:
+      count: 1
+      prefix: "data-"
+      type: "t2.large"
+
+  - name: "HAMode"
+    ami_id: "ami-0c94855ba95c71c99"
+    instance_count: 5
+    vpc_id: "vpc-0123456789abcdef0"
+    required_elastic_ip: true
+
+    master:
+      count: 2
+      prefix: "ham-master-"
+      type: "m5.large"
+
+    worker:
+      count: 2
+      prefix: "ham-worker-"
+      type: "m5.xlarge"
+
+    data_service:
+      count: 1
+      prefix: "ham-data-"
+      type: "m5.large"
+      
+
+  - name: "NonHaMode"
+    ami_id: "ami-0c94855ba95c71c99"
+    instance_count: 3
+    vpc_id: ""                
+    required_elastic_ip: false
+
+    master:
+      count: 1
+      prefix: "nh-master-"
+      type: "t3.medium"
+
+    worker:
+      count: 1
+      prefix: "nh-worker-"
+      type: "t3.small"
+
+    data_service:
+      count: 1
+      prefix: "nh-data-"
+      type: "t3.medium"
+
+# To add a new deployment type: append another block with the same structure.
+  - name: "LightWeight"
+    ami_id: "ami-06d753822bd94c64e"
+    instance_count: 1
+    vpc_id: "vpc-9d9385fa"                # empty → create or default
+    required_elastic_ip: false
+
+    master:
+      count: 1
+      prefix: "master-"
+      type: "t2.medium"

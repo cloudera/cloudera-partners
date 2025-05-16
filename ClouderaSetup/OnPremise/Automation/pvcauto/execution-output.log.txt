@@ -1,0 +1,2539 @@
+ksahu@Kuldeeps-MacBook-Air ~ % bash clone_and_run_terraform.sh                 
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Checking Terraform installation... 🚀          
+=================================================================
+
+✅ Terraform already installed: Terraform v1.11.4
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Checking AWS CLI installation... 🚀          
+=================================================================
+
+✅ AWS CLI v2 already installed: aws-cli/2.19.4 Python/3.12.7 Darwin/24.4.0 source/arm64
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Checking AWS credentials... 🚀          
+=================================================================
+
+✅ AWS credentials are valid.
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Checking for .tfvars.env file... 🚀          
+=================================================================
+
+✅ .tfvars.env file found.
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Checking Git installation... 🚀          
+=================================================================
+
+✅ Git already installed: git version 2.39.5 (Apple Git-154)
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Verify environment name : 'development' is set from .tfvars.env file 🚀          
+=================================================================
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Cloning repository if needed... 🚀          
+=================================================================
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Setting Terraform workspace to 'development'... 🚀          
+=================================================================
+
+Switched to workspace "development".
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Initializing Terraform... 🚀          
+=================================================================
+
+Initializing the backend...
+Initializing modules...
+Initializing provider plugins...
+- Reusing previous version of hashicorp/tls from the dependency lock file
+- Reusing previous version of hashicorp/local from the dependency lock file
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Using previously-installed hashicorp/tls v4.1.0
+- Using previously-installed hashicorp/local v2.5.2
+- Using previously-installed hashicorp/aws v5.97.0
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Planning Terraform... 🚀          
+=================================================================
+
+module.vpc.data.aws_vpc.default[0]: Reading...
+module.vpc.data.aws_vpc.default[0]: Read complete after 2s [id=vpc-9d9385fa]
+module.vpc.data.aws_subnets.default[0]: Reading...
+module.vpc.data.aws_subnets.default[0]: Read complete after 0s [id=ap-southeast-1]
+module.security_group.data.aws_security_group.existing_sg[0]: Reading...
+module.security_group.data.aws_security_group.existing_sg[0]: Read complete after 0s [id=sg-0dbb6f79cba5ef701]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.ec2_instances.aws_eip_association.cldr_mngr["cldr_mngr-1"] will be created
+  + resource "aws_eip_association" "cldr_mngr" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + instance_id          = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip_address   = (known after apply)
+      + public_ip            = (known after apply)
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["cldr_mngr-1"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "cldr_mngr"
+          + "Name"        = "development-cldr-mngr-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "cldr_mngr"
+          + "Name"        = "development-cldr-mngr-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1500
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["ipa_server-1"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.4xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "ipa_server"
+          + "Name"        = "development-ipa-server-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "ipa_server"
+          + "Name"        = "development-ipa-server-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 250
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcbase_master"
+          + "Name"        = "development-pvcbase-master-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcbase_master"
+          + "Name"        = "development-pvcbase-master-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1000
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcbase_worker-1"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1000
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-2"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-2"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1000
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcbase_worker-3"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-3"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-3"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1000
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-4"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-4"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1000
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcbase_worker-5"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-5"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcbase_worker"
+          + "Name"        = "development-pvcbase-worker-5"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 1000
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_master-1"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_master"
+          + "Name"        = "development-pvcecs-master-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_master"
+          + "Name"        = "development-pvcecs-master-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-1"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-1"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-10"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-10"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-2"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-2"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-3"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-3"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-3"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-4"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-4"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-5"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-5"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-6"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-6"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-7"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-7"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-7"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-8"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-8"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-8"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.ec2_instances.aws_instance.group_instances["pvcecs_worker-9"] will be created
+  + resource "aws_instance" "group_instances" {
+      + ami                                  = "ami-06dc977f58c8d7857"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = true
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+      + cpu_threads_per_core                 = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = (known after apply)
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "m5.8xlarge"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "pvc-new-keypair1"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = "subnet-affc06c9"
+      + tags                                 = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-9"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all                             = {
+          + "Group"       = "pvcecs_worker"
+          + "Name"        = "development-pvcecs-worker-9"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tenancy                              = (known after apply)
+      + user_data                            = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = [
+          + "sg-0dbb6f79cba5ef701",
+        ]
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device {
+          + delete_on_termination = true
+          + device_name           = (known after apply)
+          + encrypted             = (known after apply)
+          + iops                  = (known after apply)
+          + kms_key_id            = (known after apply)
+          + tags_all              = (known after apply)
+          + throughput            = (known after apply)
+          + volume_id             = (known after apply)
+          + volume_size           = 2300
+          + volume_type           = "gp3"
+        }
+    }
+
+  # module.elastic-ip.aws_eip.this[0] will be created
+  + resource "aws_eip" "this" {
+      + allocation_id        = (known after apply)
+      + arn                  = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = "vpc"
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + ipam_pool_id         = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + ptr_record           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "CreatedBy"   = "Terraform"
+          + "Name"        = "cldr-mngr-eip"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all             = {
+          + "CreatedBy"   = "Terraform"
+          + "Name"        = "cldr-mngr-eip"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + vpc                  = (known after apply)
+    }
+
+  # module.key-pair.aws_key_pair.pvc_cluster_keypair[0] will be created
+  + resource "aws_key_pair" "pvc_cluster_keypair" {
+      + arn             = (known after apply)
+      + fingerprint     = (known after apply)
+      + id              = (known after apply)
+      + key_name        = "pvc-new-keypair1"
+      + key_name_prefix = (known after apply)
+      + key_pair_id     = (known after apply)
+      + key_type        = (known after apply)
+      + public_key      = (known after apply)
+      + tags            = {
+          + "created_by"  = "Terraform"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+      + tags_all        = {
+          + "created_by"  = "Terraform"
+          + "environment" = "development"
+          + "owner"       = "ksahu-ygulati"
+        }
+    }
+
+  # module.key-pair.local_sensitive_file.pem_file[0] will be created
+  + resource "local_sensitive_file" "pem_file" {
+      + content              = (sensitive value)
+      + content_base64sha256 = (known after apply)
+      + content_base64sha512 = (known after apply)
+      + content_md5          = (known after apply)
+      + content_sha1         = (known after apply)
+      + content_sha256       = (known after apply)
+      + content_sha512       = (known after apply)
+      + directory_permission = "700"
+      + file_permission      = "600"
+      + filename             = "pvc-new-keypair1.pem"
+      + id                   = (known after apply)
+    }
+
+  # module.key-pair.tls_private_key.pvc_private_key[0] will be created
+  + resource "tls_private_key" "pvc_private_key" {
+      + algorithm                     = "RSA"
+      + ecdsa_curve                   = "P224"
+      + id                            = (known after apply)
+      + private_key_openssh           = (sensitive value)
+      + private_key_pem               = (sensitive value)
+      + private_key_pem_pkcs8         = (sensitive value)
+      + public_key_fingerprint_md5    = (known after apply)
+      + public_key_fingerprint_sha256 = (known after apply)
+      + public_key_openssh            = (known after apply)
+      + public_key_pem                = (known after apply)
+      + rsa_bits                      = 4096
+    }
+
+Plan: 24 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + cldr_mngr_eip_association_id = (known after apply)
+  + cldr_mngr_public_ip          = [
+      + (known after apply),
+    ]
+  + eip_allocation_id            = (known after apply)
+  + instance_groups              = {
+      + cldr_mngr      = {
+          + ami           = "ami-06dc977f58c8d7857"
+          + count         = 1
+          + instance_type = "m5.8xlarge"
+          + tags          = {
+              + Name = "development-cldr-mngr"
+            }
+          + user_data     = null
+          + volume_size   = 1500
+        }
+      + ipa_server     = {
+          + ami           = "ami-06dc977f58c8d7857"
+          + count         = 1
+          + instance_type = "m5.4xlarge"
+          + tags          = {
+              + Name = "development-ipa-server"
+            }
+          + user_data     = null
+          + volume_size   = 250
+        }
+      + pvcbase_master = {
+          + ami           = "ami-06dc977f58c8d7857"
+          + count         = 1
+          + instance_type = "m5.8xlarge"
+          + tags          = {
+              + Name = "development-pvcbase-master"
+            }
+          + user_data     = null
+          + volume_size   = 1000
+        }
+      + pvcbase_worker = {
+          + ami           = "ami-06dc977f58c8d7857"
+          + count         = 5
+          + instance_type = "m5.8xlarge"
+          + tags          = {
+              + Name = "development-pvcbase-worker"
+            }
+          + user_data     = null
+          + volume_size   = 1000
+        }
+      + pvcecs_master  = {
+          + ami           = "ami-06dc977f58c8d7857"
+          + count         = 1
+          + instance_type = "m5.8xlarge"
+          + tags          = {
+              + Name = "development-pvcecs-master"
+            }
+          + user_data     = null
+          + volume_size   = 2300
+        }
+      + pvcecs_worker  = {
+          + ami           = "ami-06dc977f58c8d7857"
+          + count         = 10
+          + instance_type = "m5.8xlarge"
+          + tags          = {
+              + Name = "development-pvcecs-worker"
+            }
+          + user_data     = null
+          + volume_size   = 2300
+        }
+    }
+  + instance_ids                 = {
+      + cldr_mngr-1      = (known after apply)
+      + ipa_server-1     = (known after apply)
+      + pvcbase_master-1 = (known after apply)
+      + pvcbase_worker-1 = (known after apply)
+      + pvcbase_worker-2 = (known after apply)
+      + pvcbase_worker-3 = (known after apply)
+      + pvcbase_worker-4 = (known after apply)
+      + pvcbase_worker-5 = (known after apply)
+      + pvcecs_master-1  = (known after apply)
+      + pvcecs_worker-1  = (known after apply)
+      + pvcecs_worker-10 = (known after apply)
+      + pvcecs_worker-2  = (known after apply)
+      + pvcecs_worker-3  = (known after apply)
+      + pvcecs_worker-4  = (known after apply)
+      + pvcecs_worker-5  = (known after apply)
+      + pvcecs_worker-6  = (known after apply)
+      + pvcecs_worker-7  = (known after apply)
+      + pvcecs_worker-8  = (known after apply)
+      + pvcecs_worker-9  = (known after apply)
+    }
+  + keypair_name                 = "pvc-new-keypair1"
+  + private_ips                  = {
+      + cldr_mngr-1      = (known after apply)
+      + ipa_server-1     = (known after apply)
+      + pvcbase_master-1 = (known after apply)
+      + pvcbase_worker-1 = (known after apply)
+      + pvcbase_worker-2 = (known after apply)
+      + pvcbase_worker-3 = (known after apply)
+      + pvcbase_worker-4 = (known after apply)
+      + pvcbase_worker-5 = (known after apply)
+      + pvcecs_master-1  = (known after apply)
+      + pvcecs_worker-1  = (known after apply)
+      + pvcecs_worker-10 = (known after apply)
+      + pvcecs_worker-2  = (known after apply)
+      + pvcecs_worker-3  = (known after apply)
+      + pvcecs_worker-4  = (known after apply)
+      + pvcecs_worker-5  = (known after apply)
+      + pvcecs_worker-6  = (known after apply)
+      + pvcecs_worker-7  = (known after apply)
+      + pvcecs_worker-8  = (known after apply)
+      + pvcecs_worker-9  = (known after apply)
+    }
+  + public_ips                   = {
+      + cldr_mngr-1      = (known after apply)
+      + ipa_server-1     = (known after apply)
+      + pvcbase_master-1 = (known after apply)
+      + pvcbase_worker-1 = (known after apply)
+      + pvcbase_worker-2 = (known after apply)
+      + pvcbase_worker-3 = (known after apply)
+      + pvcbase_worker-4 = (known after apply)
+      + pvcbase_worker-5 = (known after apply)
+      + pvcecs_master-1  = (known after apply)
+      + pvcecs_worker-1  = (known after apply)
+      + pvcecs_worker-10 = (known after apply)
+      + pvcecs_worker-2  = (known after apply)
+      + pvcecs_worker-3  = (known after apply)
+      + pvcecs_worker-4  = (known after apply)
+      + pvcecs_worker-5  = (known after apply)
+      + pvcecs_worker-6  = (known after apply)
+      + pvcecs_worker-7  = (known after apply)
+      + pvcecs_worker-8  = (known after apply)
+      + pvcecs_worker-9  = (known after apply)
+    }
+  + sec_group_details            = "sg-0dbb6f79cba5ef701"
+  + subnet_ids                   = [
+      + "subnet-affc06c9",
+      + "subnet-6346ad2b",
+      + "subnet-44e0511d",
+    ]
+  + vpc_id                       = "vpc-9d9385fa"
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan.out
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan.out"
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Applying Terraform... 🚀          
+=================================================================
+
+TF_DATA_DIR: 
+PWD: /Users/ksahu/cdp-onprem-automation/cloudera-pvc-terraform
+-rw-r--r--@ 1 ksahu  staff    183 May  9 16:30 terraform.tfstate
+-rw-r--r--@ 1 ksahu  staff  89787 May  9 16:30 terraform.tfstate.backup
+
+terraform.tfstate.d:
+total 0
+drwxr-xr-x@ 4 ksahu  staff  128 May  9 16:32 development
+module.key-pair.tls_private_key.pvc_private_key[0]: Creating...
+module.elastic-ip.aws_eip.this[0]: Creating...
+module.elastic-ip.aws_eip.this[0]: Creation complete after 1s [id=eipalloc-00d8d0c1f90b4d876]
+module.key-pair.tls_private_key.pvc_private_key[0]: Creation complete after 2s [id=ce663ea564992aa40cc68ee64a9857cc07e4ef11]
+module.key-pair.aws_key_pair.pvc_cluster_keypair[0]: Creating...
+module.key-pair.local_sensitive_file.pem_file[0]: Creating...
+module.key-pair.local_sensitive_file.pem_file[0]: Creation complete after 0s [id=9ccf2aa8f471d02b464babadfb8f28ffe1e7b632]
+module.key-pair.aws_key_pair.pvc_cluster_keypair[0]: Creation complete after 1s [id=pvc-new-keypair1]
+module.ec2_instances.aws_instance.group_instances["pvcecs_master-1"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-5"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-7"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-3"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-1"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-1"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-9"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-8"]: Creating...
+module.ec2_instances.aws_instance.group_instances["cldr_mngr-1"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-3"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_master-1"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-5"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-7"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-1"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-1"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-9"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-8"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["cldr_mngr-1"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-3"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-3"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-7"]: Creation complete after 13s [id=i-098d3905c621fcbc8]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-3"]: Creation complete after 13s [id=i-0d1353be878097cff]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-9"]: Creation complete after 13s [id=i-0f06bef1fde8932bb]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_master-1"]: Creation complete after 13s [id=i-033bcd672b041c641]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-3"]: Creation complete after 13s [id=i-0203039b98a992626]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-1"]: Creation complete after 13s [id=i-0b1d13a17b614cd77]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-1"]: Creation complete after 13s [id=i-0c353f9ec87452ebb]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-8"]: Creation complete after 13s [id=i-0b14fb1d01088d0ce]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-5"]: Creation complete after 13s [id=i-089879bc181861466]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Creating...
+module.ec2_instances.aws_instance.group_instances["ipa_server-1"]: Creating...
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Creating...
+module.ec2_instances.aws_instance.group_instances["cldr_mngr-1"]: Creation complete after 13s [id=i-0fda96bb0750ef8df]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["ipa_server-1"]: Still creating... [10s elapsed]
+module.ec2_instances.aws_instance.group_instances["ipa_server-1"]: Creation complete after 14s [id=i-0741fc7881ee86eb4]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-2"]: Creation complete after 59s [id=i-0a6ead8a930b31414]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [1m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [1m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Still creating... [1m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-2"]: Creation complete after 1m27s [id=i-0366855e3dc0e462c]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [1m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [1m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [1m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Still creating... [1m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [1m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [1m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-5"]: Creation complete after 1m38s [id=i-07e19dca8dd639e1d]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [1m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [1m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [1m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [1m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [1m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [1m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [1m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [1m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [1m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [1m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [2m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [2m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [2m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [2m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [2m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [2m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [2m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [2m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [2m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [2m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [2m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [2m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [2m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [2m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [2m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [2m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Still creating... [2m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [2m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [2m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [2m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-6"]: Creation complete after 2m32s [id=i-0210b0ed44f04fb48]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [2m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [2m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [2m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Still creating... [2m40s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_worker-4"]: Creation complete after 2m41s [id=i-0454c4954dd985505]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [2m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Still creating... [2m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Still creating... [2m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-10"]: Creation complete after 2m50s [id=i-06736569e82ea7b62]
+module.ec2_instances.aws_instance.group_instances["pvcbase_master-1"]: Creation complete after 2m57s [id=i-0e5a3a6b008fbd942]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [3m0s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [3m10s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [3m20s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [3m30s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [3m40s elapsed]
+
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Still creating... [3m50s elapsed]
+module.ec2_instances.aws_instance.group_instances["pvcecs_worker-4"]: Creation complete after 3m54s [id=i-06d7704d18d84d1b6]
+module.ec2_instances.aws_eip_association.cldr_mngr["cldr_mngr-1"]: Creating...
+module.ec2_instances.aws_eip_association.cldr_mngr["cldr_mngr-1"]: Creation complete after 1s [id=eipassoc-0761f6a12d4f4a9a5]
+
+Apply complete! Resources: 24 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cldr_mngr_eip_association_id = "eipassoc-0761f6a12d4f4a9a5"
+cldr_mngr_public_ip = [
+  "18.141.97.243",
+]
+eip_allocation_id = "eipalloc-00d8d0c1f90b4d876"
+instance_groups = tomap({
+  "cldr_mngr" = {
+    "ami" = "ami-06dc977f58c8d7857"
+    "count" = 1
+    "instance_type" = "m5.8xlarge"
+    "tags" = tomap({
+      "Name" = "development-cldr-mngr"
+    })
+    "user_data" = tostring(null)
+    "volume_size" = 1500
+  }
+  "ipa_server" = {
+    "ami" = "ami-06dc977f58c8d7857"
+    "count" = 1
+    "instance_type" = "m5.4xlarge"
+    "tags" = tomap({
+      "Name" = "development-ipa-server"
+    })
+    "user_data" = tostring(null)
+    "volume_size" = 250
+  }
+  "pvcbase_master" = {
+    "ami" = "ami-06dc977f58c8d7857"
+    "count" = 1
+    "instance_type" = "m5.8xlarge"
+    "tags" = tomap({
+      "Name" = "development-pvcbase-master"
+    })
+    "user_data" = tostring(null)
+    "volume_size" = 1000
+  }
+  "pvcbase_worker" = {
+    "ami" = "ami-06dc977f58c8d7857"
+    "count" = 5
+    "instance_type" = "m5.8xlarge"
+    "tags" = tomap({
+      "Name" = "development-pvcbase-worker"
+    })
+    "user_data" = tostring(null)
+    "volume_size" = 1000
+  }
+  "pvcecs_master" = {
+    "ami" = "ami-06dc977f58c8d7857"
+    "count" = 1
+    "instance_type" = "m5.8xlarge"
+    "tags" = tomap({
+      "Name" = "development-pvcecs-master"
+    })
+    "user_data" = tostring(null)
+    "volume_size" = 2300
+  }
+  "pvcecs_worker" = {
+    "ami" = "ami-06dc977f58c8d7857"
+    "count" = 10
+    "instance_type" = "m5.8xlarge"
+    "tags" = tomap({
+      "Name" = "development-pvcecs-worker"
+    })
+    "user_data" = tostring(null)
+    "volume_size" = 2300
+  }
+})
+instance_ids = {
+  "cldr_mngr-1" = "i-0fda96bb0750ef8df"
+  "ipa_server-1" = "i-0741fc7881ee86eb4"
+  "pvcbase_master-1" = "i-0e5a3a6b008fbd942"
+  "pvcbase_worker-1" = "i-0b1d13a17b614cd77"
+  "pvcbase_worker-2" = "i-0a6ead8a930b31414"
+  "pvcbase_worker-3" = "i-0203039b98a992626"
+  "pvcbase_worker-4" = "i-0454c4954dd985505"
+  "pvcbase_worker-5" = "i-089879bc181861466"
+  "pvcecs_master-1" = "i-033bcd672b041c641"
+  "pvcecs_worker-1" = "i-0c353f9ec87452ebb"
+  "pvcecs_worker-10" = "i-06736569e82ea7b62"
+  "pvcecs_worker-2" = "i-0366855e3dc0e462c"
+  "pvcecs_worker-3" = "i-0d1353be878097cff"
+  "pvcecs_worker-4" = "i-06d7704d18d84d1b6"
+  "pvcecs_worker-5" = "i-07e19dca8dd639e1d"
+  "pvcecs_worker-6" = "i-0210b0ed44f04fb48"
+  "pvcecs_worker-7" = "i-098d3905c621fcbc8"
+  "pvcecs_worker-8" = "i-0b14fb1d01088d0ce"
+  "pvcecs_worker-9" = "i-0f06bef1fde8932bb"
+}
+keypair_name = "pvc-new-keypair1"
+private_ips = {
+  "cldr_mngr-1" = "172.31.17.43"
+  "ipa_server-1" = "172.31.29.234"
+  "pvcbase_master-1" = "172.31.24.105"
+  "pvcbase_worker-1" = "172.31.29.215"
+  "pvcbase_worker-2" = "172.31.18.12"
+  "pvcbase_worker-3" = "172.31.22.249"
+  "pvcbase_worker-4" = "172.31.23.34"
+  "pvcbase_worker-5" = "172.31.24.112"
+  "pvcecs_master-1" = "172.31.27.22"
+  "pvcecs_worker-1" = "172.31.18.96"
+  "pvcecs_worker-10" = "172.31.23.42"
+  "pvcecs_worker-2" = "172.31.27.42"
+  "pvcecs_worker-3" = "172.31.30.219"
+  "pvcecs_worker-4" = "172.31.27.196"
+  "pvcecs_worker-5" = "172.31.23.118"
+  "pvcecs_worker-6" = "172.31.27.97"
+  "pvcecs_worker-7" = "172.31.19.236"
+  "pvcecs_worker-8" = "172.31.20.150"
+  "pvcecs_worker-9" = "172.31.28.149"
+}
+public_ips = {
+  "cldr_mngr-1" = "18.141.97.243"
+  "ipa_server-1" = "47.129.52.184"
+  "pvcbase_master-1" = "54.169.93.254"
+  "pvcbase_worker-1" = "52.77.233.175"
+  "pvcbase_worker-2" = "18.142.43.53"
+  "pvcbase_worker-3" = "3.0.20.43"
+  "pvcbase_worker-4" = "54.254.112.21"
+  "pvcbase_worker-5" = "54.169.185.56"
+  "pvcecs_master-1" = "54.151.166.21"
+  "pvcecs_worker-1" = "13.250.111.177"
+  "pvcecs_worker-10" = "18.139.219.226"
+  "pvcecs_worker-2" = "13.229.83.82"
+  "pvcecs_worker-3" = "3.0.91.26"
+  "pvcecs_worker-4" = "54.255.136.42"
+  "pvcecs_worker-5" = "52.77.233.184"
+  "pvcecs_worker-6" = "13.213.61.173"
+  "pvcecs_worker-7" = "13.213.40.243"
+  "pvcecs_worker-8" = "18.142.186.85"
+  "pvcecs_worker-9" = "54.169.245.106"
+}
+sec_group_details = "sg-0dbb6f79cba5ef701"
+subnet_ids = tolist([
+  "subnet-affc06c9",
+  "subnet-6346ad2b",
+  "subnet-44e0511d",
+])
+vpc_id = "vpc-9d9385fa"
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: ✅ Terraform provisioning complete! 🚀          
+=================================================================
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Running generate_inventory.sh... 🚀          
+=================================================================
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Generating Ansible inventory... 🚀          
+=================================================================
+
+SCRIPT_DIR is: /Users/ksahu/cdp-onprem-automation/cloudera-pvc-terraform
+[ipaserver]
+ipaserver ansible_host=47.129.52.184 cldr_hostname=ipaserver
+
+[cldr-mngr]
+cldr-mngr ansible_host=18.141.97.243 cldr_hostname=cldr-mngr
+
+[base-masters]
+pvcbase-master ansible_host=54.169.93.254 cldr_hostname=pvcbase-master
+
+[base-workers]
+pvcbase-worker1 ansible_host=52.77.233.175 cldr_hostname=pvcbase-worker1
+pvcbase-worker2 ansible_host=18.142.43.53 cldr_hostname=pvcbase-worker2
+pvcbase-worker3 ansible_host=3.0.20.43 cldr_hostname=pvcbase-worker3
+pvcbase-worker4 ansible_host=54.254.112.21 cldr_hostname=pvcbase-worker4
+pvcbase-worker5 ansible_host=54.169.185.56 cldr_hostname=pvcbase-worker5
+
+[ecs-masters]
+pvcecs-master ansible_host=54.151.166.21 cldr_hostname=pvcecs-master
+
+[ecs-workers]
+pvcecs-worker1 ansible_host=13.250.111.177 cldr_hostname=pvcecs-worker1
+pvcecs-worker2 ansible_host=18.139.219.226 cldr_hostname=pvcecs-worker2
+pvcecs-worker3 ansible_host=13.229.83.82 cldr_hostname=pvcecs-worker3
+pvcecs-worker4 ansible_host=3.0.91.26 cldr_hostname=pvcecs-worker4
+pvcecs-worker5 ansible_host=54.255.136.42 cldr_hostname=pvcecs-worker5
+pvcecs-worker6 ansible_host=52.77.233.184 cldr_hostname=pvcecs-worker6
+pvcecs-worker7 ansible_host=13.213.61.173 cldr_hostname=pvcecs-worker7
+pvcecs-worker8 ansible_host=13.213.40.243 cldr_hostname=pvcecs-worker8
+pvcecs-worker9 ansible_host=18.142.186.85 cldr_hostname=pvcecs-worker9
+pvcecs-worker10 ansible_host=54.169.245.106 cldr_hostname=pvcecs-worker10
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Inventory generated at: ansible_inventory.ini 🚀          
+=================================================================
+
+[ipaserver]
+ipaserver ansible_host=47.129.52.184 cldr_hostname=ipaserver
+
+[cldr-mngr]
+cldr-mngr ansible_host=18.141.97.243 cldr_hostname=cldr-mngr
+
+[base-masters]
+pvcbase-master ansible_host=54.169.93.254 cldr_hostname=pvcbase-master
+
+[base-workers]
+pvcbase-worker1 ansible_host=52.77.233.175 cldr_hostname=pvcbase-worker1
+pvcbase-worker2 ansible_host=18.142.43.53 cldr_hostname=pvcbase-worker2
+pvcbase-worker3 ansible_host=3.0.20.43 cldr_hostname=pvcbase-worker3
+pvcbase-worker4 ansible_host=54.254.112.21 cldr_hostname=pvcbase-worker4
+pvcbase-worker5 ansible_host=54.169.185.56 cldr_hostname=pvcbase-worker5
+
+[ecs-masters]
+pvcecs-master ansible_host=54.151.166.21 cldr_hostname=pvcecs-master
+
+[ecs-workers]
+pvcecs-worker1 ansible_host=13.250.111.177 cldr_hostname=pvcecs-worker1
+pvcecs-worker2 ansible_host=18.139.219.226 cldr_hostname=pvcecs-worker2
+pvcecs-worker3 ansible_host=13.229.83.82 cldr_hostname=pvcecs-worker3
+pvcecs-worker4 ansible_host=3.0.91.26 cldr_hostname=pvcecs-worker4
+pvcecs-worker5 ansible_host=54.255.136.42 cldr_hostname=pvcecs-worker5
+pvcecs-worker6 ansible_host=52.77.233.184 cldr_hostname=pvcecs-worker6
+pvcecs-worker7 ansible_host=13.213.61.173 cldr_hostname=pvcecs-worker7
+pvcecs-worker8 ansible_host=13.213.40.243 cldr_hostname=pvcecs-worker8
+pvcecs-worker9 ansible_host=18.142.186.85 cldr_hostname=pvcecs-worker9
+pvcecs-worker10 ansible_host=54.169.245.106 cldr_hostname=pvcecs-worker10
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Ansible inventory generation completed. 🚀          
+=================================================================
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Please check the inventory.ini file for the generated Ansible inventory. 🚀          
+=================================================================
+
+✅ Found inventory.ini in current directory.
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Ansible inventory generation completed. 🚀          
+=================================================================
+
+
+=================================================================
+            🚀 clone_and_run_terraform.sh: Please check the inventory.ini file for the generated Ansible inventory. 🚀          
+=================================================================
+
+PWD: /Users/ksahu/cdp-onprem-automation/cloudera-pvc-terraform
+✅ Found inventory.ini in current directory.
+✅ Found Ansible directory: ../ansible-cloudera-pvc
+./ansible_inventory.ini -> ../ansible-cloudera-pvc/inventory.ini
+📂 Copied ./ansible_inventory.ini to ../ansible-cloudera-pvc/inventory.ini
+✅ Found key file: ./pvc-new-keypair1.pem
+./pvc-new-keypair1.pem -> ../.././pvc-new-keypair1.pem
+📂 Copied ./pvc-new-keypair1.pem to ../.././pvc-new-keypair1.pem
+ksahu@Kuldeeps-MacBook-Air ~ %

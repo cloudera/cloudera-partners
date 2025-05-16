@@ -1,0 +1,251 @@
+= Cloudera On-Prem Automation Guide for EC2 instances
+v0.1, 2025-04-10: Draft
+:description: *Installation instructions for Cloudera OnPrem Cluster nodes on AWS*
+:toc: left
+:toc-title: Table of Contents
+:toclevels: 2
+:sectnums:
+:source-highlighter: highlightjs
+:icons: font
+:imagesdir: ./images
+:keywords: Cloudera, Automation
+:hide-uri-scheme:
+:homepage: https://github.com/kuldeepsahu1105/cdp-onprem-automation
+
+[WARNING]
+====
+📝 **DRAFT** — This document is WIP and Not Final.
+====
+
+== Overview
+
+A comprehensive guide to automate the provisioning of Cloudera Data Platform (CDP) cluster instances on AWS.
+This automation facilitates the provisioning of a Cloudera Private Cloud (PVC) environment on AWS using Terraform. It supports both Mac and Linux systems and offers two primary methods for deployment:
+
+. *Wrapper Script Method*
+. *Manual Terraform Method*
+
+== Minimum Pre-Requisites
+
+Ensure the following tools and accounts are available before proceeding:
+
+(Checks are added there in the wrapper script to ensure that the all above dependecies prerequisites are made by user)
+
+. *MacOS or Linux OS*
+. *AWS Account with Power User Permissions*
+. *AWS CLI Installed*
+. *Login to AWS CLI either using accesskey/secretkey method or using sso login*
+. *Terraform*
+. *Git* 
+// . Cloudera license
+// .. Request a https://github.com/cloudera/cloudera-partners/tree/main/PartnerResources#partner-developer-license-program[Free Partner Developer License]
+
+[NOTE]
+====
+📝 All `**.tf**` files used for deploying various resources can be found in the link:./cloudera-pvc-terraform[`**cloudera-pvc-terraform**`] folder.
+====
+== Deployment Methods
+
+=== Wrapper Script Method
+
+This is the quickest method for setting up your infrastructure.
+
+==== Steps
+
+. Download the wrapper script and environment file:
++
+[source, bash]
+----
+curl -O https://raw.githubusercontent.com/kuldeepsahu1105/cdp-onprem-automation/dev/terraform/clone_and_run_terraform.sh
+curl -O https://raw.githubusercontent.com/kuldeepsahu1105/cdp-onprem-automation/dev/terraform/.tfvars.env
+----
+
+. *Configure `.tfvars.env`:* Edit the file to match your desired configuration. See the <<tfvars-configuration, .tfvars.env Configuration Guide>> for details.
+
+. Execute the script:
++
+[source, bash]
+----
+bash clone_and_run_terraform.sh
+----
+
+Ensure `.tfvars.env` is in the same directory as the script.
+
+=== Manual Terraform Method
+
+This method provides more granular control over the deployment process.
+
+==== Steps
+
+. Clone the repository:
++
+[source, bash]
+----
+git clone https://github.com/kuldeepsahu1105/cdp-onprem-automation.git
+cd cdp-onprem-automation
+----
+
+. *Configure `terraform.tfvars`:* Modify the file to fit your desired setup. Refer to the <<tfvars-configuration, .tfvars.env Configuration Guide>>.
+
+. Initialize and apply the Terraform configuration:
++
+[source, bash]
+----
+terraform init
+terraform apply
+----
+
+[[tfvars-configuration]]
+== .tfvars.env Configuration Guide
+
+  The `.tfvars.env` file defines environment-specific settings used by Terraform.
+
+=== AWS Region and Environment Settings
+
+[source, bash]
+----
+AWS_REGION="${AWS_REGION:-ap-southeast-1}"
+OWNER="${OWNER:-ksahu}"
+ENVIRONMENT="${ENVIRONMENT:-development}"
+TERRAFORM_VERSION="${TERRAFORM_VERSION:-latest}"
+----
+
+- `AWS_REGION`: AWS region for deployment
+- `OWNER`: Resource tag owner
+- `ENVIRONMENT`: Environment name (e.g., dev, stage, prod)
+- `TERRAFORM_VERSION`: Terraform version to install and use (if Terraform is not already installed)
+
+=== VPC Configuration
+
+[source, bash]
+----
+-var="create_vpc=false"
+-var="vpc_name=cloudera-vpc"
+-var="vpc_cidr_block=172.16.0.0/16"
+-var='azs=["ap-southeast-1a","ap-southeast-1b"]'
+-var='public_subnets_cidr=["172.16.0.0/24"]'
+-var='private_subnets_cidr=[]'
+-var="enable_nat_gateway=false"
+-var="enable_vpn_gateway=false"
+----
+
+- `create_vpc`: Set to `true` to create a new VPC
+
+- If `create_vpc=true`, the following parameters are required:
+- `vpc_name`: Name of the VPC
+- `vpc_cidr_block`: CIDR block for the VPC
+- `azs`: Availability zones for the VPC
+- `public_subnets_cidr`: CIDR blocks for public subnets
+- `private_subnets_cidr`: CIDR blocks for private subnets
+
+- If `create_vpc=false`, the script will use the default VPC in that region.
+
+=== Security Group Configuration
+
+[source, bash]
+----
+-var="create_new_sg=false"
+-var='allowed_cidrs=["0.0.0.0/0"]'
+-var='allow_all=true'
+-var='allowed_ports=[22, 443, 80, 7180, 7183, 7182]'
+-var="sg_name=pvc_cluster_sg"
+-var="existing_sg=sg-0dbb6f79cba5ef701"
+----
+
+- `create_new_sg`: Set to `true` to create a new security group
+- If `create_new_sg=true`, the following parameters are required:
+- `allowed_cidrs`: CIDR blocks to allow access
+- `allow_all`: Set to `true` to allow all traffic
+- If `allow_all=false`, `allowed_ports` value is required for Ports to allow access
+- `sg_name`: Name of the security group to be created
+
+- If `create_new_sg=false`, the script will use the existing security group specified by `existing_sg`.
+- `existing_sg`: ID of the existing security group to use
+
+=== Elastic IP and Key Pair Configuration
+
+[source, bash]
+----
+-var="create_eip=true"
+-var="cldr_eip_name=cldr-mngr-eip"
+
+-var="create_keypair=true"
+-var="keypair_name=pvc-new-keypair"
+-var="existing_keypair_name=kuldeep-pvc-session"
+----
+
+- `create_eip`: Set to `true` to create a new Elastic IP
+- `cldr_eip_name`: Name of the Elastic IP to be created
+- `create_keypair`: Set to `true` to create a new key pair
+- `keypair_name`: Name of the key pair to be created
+- `existing_keypair_name`: Name of the existing key pair to use
+- If `create_keypair=false`, the script will use the existing key pair specified by `existing_keypair_name`.
+- If `create_eip=false`, the script will use the existing Elastic IP specified by `cldr_eip_name`.
+- If `create_eip=true`, the script will create a new Elastic IP and associate it with the cldr-mngr instance.
+
+=== Instance Groups Configuration
+
+- `instance_groups`: Defines the EC2 instance groups to be created
+- Each group can have the following parameters:
+- `count`: Number of instances in the group
+- `ami`: AMI ID for the instances
+- `instance_type`: Instance type (e.g., m5.8xlarge)
+- `volume_size`: Size of the EBS volume in GB
+- `tags`: Tags to be applied to the instances
+- `Name`: Name tag for the instances, typically in the format `${ENVIRONMENT}-<group_name>`
+- Make sure AMI ID is available in the specified region and is compatible with the instance type.
+
+[source, bash]
+----
+-var='instance_groups={
+  cldr_mngr = {
+    count = 1
+    ami = "ami-06dc977f58c8d7857"
+    instance_type = "m5.8xlarge"
+    volume_size = 1500
+    tags = { Name = "'"${ENVIRONMENT}"'-cldr-mngr" }
+  },
+  ipa_server = {
+    count = 1
+    ami = "ami-06dc977f58c8d7857"
+    instance_type = "m5.4xlarge"
+    volume_size = 250
+    tags = { Name = "'"${ENVIRONMENT}"'-ipa-server" }
+  },
+  pvcbase_master = {
+    count = 1
+    ami = "ami-06dc977f58c8d7857"
+    instance_type = "m5.8xlarge"
+    volume_size = 1000
+    tags = { Name = "'"${ENVIRONMENT}"'-pvcbase-master" }
+  },
+  pvcbase_worker = {
+    count = 5
+    ami = "ami-06dc977f58c8d7857"
+    instance_type = "m5.8xlarge"
+    volume_size = 1000
+    tags = { Name = "'"${ENVIRONMENT}"'-pvcbase-worker" }
+  },
+  pvcecs_master = {
+    count = 1
+    ami = "ami-06dc977f58c8d7857"
+    instance_type = "m5.8xlarge"
+    volume_size = 2300
+    tags = { Name = "'"${ENVIRONMENT}"'-pvcecs-master" }
+  },
+  pvcecs_worker = {
+    count = 10
+    ami = "ami-06dc977f58c8d7857"
+    instance_type = "m5.8xlarge"
+    volume_size = 2300
+    tags = { Name = "'"${ENVIRONMENT}"'-pvcecs-worker" }
+  }
+}'
+----
+
+== Best Practices
+
+. *Version Control*: Store all infrastructure code in Git.
+. *Remote State*: Use remote backends like S3 with DynamoDB for secure state storage.
+. *Modularization*: Organize Terraform into reusable modules.
+. *Variable Management*: Use `.tfvars` files and environment overrides for clean configuration.

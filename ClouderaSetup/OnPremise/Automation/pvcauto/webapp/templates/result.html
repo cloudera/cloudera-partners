@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deployment Result</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+
+  <div class="d-flex justify-content-center align-items-center vh-100 p-3">
+
+    <div class="card deploy-card w-100" style="max-width:800px;">
+      <h2 class="text-center text-success mb-4">Deployment Successful</h2>
+
+      <div class="d-flex justify-content-end mb-3">
+        <button id="download-csv" class="btn btn-outline-primary">Download CSV</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <thead class="thead-accent">
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Public IP</th>
+              <th scope="col">Private IP</th>
+              <th scope="col">SSH Command</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name, pub, priv in instances %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>{{ pub }}</td>
+              <td>{{ priv }}</td>
+              <td><code>ssh -i ~/.ssh/{{ key_name }}.pem ec2-user@{{ pub }}</code></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // prepare data for CSV
+    const instances = {{ instances|tojson }};
+    const keyName   = "{{ key_name }}";
+
+    document.getElementById('download-csv').addEventListener('click', () => {
+      let csv = 'Name,Public IP,Private IP,SSH Command\n';
+      instances.forEach(([name, pub, priv]) => {
+        const cmd = `ssh -i ~/.ssh/${keyName}.pem ec2-user@${pub}`;
+        csv += `"${name}","${pub}","${priv}","${cmd}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'instances.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

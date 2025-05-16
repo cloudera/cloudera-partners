@@ -1,0 +1,4 @@
+Flask==2.2.5
+PyYAML>=6.0,<7.0
+Cython>=0.29.34
+ansible
