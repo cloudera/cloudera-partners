@@ -56,8 +56,8 @@ This is the quickest method for setting up your infrastructure.
 +
 [source, bash]
 ----
-curl -O https://raw.githubusercontent.com/kuldeepsahu1105/cdp-onprem-automation/dev/terraform/clone_and_run_terraform.sh
-curl -O https://raw.githubusercontent.com/kuldeepsahu1105/cdp-onprem-automation/dev/terraform/.tfvars.env
+curl -O https://raw.githubusercontent.com/cloudera/cloudera-partners/refs/heads/feature/pvcauto/ClouderaSetup/OnPremise/Automation/pvcauto/clone_and_run_terraform.sh
+curl -O https://raw.githubusercontent.com/cloudera/cloudera-partners/refs/heads/feature/pvcauto/ClouderaSetup/OnPremise/Automation/pvcauto/.tfvars.env
 ----
 
 . *Configure `.tfvars.env`:* Edit the file to match your desired configuration. See the <<tfvars-configuration, .tfvars.env Configuration Guide>> for details.
