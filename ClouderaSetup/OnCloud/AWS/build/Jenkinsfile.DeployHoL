@@ -435,14 +435,32 @@ HOSTEDZONEID:${params.HOSTEDZONEID}
                     """
                 }
                 archiveArtifacts artifacts: "${env.WORKSHOP_NAME_LOWER}.txt,configfile", allowEmptyArchive: true
-                def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem"
+                //def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem,hol-provisioner-${BUILD_NUMBER}.log"
+                def attachmentsList = []
+		if (fileExists("${env.WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt")) {
+    		    attachmentsList << "${env.WORKSHOP_NAME_LOWER}.txt"
+		}
+		if (fileExists("${env.WORKSPACE}/configfile")) {
+    		    attachmentsList << "configfile"
+		}
+		if (fileExists("${env.WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem")) {
+    		    attachmentsList << "${env.WORKSHOP_NAME_LOWER}-keypair.pem" 
+		}
+		if (fileExists("${env.WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log")) {
+            	    attachmentsList << "hol-provisioner-${BUILD_NUMBER}.log"
+        	}
+
+		def attachments = attachmentsList.join(',')
+
+                // Debug: Verify email recipient and attachments
+        	echo "Sending email to: ${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}"
+       		echo "Attachments: ${attachments}"
+
 
                 // Debug: Verify email and files
-                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
-                sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
-                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
-
-                // Send email
+                // sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
+                // sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
+                // sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
                 emailext(
                     to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
                     subject: "✅ Jenkins Build Success: ${JOB_NAME} [${BUILD_NUMBER}] ${params.ACTION}",
@@ -519,12 +537,32 @@ HOSTEDZONEID:${params.HOSTEDZONEID}
                     """
                 }
                 archiveArtifacts artifacts: "${env.WORKSHOP_NAME_LOWER}.txt,configfile", allowEmptyArchive: true
-                def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem,hol-provisioner-${BUILD_NUMBER}.log"
+                //def attachments = "${env.WORKSHOP_NAME_LOWER}.txt,configfile,${env.WORKSHOP_NAME_LOWER}-keypair.pem,hol-provisioner-${BUILD_NUMBER}.log"
+                def attachmentsList = []
+		if (fileExists("${env.WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt")) {
+    		    attachmentsList << "${env.WORKSHOP_NAME_LOWER}.txt"
+		}
+		if (fileExists("${env.WORKSPACE}/configfile")) {
+    		    attachmentsList << "configfile"
+		}
+		if (fileExists("${env.WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem")) {
+    		    attachmentsList << "${env.WORKSHOP_NAME_LOWER}-keypair.pem" 
+		}
+		if (fileExists("${env.WORKSPACE}/hol-provisioner-${BUILD_NUMBER}.log")) {
+            	    attachmentsList << "hol-provisioner-${BUILD_NUMBER}.log"
+        	}
+
+		def attachments = attachmentsList.join(',')
+
+                // Debug: Verify email recipient and attachments
+        	echo "Sending email to: ${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}"
+       		echo "Attachments: ${attachments}"
+
 
                 // Debug: Verify email and files
-                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
-                sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
-                sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
+                // sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}.txt || echo 'File not found'"
+                // sh "ls -l ${WORKSPACE}/configfile || echo 'File not found'"
+                // sh "ls -l ${WORKSPACE}/${env.WORKSHOP_NAME_LOWER}-keypair.pem || echo 'File not found'"
 
                 emailext(
                     to: "${env.BUILD_USER_EMAIL ?: 'pse-apac@cloudera.com'}",
