@@ -7,16 +7,22 @@ Cloudera | CDP PVC-OnPrem Deployment Guide
 
 This guide walks you through deploying the Cloudera On Premise on AWS infrastructure.
 
+[NOTE]
+====
+**DRAFT** — This is a work-in-progress deployment guide for internal review. Content may change and is not final. Please do not circulate outside the team.
+
+**IMPORTANT** — The Community Edition PVC deployment repo is currently hosted on the **Internal Cloudera GitHub** and is **not accessible** outside the Cloudera network. You **must be connected to the Cloudera VPN** for this automation to work.
+====
+
 == Prerequisites
 
 Before you begin, ensure the following are installed and configured on your system:
 
-* **AWS CLI** installed and configured (via AWS SSO or static Access Key/Secret).
-* **Docker** installed and running.
-* **License file** named `license.txt` present in the cloned automation directory.
-* **SSH private key** available at `~/.ssh/id_rsa`.
-* You are logged into AWS CLI (run `aws sso login` if using SSO, or `aws configure` for static credentials).
-
+* ✅ **AWS CLI** installed and configured (via AWS SSO or static Access Key/Secret).
+* ✅ **Docker** installed and running.
+* ✅ **License file** named `license.txt` present in the cloned automation directory.
+* ✅ **SSH private key** available at `~/.ssh/id_rsa`.
+* ✅ You are logged into AWS CLI (run `aws sso login` if using SSO, or `aws configure` for static credentials).
 
 == Automated Deployment using Wrapper Script
 
@@ -206,5 +212,47 @@ To clean up the environment when no longer needed:
 ----
 ansible-navigator run infrastructure_teardown.yml -e @config.yml
 ----
+
+=== Access the Deployment Summary and UI
+
+Once deployment is complete, you can review the deployment summary and access the available UI endpoints:
+
+=== View Summary Page
+
+You can either:
+
+* Open the generated `<NAME_PREFIX>-summary.html` file from the project directory, or
+* Visit the hosted URL:
+
+[source,sh]
+----
+https://REVERSE_PROXY_PUBLIC_IP.pvc.cloudera-labs.com
+----
+
+This summary page provides:
+
+* All UI endpoint URLs (Cloudera Manager, FreeIPA, pgAdmin, Knox, etc.)
+* Hostnames and their assigned Ansible groups
+* Service status snapshots
+
+=== Quick Command to Open in Browser
+
+Use this command to open the summary file directly in your default web browser:
+
+[source,sh]
+----
+python -m webbrowser file://${PWD}/<NAME_PREFIX>-summary.html
+----
+
+=== What Next?
+
+After the stack is provisioned:
+
+* You can continue further configuration in **Cloudera Manager UI**
+* Use **Knox Gateway** to interact with cluster endpoints securely
+* Access **pgAdmin**, **FreeIPA**, and other UIs to explore more capabilities
+
+This concludes the deployment. You're now ready to explore the automated installation of Cloudera OnPremise on AWS Infrastructure.
+Happy deploying! For issues or suggestions, reach out to `@Kuldeep Sahu`, Partner SE team or the GOES team.
 
 ---
