@@ -32,6 +32,8 @@ curl -O https://raw.githubusercontent.com/cloudera/cloudera-partners/goespvc/Clo
 chmod +x run_onprem_deploy.sh
 ----
 
+==== Provision
+
 **To provision using AWS SSO:**
 
 [source,sh]
@@ -52,6 +54,8 @@ chmod +x run_onprem_deploy.sh
 ----
 ./run_onprem_deploy.sh deploy --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
 ----
+
+==== Destroy (Teardown)
 
 **To teardown the deployment using AWS SSO:**
 
@@ -74,7 +78,7 @@ chmod +x run_onprem_deploy.sh
 ./run_onprem_deploy.sh --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
 ----
 
-**Arguments explained:**
+==== **Arguments explained:**
 
 * `provision` or `teardown` — action to perform.
 * `--sso` — optional, use AWS SSO for authentication.
