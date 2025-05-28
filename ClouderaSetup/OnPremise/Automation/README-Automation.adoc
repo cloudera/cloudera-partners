@@ -17,6 +17,7 @@ Before you begin, ensure the following are installed and configured on your syst
 * **SSH private key** available at `~/.ssh/id_rsa`.
 * You are logged into AWS CLI (run `aws sso login` if using SSO, or `aws configure` for static credentials).
 
+
 == Automated Deployment using Wrapper Script
 
 To simplify the entire deployment or teardown process, use the provided wrapper script `run_onprem_deploy.sh`. This script automates virtualenv setup, credential management (with optional SSO), environment variable setup, and playbook execution.
@@ -43,8 +44,13 @@ chmod +x run_onprem_deploy.sh
 [source,sh]
 ----
 ./run_onprem_deploy.sh deploy --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+----
 
-/run_onprem_deploy.sh deploy --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
+**Example:**
+
+[source,sh]
+----
+./run_onprem_deploy.sh deploy --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
 ----
 
 **To teardown the deployment using AWS SSO:**
@@ -52,7 +58,12 @@ chmod +x run_onprem_deploy.sh
 [source,sh]
 ----
 ./run_onprem_deploy.sh --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+----
 
+**Example:**
+
+[source,sh]
+----
 ./run_onprem_deploy.sh --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
 ----
 
@@ -71,6 +82,15 @@ chmod +x run_onprem_deploy.sh
 * `--prefix` — unique deployment name prefix.
 * `--owner` — your email address.
 * `--password` — common secure password meeting complexity requirements.
+
+
+NOTE: The `password` or `common_password` is reused across multiple components (e.g. FreeIPA, Ranger, Cloudera Manager UI). It must meet the following complexity requirements:
+
+* Minimum 8 characters
+* At least one uppercase letter
+* At least one lowercase letter
+* At least one number
+* At least one special character
 
 == Manual execution of commands after cloning the repository (Manual Method)
 
@@ -164,14 +184,6 @@ infra_region:      <aws-region-code>
 common_password:   <secure-password>
 owner:             <your-email@cloudera.com>
 ----
-
-NOTE: The `common_password` is reused across multiple components (e.g. FreeIPA, Ranger, Cloudera Manager UI). It must meet the following complexity requirements:
-
-* Minimum 8 characters
-* At least one uppercase letter
-* At least one lowercase letter
-* At least one number
-* At least one special character
 
 === Deploy the CDP PVC Stack
 
