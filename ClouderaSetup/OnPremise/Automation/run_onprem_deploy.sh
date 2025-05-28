@@ -26,6 +26,21 @@ check_prerequisites() {
   command -v git >/dev/null 2>&1 || { echo "❌ git is not installed. Please install it."; exit 1; }
   command -v pip3 >/dev/null 2>&1 || { echo "❌ pip3 is not installed. Please install it."; exit 1; }
   command -v python3 >/dev/null 2>&1 || { echo "❌ python3 is not installed. Please install it."; exit 1; }
+  
+  echo "🔍 Checking Docker..."
+  # Check if docker command exists
+  if ! command -v docker &> /dev/null; then
+    echo "❌ Docker is not installed. Please install Docker and try again."
+    exit 1
+  fi
+  
+  # Check if Docker daemon is running
+  if ! docker info > /dev/null 2>&1; then
+    echo "❌ Docker daemon is not running. Please start Docker and try again."
+    exit 1
+  fi
+  
+  echo "✅ Docker is installed and running."
 }
 
 setup_virtualenv() {
