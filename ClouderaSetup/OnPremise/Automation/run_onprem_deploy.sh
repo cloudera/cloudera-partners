@@ -20,6 +20,14 @@ print_usage() {
   exit 1
 }
 
+check_prerequisites() {
+  echo "🔍 Checking prerequisites..."
+  command -v aws >/dev/null 2>&1 || { echo "❌ AWS CLI is not installed. Please install it."; exit 1; }
+  command -v git >/dev/null 2>&1 || { echo "❌ git is not installed. Please install it."; exit 1; }
+  command -v pip3 >/dev/null 2>&1 || { echo "❌ pip3 is not installed. Please install it."; exit 1; }
+  command -v python3 >/dev/null 2>&1 || { echo "❌ python3 is not installed. Please install it."; exit 1; }
+}
+
 setup_virtualenv() {
   echo "🔧 Setting up Python virtual environment..."
   pip3 install --quiet virtualenv
@@ -90,13 +98,19 @@ done
 
 [[ -z "$AWS_REGION" || -z "$NAME_PREFIX" || -z "$OWNER_EMAIL" || -z "$COMMON_PASSWORD" ]] && print_usage
 
-# Run steps
-if [[ ! -d "$REPO_DIR" ]]; then
+check_prerequisites
+
+# Clone or update repo
+if [[ -d "$REPO_DIR/.git" ]]; then
+  echo "🔄 Repository already cloned. Pulling latest changes..."
+  cd "$REPO_DIR"
+  git pull
+else
   echo "📥 Cloning repository..."
   git clone "$REPO_URL"
+  cd "$REPO_DIR"
 fi
 
-cd "$REPO_DIR"
 setup_virtualenv
 configure_aws
 prepare_files
