@@ -1,13 +1,80 @@
-= Deploying PVC Community Edition on AWS
-Cloudera | CDP PVC-CE Deployment Guide
+= Deploying Cloudera OnPremise on AWS Infra
+Cloudera | CDP PVC-OnPrem Deployment Guide
 :toc:
 :icons: font
 :source-highlighter: pygments
 :sectnums:
 
-This guide walks you through deploying the Cloudera PVC Community Edition on AWS using Ansible Navigator, virtual environments, and proper credential management.
+This guide walks you through deploying the Cloudera On Premise on AWS infrastructure.
 
-== Clone the Repository
+== Prerequisites
+
+Before you begin, ensure the following are installed and configured on your system:
+
+* **AWS CLI** installed and configured (via AWS SSO or static Access Key/Secret).
+* **Docker** installed and running.
+* **License file** named `license.txt` present in the cloned automation directory.
+* **SSH private key** available at `~/.ssh/id_rsa`.
+* You are logged into AWS CLI (run `aws sso login` if using SSO, or `aws configure` for static credentials).
+
+== Automated Deployment using Wrapper Script
+
+To simplify the entire deployment or teardown process, use the provided wrapper script `run_onprem_deploy.sh`. This script automates virtualenv setup, credential management (with optional SSO), environment variable setup, and playbook execution.
+
+You can deploy or teardown the PVC stack using either the automated wrapper script or the manual Ansible Navigator commands.
+
+=== Download the wrapper script, make it executable, and run it with your desired options.
+
+[source,sh]
+----
+curl -O https://raw.githubusercontent.com/cloudera/cloudera-partners/goespvc/ClouderaSetup/OnPremise/Automation/run_onprem_deploy.sh
+chmod +x run_onprem_deploy.sh
+----
+
+**To provision using AWS SSO:**
+
+[source,sh]
+----
+./run_onprem_deploy.sh provision --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+----
+
+**To provision using static AWS credentials:**
+
+[source,sh]
+----
+./run_onprem_deploy.sh deploy --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+
+/run_onprem_deploy.sh deploy --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
+----
+
+**To teardown the deployment using AWS SSO:**
+
+[source,sh]
+----
+./run_onprem_deploy.sh --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+
+./run_onprem_deploy.sh --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
+----
+
+**To teardown the deployment using static AWS credentials:**
+
+[source,sh]
+----
+./run_onprem_deploy.sh --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+----
+
+**Arguments explained:**
+
+* `provision` or `teardown` — action to perform.
+* `--sso` — optional, use AWS SSO for authentication.
+* `--region` — AWS region code (e.g., us-west-2).
+* `--prefix` — unique deployment name prefix.
+* `--owner` — your email address.
+* `--password` — common secure password meeting complexity requirements.
+
+== Manual execution of commands after cloning the repository (Manual Method)
+
+=== Clone the Repository
 
 [source,sh]
 ----
@@ -15,7 +82,7 @@ git clone https://github.infra.cloudera.com/GOES/pvc-community-edition-aws.git
 cd pvc-community-edition-aws
 ----
 
-== Set Up Python Virtual Environment
+=== Set Up Python Virtual Environment
 
 [source,sh]
 ----
@@ -24,14 +91,14 @@ python3 -m venv ~/cdp-navigator
 source ~/cdp-navigator/bin/activate
 ----
 
-== Install Required Python Packages
+=== Install Required Python Packages
 
 [source,sh]
 ----
 pip3 install ansible-core ansible-navigator virtualenv
 ----
 
-== Configure AWS Credentials
+=== Configure AWS Credentials
 
 IMPORTANT: If you are using AWS SSO, export any existing static credentials first:
 
@@ -44,9 +111,9 @@ eval $(aws configure export-credentials --format env)
 
 TIP: You can also use standard Access Key and Secret if not using SSO.
 
-== Prepare Required Files
+=== Prepare Required Files
 
-=== License File
+==== License File
 
 Place your CDP license file in the current directory and name it:
 
@@ -55,7 +122,7 @@ Place your CDP license file in the current directory and name it:
 license.txt
 ----
 
-=== SSH Private Key
+==== SSH Private Key
 
 Ensure your SSH private key is available at the following path:
 
@@ -71,7 +138,7 @@ If the file does not exist, generate a new one:
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
 ----
 
-== Set Environment Variables
+=== Set Environment Variables
 
 [source,sh]
 ----
@@ -79,7 +146,7 @@ export SSH_PRIVATE_KEY_FILE=~/.ssh/id_rsa
 export CDP_LICENSE_FILE=license.txt
 ----
 
-== Prepare Configuration File
+=== Prepare Configuration File
 
 Create a working copy of the template:
 
@@ -106,7 +173,7 @@ NOTE: The `common_password` is reused across multiple components (e.g. FreeIPA, 
 * At least one number
 * At least one special character
 
-== Deploy the CDP PVC Stack
+=== Deploy the CDP PVC Stack
 
 To deploy the full stack (infrastructure + services + Ozone cluster), run:
 
@@ -115,7 +182,7 @@ To deploy the full stack (infrastructure + services + Ozone cluster), run:
 ansible-navigator run infrastructure_setup.yml services_setup.yml cm_setup.yml ozone-cluster.yml -e @config.yml
 ----
 
-== Teardown the CDP PVC Stack
+=== Teardown the CDP PVC Stack
 
 To clean up the environment when no longer needed:
 
@@ -124,53 +191,4 @@ To clean up the environment when no longer needed:
 ansible-navigator run infrastructure_teardown.yml -e @config.yml
 ----
 
-== Automate Deployment with Wrapper Script
-
-To simplify the entire deployment or teardown process, use the provided wrapper script `run.sh`. This script automates virtualenv setup, credential management (with optional SSO), environment variable setup, and playbook execution.
-
-=== Usage
-
-To provision the stack using SSO:
-
-[source,sh]
-----
-./run.sh --sso --config config.yml --license license.txt provision
-----
-
-To provision the stack using static credentials:
-
-[source,sh]
-----
-./run.sh --config config.yml --license license.txt provision
-----
-
-To teardown the stack using SSO:
-
-[source,sh]
-----
-./run.sh --sso --config config.yml teardown
-----
-
-=== Arguments
-
-* `--sso`: (Optional) Use AWS SSO for authentication. Skips this if using static credentials.
-* `--config`: Path to the populated `config.yml` file.
-* `--license`: (Optional) Path to the `license.txt` file. If not passed, defaults to `license.txt` in current directory.
-* `provision`: Deploys infrastructure, services, Cloudera Manager, and Ozone.
-* `teardown`: Destroys the deployed infrastructure stack.
-
-=== Benefits
-
-* One-step provisioning or teardown.
-* No manual steps for virtual environment, credentials, or environment variables.
-* Supports both SSO and static credentials.
-* Ensures consistent deployment behavior across users and environments.
-
-== Notes
-
-* Keep your license and SSH keys secure and private.
-* Make sure your IAM user/role has sufficient privileges to create and manage resources in the specified AWS region.
-
 ---
-
-Happy deploying! Need help? Reach out to `@Kuldeep Sahu`, PSE Team or GOES Team for more details or the contributions.
