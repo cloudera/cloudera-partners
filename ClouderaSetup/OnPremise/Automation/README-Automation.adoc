@@ -1,0 +1,135 @@
+= Deploying PVC Community Edition on AWS
+Cloudera | CDP PVC-CE Deployment Guide
+:toc:
+:icons: font
+:source-highlighter: pygments
+:sectnums:
+
+This guide walks you through deploying the Cloudera PVC Community Edition on AWS using Ansible Navigator, virtual environments, and proper credential management.
+
+== Clone the Repository
+
+[source,sh]
+----
+git clone https://github.infra.cloudera.com/GOES/pvc-community-edition-aws.git
+cd pvc-community-edition-aws
+----
+
+== Set Up Python Virtual Environment
+
+[source,sh]
+----
+pip3 install virtualenv
+python3 -m venv ~/cdp-navigator
+source ~/cdp-navigator/bin/activate
+----
+
+== Install Required Python Packages
+
+[source,sh]
+----
+pip3 install ansible-core ansible-navigator virtualenv
+----
+
+== Configure AWS Credentials
+
+IMPORTANT: If you are using AWS SSO, export any existing static credentials first:
+
+[source,sh]
+----
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_CREDENTIAL_EXPIRATION AWS_SESSION_TOKEN
+aws sso login
+eval $(aws configure export-credentials --format env)
+----
+
+TIP: You can also use standard Access Key and Secret if not using SSO.
+
+== Prepare Required Files
+
+=== License File
+
+Place your CDP license file in the current directory and name it:
+
+[source,sh]
+----
+license.txt
+----
+
+=== SSH Private Key
+
+Ensure your SSH private key is available at the following path:
+
+[source,sh]
+----
+~/.ssh/id_rsa
+----
+
+If the file does not exist, generate a new one:
+
+[source,sh]
+----
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
+----
+
+== Set Environment Variables
+
+[source,sh]
+----
+export SSH_PRIVATE_KEY_FILE=~/.ssh/id_rsa
+export CDP_LICENSE_FILE=license.txt
+----
+
+== Prepare Configuration File
+
+Create a working copy of the template:
+
+[source,sh]
+----
+cp config-template.yml config.yml
+----
+
+Edit `config.yml` and update the following fields:
+
+[source,yaml]
+----
+name_prefix:       <unique-deployment-name>
+infra_region:      <aws-region-code>
+common_password:   <secure-password>
+owner:             <your-email@cloudera.com>
+----
+
+NOTE: The `common_password` is reused across multiple components (e.g. FreeIPA, Ranger, Cloudera Manager UI). It must meet the following complexity requirements:
+
+* Minimum 8 characters
+* At least one uppercase letter
+* At least one lowercase letter
+* At least one number
+* At least one special character
+
+== Deploy the CDP PVC Stack
+
+To deploy the full stack (infrastructure + services + Ozone cluster), run:
+
+[source,sh]
+----
+ansible-navigator run infrastructure_setup.yml services_setup.yml cm_setup.yml ozone-cluster.yml -e @config.yml
+----
+
+== Teardown the CDP PVC Stack
+
+To clean up the environment when no longer needed:
+
+[source,sh]
+----
+ansible-navigator run infrastructure_teardown.yml -e @config.yml
+----
+
+== Notes
+
+* Consider wrapping these steps in a shell script with CLI arguments to automate configuration population.
+* Keep your license and SSH keys secure and private.
+* Make sure your IAM user/role has sufficient privileges to create and manage resources in the specified AWS region.
+
+---
+
+Happy deploying! Need help? Reach out to `@Kuldeep Sahu` or your team’s Cloudera support lead.
