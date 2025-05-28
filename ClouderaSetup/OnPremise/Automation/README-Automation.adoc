@@ -124,12 +124,53 @@ To clean up the environment when no longer needed:
 ansible-navigator run infrastructure_teardown.yml -e @config.yml
 ----
 
+== Automate Deployment with Wrapper Script
+
+To simplify the entire deployment or teardown process, use the provided wrapper script `run.sh`. This script automates virtualenv setup, credential management (with optional SSO), environment variable setup, and playbook execution.
+
+=== Usage
+
+To provision the stack using SSO:
+
+[source,sh]
+----
+./run.sh --sso --config config.yml --license license.txt provision
+----
+
+To provision the stack using static credentials:
+
+[source,sh]
+----
+./run.sh --config config.yml --license license.txt provision
+----
+
+To teardown the stack using SSO:
+
+[source,sh]
+----
+./run.sh --sso --config config.yml teardown
+----
+
+=== Arguments
+
+* `--sso`: (Optional) Use AWS SSO for authentication. Skips this if using static credentials.
+* `--config`: Path to the populated `config.yml` file.
+* `--license`: (Optional) Path to the `license.txt` file. If not passed, defaults to `license.txt` in current directory.
+* `provision`: Deploys infrastructure, services, Cloudera Manager, and Ozone.
+* `teardown`: Destroys the deployed infrastructure stack.
+
+=== Benefits
+
+* One-step provisioning or teardown.
+* No manual steps for virtual environment, credentials, or environment variables.
+* Supports both SSO and static credentials.
+* Ensures consistent deployment behavior across users and environments.
+
 == Notes
 
-* Consider wrapping these steps in a shell script with CLI arguments to automate configuration population.
 * Keep your license and SSH keys secure and private.
 * Make sure your IAM user/role has sufficient privileges to create and manage resources in the specified AWS region.
 
 ---
 
-Happy deploying! Need help? Reach out to `@Kuldeep Sahu` or your team’s Cloudera support lead.
+Happy deploying! Need help? Reach out to `@Kuldeep Sahu`, PSE Team or GOES Team for more details or the contributions.
