@@ -14,7 +14,7 @@ This guide walks you through deploying the Cloudera On Premise on AWS infrastruc
 **IMPORTANT** — The Community Edition PVC deployment repo is currently hosted on the **Internal Cloudera GitHub** and is **not accessible** outside the Cloudera network. You **must be connected to the Cloudera VPN** for this automation to work.
 ====
 
-== Outcomes?
+== Outcomes
 
 * ✅ Cloudera Manager running with AutoTLS and Kerberos enabled.
 * ✅ Base Cluster Deployed with major services.
@@ -228,7 +228,7 @@ Once deployment is complete, you can review the deployment summary and access th
 You can either:
 
 * Open the generated `<NAME_PREFIX>-summary.html` file from the project directory, or
-* Visit the hosted URL:
+* Visit the hosted URL (Listed in the webpage `<NAME_PREFIX>-summary.html`) :
 
 [source,sh]
 ----
