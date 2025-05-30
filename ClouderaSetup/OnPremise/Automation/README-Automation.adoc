@@ -18,7 +18,7 @@ This guide walks you through deploying the Cloudera On Premise on AWS infrastruc
 
 * ✅ Cloudera Manager running with AutoTLS and Kerberos enabled.
 * ✅ Base Cluster Deployed with major services.
-* ✅ UI for the Access URLs Link mentioned in it, PGAdmin and Knox.
+* ✅ UI for the Access URLs Link mentioned in it, PGAdmin, FreeIPA WebUI and Knox.
 
 == Prerequisites
 
