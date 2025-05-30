@@ -217,15 +217,7 @@ helm install \
 +
 [source, bash]
 ----
-cat <<EOF > clusterissuer.yaml
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: self-signed-ca-issuer
-spec:
-  selfSigned: {}
-EOF
-kubectl apply -f clusterissuer.yaml
+kubectl apply -f overrides/clusterissuer.yaml
 ----
 
 === Deploy Cloudera Flow Management - Kubernetes Operator
@@ -334,13 +326,13 @@ kubectl create secret docker-registry docker-pull-secret \
   --docker-password ${cloudera_password}
 ----
 
-.. Create OpenLDAP secret (if using LDAP)
+.. Create OpenLDAP secret
 +
 [source, bash]
 ----
 # Make sure to use the same <admin_password> mentioned in `openldap-values.yaml` while deploying openldap chart.
 kubectl create secret generic openldap-creds \
-  --from-literal=managerPassword=[***admin_passpord***] \
+  --from-literal=managerPassword=[***admin_password***] \
   -n demo-nifi
 ----
 
@@ -370,13 +362,13 @@ kubectl create secret docker-registry docker-pull-secret \
   --docker-password ${cloudera_password}
 ----
 
-.. Create OpenLDAP secret (if using LDAP)
+.. Create OpenLDAP secret
 +
 [source,bash]
 ----
 # Make sure to use the same <admin_password> mentioned in `openldap-values.yaml` while deploying openldap chart.
 kubectl create secret generic openldap-creds \
-  --from-literal=managerPassword=[***admin_passpord***] \
+  --from-literal=managerPassword=[***admin_password***] \
   -n demo-nifi-registry
 ----
 
