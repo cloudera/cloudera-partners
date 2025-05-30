@@ -14,6 +14,12 @@ This guide walks you through deploying the Cloudera On Premise on AWS infrastruc
 **IMPORTANT** — The Community Edition PVC deployment repo is currently hosted on the **Internal Cloudera GitHub** and is **not accessible** outside the Cloudera network. You **must be connected to the Cloudera VPN** for this automation to work.
 ====
 
+== Outcomes?
+
+* ✅ Cloudera Manager running with AutoTLS and Kerberos enabled.
+* ✅ Base Cluster Deployed with major services.
+* ✅ UI for the Access URLs Link mentioned in it, PGAdmin and Knox.
+
 == Prerequisites
 
 Before you begin, ensure the following are installed and configured on your system:
@@ -44,7 +50,7 @@ chmod +x run_onprem_deploy.sh
 
 [source,sh]
 ----
-./run_onprem_deploy.sh provision --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+./run_onprem_deploy.sh deploy --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
 ----
 
 **To provision using static AWS credentials:**
