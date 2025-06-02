@@ -1,4 +1,4 @@
-= Deploying Cloudera OnPremise on AWS Infra
+= Deploying Cloudera OnPremise on AWS Infrastructure
 Cloudera | CDP PVC-OnPrem Deployment Guide
 :toc:
 :icons: font
