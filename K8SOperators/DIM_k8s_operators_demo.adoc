@@ -19,66 +19,66 @@ This document provides a step-by-step guide to deploying and managing Cloudera D
 
 Before starting the demo, ensure you have the following prerequisites:
 
-`CFM Operator` with `NiFi`` and `NiFi Registry` installed in your Kubernetes cluster. If not installed, follow the instructions in the link:./README.adoc[`**Installation Guide**`] to set it up.
+. `CFM Operator` with `NiFi`` and `NiFi Registry` installed in your Kubernetes cluster. If not installed, follow the instructions in the link:./README.adoc[`**Installation Guide**`] to set it up.
 
-You're able to access the `NiFi` and `NiFI Registry` web UIs. Follow the steps `4.1.` and `4.2.` in the link:./README.adoc[`**Installation Guide**`] to access UI.
+. You're able to access the `NiFi` and `NiFI Registry` web UIs. Follow the steps `4.1.` and `4.2.` in the link:./README.adoc[`**Installation Guide**`] to access UI.
 
 === Demo Steps
 . Confirguration on `NiFi Registry` UI
 
 .. Login to the `NiFI Registry` UI.
-.. Create a new bucket named `demo-bucket`.
+.. Create a new bucket name it (for example `demo-bucket`).
 ... Click on the wrench`🔧` icon on the top right corner to open settings.
 +
-image::./images/settings.png[settings,600,400]
+image::../images/settings.png[settings]
 
 ... Click on New bucket and name it `demo-bucket`.
 +
-image::./images/Bucket_creation.png[bucket_creation,600,400]
+image::../images/Bucket_creation.png[bucket_creation]
 
 .. Click on `✏️` icon to edit the bucket. Click on `NEW POLICY`, select `nifiadmin` user and grant `All` permissions.
 +
-image::./images/Bucket_policy.png[Bucket_policy,600,400]
+image::../images/Bucket_policy.png[Bucket_policy]
 
 .. Click on `USERS` and add a new user with the name `CN=demonifi, O=Cluster Node`
 +
-image::./images/Add_users.png[Add_user,600,400]
+image::../images/Add_users.png[Add_user]
 
 ... Click on `✏️` icon to edit the user. And add special previleges `Can manage buckets` and `Can proxy user requests`.
 +
-image::./images/Privileges.png[Privileges,600,400]
+image::../images/Privileges.png[Privileges]
 
 . Configuration on `NiFi` UI
 .. Login to the `NiFi` UI.
 .. Right click on the canvas and select `Manage access policies` to open the `Access policies Settings`.
 +
-image::./images/Manage_access_policies.png[Manage_access_policies,600,400]
+image::../images/Manage_access_policies.png[Manage_access_policies]
 
 .. Create a new policy for `view the component` and Grant access to user `nifiadmin` and group `nifi-k8s-nodes`.
 ... Cick on `Create` button to create a new policy for `view the component`
 ... Add user `nifiadmin` and group `nifi-k8s-nodes` to the policy.
 +
-image::./images/Create_access_policy.png[Create_access_policy,600,400]
+image::../images/Create_access_policy.png[Create_access_policy]
 +
-image::./images/Add_user_group.png[Add_user_group,600,400]
+image::../images/Add_user_group.png[Add_user_group]
 +
-image::./images/view_component.png[view_component,600,400]
+image::../images/view_component.png[view_component]
 
 .. Similarly, create a new policy for `modify the component` and Grant access to user `nifiadmin` and group `nifi-k8s-nodes`.
 +
-image::./images/modify_component.png[modify_component,600,400]
+image::../images/modify_component.png[modify_component]
 
 .. Similarly, create a new policy for `operate the component` and Grant access to user `nifiadmin` and group `nifi-k8s-nodes`.
 +
-image::./images/operate_component.png[operate_component,600,400]
+image::../images/operate_component.png[operate_component]
 .. Similarly, create a new policy for `view the data` and Grant access to user `nifiadmin` and group `nifi-k8s-nodes`.
 +
-image::./images/view_data.png[view_data,600,400]
+image::../images/view_data.png[view_data]
 
 .. Add `Nifi Registry` as a registry client in the `NiFi` UI:
 ... Click on the three parallel lines in the upper right corner to open the `Controller Settings`.
 +
-image::./images/Controller_settings.png[Controller_settings,600,400]
+image::../images/Controller_settings.png[Controller_settings]
 
 ... Select the `Registry Clients` tab.
 ... Click the `+` (Add Registry Client) button.
@@ -88,25 +88,31 @@ image::./images/Controller_settings.png[Controller_settings,600,400]
 ... Click `Add` to save the registry client configuration.
 ... The NiFi Registry should now appear in the list of registry clients and be available for use in versioned flows.
 +
-image::./images/Add_registry_client.png[Add_registry_client,600,400]
+image::../images/Add_registry_client.png[Add_registry_client]
 
 . Run the demo flow
 .. Drag `process group` to the canvas. Upload the `demo-flow.xml` file to the process group.
 +
-image::./images/Upload_demo-flow.png[Upload_demo-flow,600,400]
+image::../images/Upload_demo-flow.png[Upload_demo-flow]
 .. Right click on the process group and select `version` -> `Start version control`.
 +
-image::./images/Start_version_control.png[Start_version_control,600,400]
-.. save flow version by providng a name and clicking on `Save` button.
+image::../images/Start_version_control.png[Start_version_control]
+.. Save flow version by providng a name and clicking on `Save` button.
 +
-image::./images/Save_flow_version.png[Save_flow_version,600,400]
+image::../images/Save_flow_version.png[Save_flow_version]
 
 .. You can now see the versioned flow in the `NiFi Registry` UI.
 +
-image::./images/Versioned_flow.png[Versioned_flow,600,400]
+image::../images/Versioned_flow.png[Versioned_flow]
 
 .. Right Click on the process group and select `Start` button to start the process group.
 .. You can list the queued items with option `List Queues`.
 .. Double Click on `AttributesToCSV` flow and check `terminate` option under `RELATIONSHIPS` to Terminate the flow.
 +
-image::./images/Terminate_flow.png[Terminate_flow,600,400]
+image::../images/Terminate_flow.png[Terminate_flow]
+
+[NOTE]
+====
+`**CFM operator**` Demo ends here.
+====
+
