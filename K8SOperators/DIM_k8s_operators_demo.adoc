@@ -11,7 +11,7 @@ v0.1, 2025-06-01: Draft
 :homepage: https://github.com/cloudera/cloudera-partners
 
 == Overview
-This document provides a step-by-step guide to deploying and managing Cloudera Data In Motion (DIM) using Kubernetes Operators. The demo showcases how to leverage Kubernetes Operators for automating the deployment, scaling, and management of DIM components.
+This guide provides step-by-step instructions to demonstrate the capabilities of Cloudera Data In Motion (DIM) Kubernetes Operators, including CFM Operator (for NiFi and NiFi Registry) and Streaming Operators (CSA for Flink and CSM for Kafka). It covers environment preparation, configuration, and running sample data flows and streaming jobs. The guide is intended for users who want to quickly set up and showcase data flow and streaming use cases on Kubernetes using Cloudera's operators.
 
 == CFM-Operator
 
@@ -116,3 +116,137 @@ image::../images/Terminate_flow.png[Terminate_flow]
 `**CFM operator**` Demo ends here.
 ====
 
+== Streaming-Operators Demo(CSA and CSM)
+=== Preparation
+Before starting the demo, ensure you have the following prerequisites:
+
+. `CSA Operator` with `Flink` and `CSM operator` with `Kafka` installed in your Kubernetes cluster. If not installed, follow the instructions in the link:./README.adoc[`**Installation Guide**`] to set it up.
+. You're able to access the `Flink` and `SSB` web UIs. Follow the steps `4.3.` and `4.4.` in the link:./README.adoc[`**Installation Guide**`] to access UI.
+
+. Download `kafka_shell.sh` from the Cloudera archive to manage kafka cluster. 
++
+[source, bash]
+----
+# Update the [***cloudera_username***] and [***cloudera_password***] with your cloudera license paywall credentials.
+export cloudera_username="[***cloudera_username***]"
+export cloudera_password="[***cloudera_password***]"
+
+# For Linux
+curl -u "$cloudera_username:$cloudera_password" "https://archive.cloudera.com/p/csm-operator/1.3.0/tools/kafka_shell.sh" > kafka_shell.sh
+chmod +x kafka_shell.sh
+
+# For Mac - the additional sed command is only necessary until CSMDS-1175 is resolved
+curl -u "$cloudera_username:$cloudera_password" "https://archive.cloudera.com/p/csm-operator/1.3.0/tools/kafka_shell.sh" | sed -E '/(Darwin|BASH_VERSINFO)/,/fi/s/^/#/g' > kafka_shell.sh
+chmod +x kafka_shell.sh
+----
+
+.. We can then use `kafka_shell.sh` to execute Kafka commands, like the `kafka-topics.sh`` command:
++ 
+[source,bash]
+----
+#Initialize the kafka shell with the namespace and cluster name.
+# Make sure to replace `cloudera-kafka-demo` with the namespace where your Kafka cluster is running and `kafka-cluster` with the name of your Kafka cluster.
+./kafka_shell.sh --namespace=cloudera-kafka-demo --cluster="kafka-cluster"
+
+#Once the above command is executed and prints out 'Shell ready', you will be in the kafka shell and can run kafka commands like below to list topics:
+bin/kafka-topics.sh --list --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+----
+
+. The commands below creates a web server to host the JAR files and upload the JAR file to it:
++
+[source,bash]
+----
+kubectl apply -f demo-resources/demo-webserver.yaml
+----
+
+[NOTE]
+====
+Need to update git clone URL to the public repo once the demo is ready.
+====
+
+. Clone the Flink Tutorials repo and build it:
++
+[source,bash]
+----
+git clone https://github.infra.cloudera.com/araujo/flink-tutorials.git
+cd flink-tutorials
+git checkout sko-demos
+cd flink-kubernetes-tutorial
+mvn clean package -DskipTests
+cd ../..
+----
+
+.. Upload the JAR file to the web server:
++
+[source,bash]
+----
+chmod +x demo-resources/upload-to-file-server.sh
+bash -xe demo-resources/upload-to-file-server.sh flink-tutorials/flink-kubernetes-tutorial/target/flink-kubernetes-tutorial-1.18.0-csaop1.0.0-SNAPSHOT.jar
+----
+
+=== Demo Steps
+
+. Create a topic named `demo-topic` and `demo-sql` in the Kafka cluster, we'll use these topics in the demo:
++
+[source,bash]
+----
+./kafka_shell.sh --namespace=cloudera-kafka-demo --cluster="kafka-cluster"
+
+# Once the above command is executed and prints out 'Shell ready', you will be in the kafka shell and can run kafka commands like below to create topics:
+# Create  `demo-topic`
+bin/kafka-topics.sh --create --topic demo-topic --partitions 3 --replication-factor 1 --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+# Create `demo-sql`
+bin/kafka-topics.sh --create --topic demo-sql --partitions 3 --replication-factor 1 --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+----
+
+. Run a Kafka Data Generator Job in Flink
++
+[source,bash]
+----
+kubectl apply -f demo-resources/demo-flinkjob.yaml
+----
+
+.. Wait for the task manager pod to reach the `RUNNING` state, then verify that data is being produced to the `demo-topic` topic with below command.
++
+[source,bash]
+----
+./kafka_shell.sh --namespace=cloudera-kafka-demo --cluster="kafka-cluster"
+
+#Once the above command is executed and prints out 'Shell ready', you will be in the kafka shell and can run kafka commands like below to consume messages from the topic:
+
+bin/kafka-console-consumer.sh --topic demo-topic --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+# You should see messages being produced to the topic.
+----
++
+image::../images/Generated_data.png[Generated_data]
+
+. Run a Flink SQL job to transform data from Kafka
+
+.. login to the SSB UI and create a new Flink SQL job with the given link:./demo-resources/demo-flinksql.yaml[`**SQL query**`] :
+... login to the SSB UI.
+... Open project `ssb-default`
++
+image::../images/Open_project.png[Open_project]
+
+... Right click `jobs` and then `New Job`. Provide a name for the job.
++
+image::../images/Create_job.png[Create_job]
+
+... Paste the SQL query from the link:./demo-resources/demo-flinksql.yaml[`**SQL query**`] into the SQL editor.
++
+image::../images/Paste_query.png[Paste_query]
+
+... Select all and Click on `Execute Selection` button to run the job.
+... Verify that the the data is being produced to the `demo-sql` topic with below command.
++
+[source,bash]
+----
+./kafka_shell.sh --namespace=cloudera-kafka-demo --cluster="kafka-cluster"
+
+#Once the above command is executed and prints out 'Shell ready', you will be in the kafka shell and can run kafka commands like below to consume messages from the topic:
+
+bin/kafka-console-consumer.sh --topic demo-sql --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+# You should see transformed messages being produced to the topic.
+----
++
+image::../images/Transformed_data.png[Transformed_data]

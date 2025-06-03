@@ -1,0 +1,49 @@
+CREATE TABLE source_table (
+  `id` BIGINT,
+  `now` STRING,
+  `host` STRING,
+  `ts` TIMESTAMP(3) METADATA FROM 'timestamp'
+) WITH (
+  'connector' = 'kafka',
+  'topic' = 'demo-topic',
+  'properties.bootstrap.servers' = 'kafka-cluster-kafka-bootstrap.cloudera-kafka-demo.svc.cluster.local:9092',
+  'properties.group.id' = 'testGroup',
+  'scan.startup.mode' = 'latest-offset',
+  'format' = 'json'
+)
+;
+
+CREATE TABLE sink_table (
+  `id` BIGINT,
+  `now` STRING,
+  `host` STRING,
+  `short_name` STRING,
+  `processed_at` STRING,
+  `latency_ms` BIGINT,
+  `ts` TIMESTAMP(3) METADATA FROM 'timestamp'
+) WITH (
+  'connector' = 'kafka',
+  'topic' = 'demo-sql',
+  'properties.bootstrap.servers' = 'kafka-cluster-kafka-bootstrap.cloudera-kafka-demo.svc.cluster.local:9092',
+  'properties.group.id' = 'testGroup',
+  'scan.startup.mode' = 'latest-offset',
+  'format' = 'json'
+)
+;
+
+INSERT INTO sink_table (id, now, host, short_name, processed_at, latency_ms)
+SELECT
+  id, now, host,
+  upper(regexp_replace(host, '\..*', '')) as short_name,
+  cast(proc_ts as string) as processed_at,
+  cast((1000000 * (extract(epoch from proc_ts) - extract(epoch from now_ts))
+       + extract(microsecond from proc_ts)
+       - extract(microsecond from now_ts)) / 1000 as bigint) as latency_ms
+FROM (
+  SELECT
+    id, now, host,
+    cast(regexp_replace(regexp_replace(now, 'T', ' '), '/', '-') as timestamp(3)) as now_ts,
+    now() as proc_ts
+  FROM source_table
+  WHERE host like 'host-1%'
+) _source

@@ -1,0 +1,17 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkSessionJob
+metadata:
+  name: kafka-generator-job
+spec:
+  deploymentName: demo-flink  # The name of your running FlinkDeployment
+  job:
+    jarURI: http://demo-nginx-service.default.svc.cluster.local:31080/files/flink-kubernetes-tutorial-1.18.0-csaop1.0.0-SNAPSHOT.jar
+    entryClass: com.cloudera.streaming.examples.flink.KafkaDataGeneratorJob
+    parallelism: 4
+    args:
+      - "--rowsPerSec"
+      - "10"
+      - "--bootstrapServer"
+      - "kafka-cluster-kafka-bootstrap.cloudera-kafka-demo.svc.cluster.local:9092"
+      - "--topic"
+      - "demo-topic"

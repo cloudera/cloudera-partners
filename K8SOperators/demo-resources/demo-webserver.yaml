@@ -1,0 +1,175 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: static-content
+data:
+  index.html: |
+    <!DOCTYPE html><html><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/index-style.css">
+    </head><body>
+    <center><h1>Little Demo File Server</h1>
+    <p>Welcome to our little file server!
+    <p>If you need to serve static files over HTTP to your demos,
+    <br/>upload them to this pod's /files directory (use <span style="font-family:monospace">kubectl cp</span>) and they will be available
+    <br/>to your application on <strong>http://demo-nginx-service.default.svc.cluster.local:31080/files/</strong>.
+    <br/><br/><a href="/files"><h2>Click here to browse</h2></a>
+    <p>(Note: If the link above is broken, please create the /files directory and upload as per above)
+    </center>
+    </body></html>    
+  index-header.html: |
+    <!DOCTYPE html><html><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/index-style.css">
+    </head><body>
+    <center><h1>Little Demo File Server</h1>
+    <p>Welcome to our little file server!
+    <p>If you need to serve static files over HTTP to your demos,
+    <br/>upload them to this pod's /files directory (use <span style="font-family:monospace">kubectl cp</span>) and they will be available
+    <br/>to your application on <strong>http://demo-nginx-service.default.svc.cluster.local:31080/files/</strong>.
+    </center>
+    <h1>Directory: 
+  index-footer.html: "</body></html>"
+  index-style.css: |
+    body { background: #fff; color: #50596c; font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; max-width: 960px; margin-left: auto; margin-right: auto;}
+    h1 {font-weight: 300;}
+    a {color: #727e96; text-decoration: none;}
+    a:hover {color: #5764c6;}
+    #list {border: none; width: 100%;}
+    th {background: none; padding: 10px 0px 10px 0px;}
+    tr.e {background-color: #f8f9fa;}
+  404.html: |
+    <!DOCTYPE html><html><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/index-style.css">
+    <title>Oops... Nothing here</title>
+    </head><body><center>
+    <h1>Oops... Nothing here!</h1>
+    <p>The page you are looking for does not exist.
+    </center></body></html>
+  50x.html: |
+    <!DOCTYPE html><html><head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/index-style.css">
+    <title>Error</title>
+    </head><body><center>
+    <h1>An error occurred.</h1>
+    <p>Sorry, the page you are looking for is currently unavailable.<br/>
+    Please try again later.</p>
+    </center></body></html>
+  nginx.conf: |
+    server {
+        listen       80;
+        listen  [::]:80;
+        server_name  localhost;
+    
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+    
+        location ~ /files/?(.*)$ {
+            alias                 /files/$1;
+            absolute_redirect     off;
+            fancyindex            on;
+            fancyindex_exact_size off;
+            fancyindex_header     /index-header.html;
+            fancyindex_footer     /index-footer.html;
+        }
+
+        error_page  404              /404.html;
+    
+        error_page  500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+    
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+    
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-nginx
+  labels:
+    app: demo-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-nginx
+  template:
+    metadata:
+      labels:
+        app: demo-nginx
+    spec:
+      containers:
+      - name: demo-nginx
+        image: jrdasm/nginx-fancy
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: "/etc/nginx/conf.d"
+          readOnly: true
+        - name: static-content
+          mountPath: "/usr/share/nginx/html"
+          readOnly: true
+      volumes:
+      - name: static-content
+        configMap:
+          name: static-content
+          items:
+          - key: index.html
+            path: index.html
+          - key: 404.html
+            path: 404.html
+          - key: 50x.html
+            path: 50x.html
+          - key: index-header.html
+            path: index-header.html
+          - key: index-footer.html
+            path: index-footer.html
+          - key: index-style.css
+            path: index-style.css
+      - name: nginx-conf
+        configMap:
+          name: static-content
+          items:
+          - key: nginx.conf
+            path: default.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-nginx-service
+spec:
+  selector:
+    app: demo-nginx
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 31080
+    targetPort: 80
