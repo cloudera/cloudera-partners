@@ -201,7 +201,7 @@
                     // Create or overwrite the config file
                     writeFile file: env.CONFIG_FILE, text: """PROVISION_KEYCLOAK:${params.PROVISION_KEYCLOAK}
 KEYCLOAK_ADMIN_PASSWORD:${params.KEYCLOAK_ADMIN_PASSWORD}
-PROVISION_CAII: ${params.PROVISION_CAII}
+PROVISION_CAII:${params.PROVISION_CAII}
 AWS_REGION:${params.AWS_REGION}
 CDP_DEPLOYMENT_TYPE:${params.CDP_DEPLOYMENT_TYPE}
 LOCAL_MACHINE_IP:${params.LOCAL_MACHINE_IP}
