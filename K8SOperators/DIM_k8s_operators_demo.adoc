@@ -19,7 +19,7 @@ This guide provides step-by-step instructions to demonstrate the capabilities of
 
 Before starting the demo, ensure you have the following prerequisites:
 
-. `CFM Operator` with `NiFi`` and `NiFi Registry` installed in your Kubernetes cluster. If not installed, follow the instructions in the link:./README.adoc[`**Installation Guide**`] to set it up.
+. `CFM Operator` with `NiFi` and `NiFi Registry` installed in your Kubernetes cluster. If not installed, follow the instructions in the link:./README.adoc[`**Installation Guide**`] to set it up.
 
 . You're able to access the `NiFi` and `NiFI Registry` web UIs. Follow the steps `4.1.` and `4.2.` in the link:./README.adoc[`**Installation Guide**`] to access UI.
 
@@ -168,6 +168,7 @@ Need to update git clone URL to the public repo once the demo is ready.
 +
 [source,bash]
 ----
+#Must be on the VPN
 git clone https://github.infra.cloudera.com/araujo/flink-tutorials.git
 cd flink-tutorials
 git checkout sko-demos
@@ -194,9 +195,9 @@ bash -xe demo-resources/upload-to-file-server.sh flink-tutorials/flink-kubernete
 
 # Once the above command is executed and prints out 'Shell ready', you will be in the kafka shell and can run kafka commands like below to create topics:
 # Create  `demo-topic`
-bin/kafka-topics.sh --create --topic demo-topic --partitions 3 --replication-factor 1 --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+bin/kafka-topics.sh  --bootstrap-server kafka-cluster-kafka-bootstrap:9092 --topic demo-topic --create
 # Create `demo-sql`
-bin/kafka-topics.sh --create --topic demo-sql --partitions 3 --replication-factor 1 --bootstrap-server kafka-cluster-kafka-bootstrap:9092
+bin/kafka-topics.sh --bootstrap-server kafka-cluster-kafka-bootstrap:9092 --topic demo-sql --create
 ----
 
 . Run a Kafka Data Generator Job in Flink
