@@ -13,10 +13,10 @@ SSH_KEY_FILE="$HOME/.ssh/id_rsa"
 
 ### FUNCTIONS ###
 print_usage() {
-  echo "Usage: $0 [deploy|teardown] --region <aws-region> --prefix <name-prefix> --owner <email> --password <common-password> [--sso]"
+  echo "Usage: $0 [deploy|teardown] --region <aws-region> --prefix <name-prefix> --owner_email <email> --password <common-password> [--sso]"
   echo
   echo "Example:"
-  echo "  $0 deploy --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso"
+  echo "  $0 deploy --region us-west-2 --prefix demo-pvc --owner_email you@example.com --password 'Str0ngP@ssword!' --sso"
   exit 1
 }
 
@@ -103,7 +103,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --region) AWS_REGION="$2"; shift ;;
     --prefix) NAME_PREFIX="$2"; shift ;;
-    --owner) OWNER_EMAIL="$2"; shift ;;
+    --owner_email) OWNER_EMAIL="$2"; shift ;;
     --password) COMMON_PASSWORD="$2"; shift ;;
     --sso) USE_SSO=true ;;
     *) echo "Unknown argument: $1"; print_usage ;;
