@@ -40,6 +40,7 @@ The canonical documentation is https://docs.cloudera.com/?tab=kubernetes-operato
 mkdir ~/k8soperators
 git clone --depth 1 --branch feature/k8soperators https://github.com/cloudera/cloudera-partners.git /tmp/repo && \
     cp -r /tmp/repo/K8SOperators/overrides ~/k8soperators/ && \
+    cp -r /tmp/repo/K8SOperators/demo-resources ~/k8soperators/ && \
     rm -rf /tmp/repo
 
 #Similarly copy the cloudera_license file to this directory.
@@ -173,7 +174,7 @@ rm minikube-linux-amd64  # Cleanup
 +
 [source, bash]
 ----
-minikube start --cpus 8 --memory 30000
+minikube start --cpus 8 --memory 30000 --kubernetes-version=v1.32.0
 ----
 
 .. Verify minikube status
@@ -187,7 +188,7 @@ minikube status
 +
 [NOTE]
 ====
-Make sure all the instances of `<admin_password>` in `overrides/openldap-values.yaml` are updated with a secure password of your choice.  
+Make sure all the three instances of `<admin_password>` in `overrides/openldap-values.yaml` are updated with a secure password of your choice.  
 Use this same password to:
 - Create OpenLDAP secrets
 - Access NiFi and NiFi Registry UIs
@@ -217,7 +218,7 @@ helm install \
 +
 [source, bash]
 ----
-kubectl apply -f overrides/clusterissuer.yaml
+kubectl apply -f overrides/clusterissuer.yaml -n cert-manager
 ----
 
 === Deploy Cloudera Flow Management - Kubernetes Operator
@@ -642,7 +643,48 @@ kubectl run kafka-consumer -it \
 == Access Application UI
 
 === Nifi
-. Expose the NiFi UI when running on localhost
+. Expose the NiFi UI using NodePort and access via SSH tunneling—for example, when running `Minikube` on a `remote` or `EC2 instance`.
+
+.. Change NiFi service type to NodePort
++
+[source, bash]
+----
+kubectl -n demo-nifi patch svc demonifi-web \
+  -p '{"spec": {"type": "NodePort"}}'
+----
+
+.. Get the NodePort value
++
+[source, bash]
+----
+kubectl get svc demonifi-web -n demo-nifi -o jsonpath='{.spec.ports[*].nodePort}'
+----
+
+.. SSH tunneling with PEM key
++
+[source, bash]
+----
+ssh -f -N -i <PEM_FILE_LOCATION> \
+  -L 8443:192.168.49.2:<NodePort> ubuntu@<ec2PublicIp>
+----
+
+.. SSH tunneling example
++
+[source, bash]
+----
+ssh -f -N -i 8443:192.168.49.2:32156 -L ubuntu@13.215.183.137
+----
++
+[NOTE]
+====
+Since a self-signed certificate is used, you may need to accept the security exception in your browser.
+
+URL: link:https://localhost:8443/nifi/[https://localhost:8443/nifi/]
+
+Default user: `nifiadmin`
+====
+
+. Expose the NiFi UI when running minikube on `local laptop`
 +
 [source,bash]
 ----
@@ -665,63 +707,8 @@ http://127.0.0.1:53759
 https://127.0.0.1:53759/nifi/
 ----
 
-. Expose the NiFi UI using NodePort and access via SSH tunneling—for example, when running Minikube on a remote or EC2 instance.
-
-.. Change NiFi service type to NodePort
-+
-[source, bash]
-----
-kubectl -n demo-nifi patch svc demonifi-web \
-  -p '{"spec": {"type": "NodePort"}}'
-----
-
-.. Get the NodePort value
-+
-[source, bash]
-----
-kubectl get svc demonifi-web -n demo-nifi -o jsonpath='{.spec.ports[*].nodePort}'
-----
-
-.. SSH tunneling example
-+
-[source, bash]
-----
-ssh -L 8443:192.168.49.2:32156 ubuntu@13.215.183.137
-----
-
-.. SSH tunneling with PEM key
-+
-[source, bash]
-----
-ssh -f -N -i <PEM_FILE_LOCATION> \
-  -L 8443:192.168.49.2:<NodePort> ubuntu@<ec2PublicIp>
-----
-
 === NiFi Registry
-. Expose the NiFi Registry UI when running on localhost
-+
-[source,bash]
-----
-minikube service demonifiregistry-web --url -n demo-nifi-registry
-----
-
-.. You should see an output like:
-+
-[source,bash]
-----
-  service demo-nifi-registry/demonifiregistry-web has no node port
-  Services [demo-nifi-registry/demonifiregistry-web] have type "ClusterIP" not meant to be exposed, however for local development minikube allows you to access this !
-http://127.0.0.1:52866
-----
-
-.. Now, keep this terminal open, and open your browser to access:
-+
-[source,bash]
-----
-https://127.0.0.1:52866/nifi-registry/
-----
-
-. Expose the NiFi Registry UI using NodePort and access via SSH tunneling—for example, when running Minikube on a remote or EC2 instance.
+. Expose the  `NiFi Registry` UI using NodePort and access via SSH tunneling—for example, when running `Minikube` on a `remote` or `EC2 instance`.
 
 .. Change NiFi Registry service type to NodePort
 +
@@ -745,23 +732,41 @@ kubectl get svc demonifiregistry-web -n demo-nifi-registry -o jsonpath='{.spec.p
 ssh -f -N -i <PEM_FILE_LOCATION> \
   -L 18443:192.168.49.2:<NodePort> ubuntu@<ec2PublicIp>
 ----
++
+[NOTE]
+====
+Since a self-signed certificate is used, you may need to accept the security exception in your browser.
+
+URL: link:https://localhost:18443/nifi-registry/[https://localhost:18443/nifi-registry]
+
+Default user: `nifiadmin`
+====
+
+. Expose the `NiFi Registry` UI when running `minikube` on `local laptop`
++
+[source,bash]
+----
+minikube service demonifiregistry-web --url -n demo-nifi-registry
+----
+
+.. You should see an output like:
++
+[source,bash]
+----
+  service demo-nifi-registry/demonifiregistry-web has no node port
+  Services [demo-nifi-registry/demonifiregistry-web] have type "ClusterIP" not meant to be exposed, however for local development minikube allows you to access this !
+http://127.0.0.1:52866
+----
+
+.. Now, keep this terminal open, and open your browser to access:
++
+[source,bash]
+----
+https://127.0.0.1:52866/nifi-registry/
+----
 
 === Flink
-. Access Flink UI when running on local laptop
-+ 
-[source,bash]
-----
-kubectl -n csa-operator-system port-forward service/demo-flink-rest <localport>:8081
-----
-
-.. Example Usage:
-+ 
-[source,bash]
-----
-kubectl -n csa-operator-system port-forward service/ssb-sse 8081:8081
-----
-
-. Expose the Flink UI using NodePort and access via SSH tunneling—for example, when running Minikube on a remote or EC2 instance.
+. Expose the `Flink` UI using NodePort and access via SSH tunneling—for example, when running `Minikube` on a `remote` or `EC2 instance`.
 .. Patch cluster IP service to NodePort
 + 
 [source,bash]
@@ -782,24 +787,29 @@ kubectl get svc <service-name> -n <namespace> -o jsonpath='{.spec.ports[*].nodeP
 ----
 ssh -f -N -i <PEM_FILE_LOCATION> -L 8081:192.168.49.2:<NodePort> ubuntu@<ec2PublicIp>
 ----
++
+[NOTE]
+====
+URL: link:http://localhost:8081[http://localhost:8081]
+====
 
-=== Cloudera SQL Stream Builder 
-. Access SQL Stream Builder, or SSB UI when running on local laptop
+. Access `Flink` UI when running on `local laptop`
 + 
 [source,bash]
 ----
-kubectl -n csa-operator-system port-forward service/ssb-sse <localport>:8081
+kubectl -n csa-operator-system port-forward service/demo-flink-rest <localport>:8081
 ----
 
 .. Example Usage:
 + 
 [source,bash]
 ----
-kubectl -n csa-operator-system port-forward service/ssb-sse 8081:8081
+kubectl -n csa-operator-system port-forward service/demo-flink-rest 8081:8081
 ----
 
-. Expose the SSB UI using NodePort and access via SSH tunneling—for example, when running Minikube on a remote or EC2 instance.
-.. Change SSB service type to NodePort
+=== Cloudera SQL Stream Builder 
+. Expose the `SSB` UI using NodePort and access via SSH tunneling—for example, when running `Minikube` on a `remote` or `EC2 instance`.
+.. Change `SSB` service type to NodePort
 + 
 [source,bash]
 ----
@@ -818,4 +828,25 @@ kubectl get svc <service-name> -n <namespace> -o jsonpath='{.spec.ports[*].nodeP
 [source,bash]
 ----
 ssh -f -N -i <PEM_FILE_LOCATION> -L 18121:192.168.49.2:<NodePort> ubuntu@<ec2PublicIp>
+----
++
+[NOTE]
+====
+URL: link:http://localhost:18121[http://localhost:18121]
+
+Default user: `admin`
+====
+
+. Access `SQL Stream Builder`, or `SSB` UI when running on `local laptop`
++ 
+[source,bash]
+----
+kubectl -n csa-operator-system port-forward service/ssb-sse <localport>:8081
+----
+
+.. Example Usage:
++ 
+[source,bash]
+----
+kubectl -n csa-operator-system port-forward service/ssb-sse 18121:8081
 ----

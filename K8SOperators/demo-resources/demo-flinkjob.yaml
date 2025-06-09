@@ -5,7 +5,7 @@ metadata:
 spec:
   deploymentName: demo-flink  # The name of your running FlinkDeployment
   job:
-    jarURI: http://demo-nginx-service.default.svc.cluster.local:31080/files/flink-kubernetes-tutorial-1.18.0-csaop1.0.0-SNAPSHOT.jar
+    jarURI: https://aktfilehosting.s3.us-east-2.amazonaws.com/flink-kubernetes-tutorial-1.18.0-csaop1.0.0-SNAPSHOT.jar
     entryClass: com.cloudera.streaming.examples.flink.KafkaDataGeneratorJob
     parallelism: 4
     args:

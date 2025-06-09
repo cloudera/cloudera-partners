@@ -50,7 +50,7 @@ image::../images/Privileges.png[Privileges]
 
 . Configuration on `NiFi` UI
 .. Login to the `NiFi` UI.
-.. Right click on the canvas and select `Manage access policies` to open the `Access policies Settings`.
+.. Right click the canvas and select `Manage access policies` to open the `Access policies Settings`.
 +
 image::../images/Manage_access_policies.png[Manage_access_policies]
 
@@ -75,15 +75,15 @@ image::../images/operate_component.png[operate_component]
 +
 image::../images/view_data.png[view_data]
 
-.. Add `Nifi Registry` as a registry client in the `NiFi` UI:
+.. Add `NiFi Registry` as a registry client in the `NiFi` UI:
 ... Click on the three parallel lines in the upper right corner to open the `Controller Settings`.
 +
 image::../images/Controller_settings.png[Controller_settings]
 
 ... Select the `Registry Clients` tab.
 ... Click the `+` (Add Registry Client) button.
-... Enter a name for the registry client (for example, `Nifi-Registry`).
-... Provide the NiFi Registry URL (for example, `https://demonifiregistry-web.demo-nifi-registry.svc.cluster.local:18443/nifi-registry`).
+... Enter a name for the registry client (for example, `NiFi-Registry`).
+... Provide the NiFi Registry URL (for example, https://demonifiregistry-web.demo-nifi-registry.svc.cluster.local:18443/nifi-registry[https://demonifiregistry-web.demo-nifi-registry.svc.cluster.local:18443/nifi-registry]).
 ... Optionally, add a description for the registry client.
 ... Click `Add` to save the registry client configuration.
 ... The NiFi Registry should now appear in the list of registry clients and be available for use in versioned flows.
@@ -94,7 +94,7 @@ image::../images/Add_registry_client.png[Add_registry_client]
 .. Drag `process group` to the canvas. Upload the `demo-flow.xml` file to the process group.
 +
 image::../images/Upload_demo-flow.png[Upload_demo-flow]
-.. Right click on the process group and select `version` -> `Start version control`.
+.. Right click the process group and select `version` -> `Start version control`.
 +
 image::../images/Start_version_control.png[Start_version_control]
 .. Save flow version by providng a name and clicking on `Save` button.
@@ -140,8 +140,8 @@ curl -u "$cloudera_username:$cloudera_password" "https://archive.cloudera.com/p/
 chmod +x kafka_shell.sh
 ----
 
-.. We can then use `kafka_shell.sh` to execute Kafka commands, like the `kafka-topics.sh`` command:
-+ 
+.. You can now use `kafka_shell.sh` to run Kafka commands, such as `kafka-topics.sh`:
++
 [source,bash]
 ----
 #Initialize the kafka shell with the namespace and cluster name.
@@ -152,42 +152,9 @@ chmod +x kafka_shell.sh
 bin/kafka-topics.sh --list --bootstrap-server kafka-cluster-kafka-bootstrap:9092
 ----
 
-. The commands below creates a web server to host the JAR files and upload the JAR file to it:
-+
-[source,bash]
-----
-kubectl apply -f demo-resources/demo-webserver.yaml
-----
-
-[NOTE]
-====
-Need to update git clone URL to the public repo once the demo is ready.
-====
-
-. Clone the Flink Tutorials repo and build it:
-+
-[source,bash]
-----
-#Must be on the VPN
-git clone https://github.infra.cloudera.com/araujo/flink-tutorials.git
-cd flink-tutorials
-git checkout sko-demos
-cd flink-kubernetes-tutorial
-mvn clean package -DskipTests
-cd ../..
-----
-
-.. Upload the JAR file to the web server:
-+
-[source,bash]
-----
-chmod +x demo-resources/upload-to-file-server.sh
-bash -xe demo-resources/upload-to-file-server.sh flink-tutorials/flink-kubernetes-tutorial/target/flink-kubernetes-tutorial-1.18.0-csaop1.0.0-SNAPSHOT.jar
-----
-
 === Demo Steps
 
-. Create a topic named `demo-topic` and `demo-sql` in the Kafka cluster, we'll use these topics in the demo:
+. Create Kafka topics named `demo-topic` and `demo-sql` in the cluster. These topics are required for the demo:
 +
 [source,bash]
 ----
@@ -204,13 +171,17 @@ bin/kafka-topics.sh --bootstrap-server kafka-cluster-kafka-bootstrap:9092 --topi
 +
 [source,bash]
 ----
-kubectl apply -f demo-resources/demo-flinkjob.yaml
+kubectl apply -f demo-resources/demo-flinkjob.yaml -n csa-operator-system
 ----
 
-.. Wait for the task manager pod to reach the `RUNNING` state, then verify that data is being produced to the `demo-topic` topic with below command.
+.. Wait for the task manager pod to reach the `READY 1/1` state, then verify that data is being produced to the `demo-topic` topic with below command.
 +
 [source,bash]
 ----
+# Check the status of the task manager pod
+kubectl get pods -n csa-operator-system | grep taskmanager
+
+# Login to kafka shell
 ./kafka_shell.sh --namespace=cloudera-kafka-demo --cluster="kafka-cluster"
 
 #Once the above command is executed and prints out 'Shell ready', you will be in the kafka shell and can run kafka commands like below to consume messages from the topic:
@@ -237,7 +208,13 @@ image::../images/Create_job.png[Create_job]
 +
 image::../images/Paste_query.png[Paste_query]
 
-... Select all and Click on `Execute Selection` button to run the job.
+... Select all and Click `Execute Selection` button to run the job. 
++
+[NOTE]
+====
+It might throw timout error, again click `Execute Selection` button to run the job.
+====
+
 ... Verify that the the data is being produced to the `demo-sql` topic with below command.
 +
 [source,bash]
