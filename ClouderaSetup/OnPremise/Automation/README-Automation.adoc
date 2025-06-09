@@ -50,21 +50,21 @@ chmod +x run_onprem_deploy.sh
 
 [source,sh]
 ----
-./run_onprem_deploy.sh deploy --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+./run_onprem_deploy.sh deploy --sso --region <aws-region> --prefix <deployment-prefix> --owner_email <your-email> --password '<secure-password>'
 ----
 
 **To provision using static AWS credentials:**
 
 [source,sh]
 ----
-./run_onprem_deploy.sh deploy --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+./run_onprem_deploy.sh deploy --region <aws-region> --prefix <deployment-prefix> --owner_email <your-email> --password '<secure-password>'
 ----
 
 **Example:**
 
 [source,sh]
 ----
-./run_onprem_deploy.sh deploy --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
+./run_onprem_deploy.sh deploy --region us-west-2 --prefix demo-pvc --owner_email you@example.com --password 'Str0ngP@ssword!' --sso
 ----
 
 ==== Destroy (Teardown)
@@ -73,21 +73,21 @@ chmod +x run_onprem_deploy.sh
 
 [source,sh]
 ----
-./run_onprem_deploy.sh --sso --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+./run_onprem_deploy.sh --sso --region <aws-region> --prefix <deployment-prefix> --owner_email <your-email> --password '<secure-password>'
 ----
 
 **Example:**
 
 [source,sh]
 ----
-./run_onprem_deploy.sh --region us-west-2 --prefix demo-pvc --owner you@example.com --password 'Str0ngP@ssword!' --sso
+./run_onprem_deploy.sh --region us-west-2 --prefix demo-pvc --owner_email you@example.com --password 'Str0ngP@ssword!' --sso
 ----
 
 **To teardown the deployment using static AWS credentials:**
 
 [source,sh]
 ----
-./run_onprem_deploy.sh --region <aws-region> --prefix <deployment-prefix> --owner <your-email> --password '<secure-password>'
+./run_onprem_deploy.sh --region <aws-region> --prefix <deployment-prefix> --owner_email <your-email> --password '<secure-password>'
 ----
 
 ==== **Arguments explained:**
@@ -96,7 +96,7 @@ chmod +x run_onprem_deploy.sh
 * `--sso` — optional, use AWS SSO for authentication.
 * `--region` — AWS region code (e.g., us-west-2).
 * `--prefix` — unique deployment name prefix.
-* `--owner` — your email address.
+* `--owner_email` — your email address.
 * `--password` — common secure password meeting complexity requirements.
 
 
@@ -198,7 +198,7 @@ Edit `config.yml` and update the following fields:
 name_prefix:       <unique-deployment-name>
 infra_region:      <aws-region-code>
 common_password:   <secure-password>
-owner:             <your-email@cloudera.com>
+owner_email:             <your-email@cloudera.com>
 ----
 
 === Deploy the CDP PVC Stack
