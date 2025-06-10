@@ -16,7 +16,7 @@ nifiregistry_tini_image: 2.10.0-b134
 #eks
 cluster_name: k8soperator-eks-cluster
 region: ""
-k8s_version: "1.31" #k8s_version
+k8s_version: "1.32" #k8s_version
 node_type: m5.xlarge
 desired_nodes: 1
 max_nodes: 2

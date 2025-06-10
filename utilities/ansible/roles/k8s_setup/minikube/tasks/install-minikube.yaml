@@ -44,7 +44,7 @@
 # Step 5: Start Minikube if not running
 - name: Start Minikube
   become_user: "{{ ansible_user }}"
-  shell: sg docker -c "minikube start --cpus 8 --memory 30000"
+  shell: sg docker -c "minikube start --cpus 8 --memory 30000 --kubernetes-version=v1.32.0"
   register: minikube_start
   when: "'host: Running' not in minikube_status.stdout_lines"
 

@@ -1,0 +1,23 @@
+## Mandatory Parameters:
+PROVISION_EC2: YES
+LOCAL_MACHINE_IP: 208.127.x.x/32
+AWS_REGION: ap-southeast-1
+
+#Values can be either 'minikube' or 'eks'.
+K8S_DISTRIBUTION: minikube
+
+ADMIN_PASSWORD: 
+CLOUDERA_USERNAME: 6Example-b56d-986af1680605
+CLOUDERA_PASSWORD: 16example_password
+ 
+
+#Comma separated values e.g. CFM,CSA,CSM or ALL if all 3 operators to be deployed
+INSTALL_OPERATORS: CFM,CSA,CSM
+
+##Parameters with Conditional Requirement
+#INSTALLATION_HOST: 3.0.x.x
+#SSH_KEY_PAIR: akt-keypair
+
+## Optional parameters
+#INSTANCE_TYPE: m5.2xlarge
+#CLUSTER_NAME: DimOperatorsdemo

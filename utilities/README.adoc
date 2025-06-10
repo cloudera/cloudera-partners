@@ -1,75 +1,87 @@
-= Cloudera OnCloud: AutoClouderaDeploy Provisioner
-:toc:
-
-Author: **Avanish Tiwari**
-
-Email: **aktiwari@cloudera.com**
-
-
----
+= Cloudera Data in Motion K8soperators Hands-on Labs Provisioner
+v0.1, 2025-06-01: Draft
+:description: Automated Deployment instructions for Cloudera Kubernetes Operators
+:toc: left
+:toclevels: 2
+:sectnums:
+:source-highlighter: rouge
+:icons: font
+:imagesdir: ./images
+:hide-uri-scheme:
+:homepage: https://github.com/cloudera/cloudera-partners
 
 
 == Overview
 
-K8soperators product play a crucial role in showcasing the capabilities of Cloudera Data Platform Public Cloud form factor to partners and customers. They offer a practical and immersive learning experience that goes beyond mere overview. Hands-on Labs facilitate participant engagement and allow them to explore and interact with different PaaS offerings of Cloudera Data Platform.
+`Cloudera` provides a set of `Kubernetes operators` that enable users to deploy and manage `Cloudera Data In Motion (DIM)` products on `Kubernetes` clusters. These operators simplify the deployment, scaling, and management of `DIM` products, allowing users to focus on their data processing tasks rather than the underlying infrastructure.
 
+**DimK8sProvisioner** is a solution designed to automate the deployment of `DIM k8s operators` in a `Kubernetes` cluster. It simplifies the process of setting up and configuring the necessary components, enabling users to focus on utilizing the operators rather than dealing with complex deployment tasks.
 
-Infrastructure components are important and play a vital role in achieving the goal of Hands-on Labs and to give a better experience to the participants.
+This automation includes steps to deploy `DIM` k8s operators with two `kubernetes` distributions: `Minikube` and `EKS`. 
 
-**AutoClouderaDeploy** provisioner is a container based solution which takes care of provisioning the required infrastructure components without much manual efforts. By executing a single command it creates a **disposable** on-demand stack consists of:
+* To provision an `EKS` cluster, you need a remote host running `Ubuntu OS` with `AWS` access already configured. 
+* For the `Minikube` distribution, you can use an existing remote `Ubuntu OS` host or let the automation create a new `EC2 instance` with `Ubuntu OS` to host the `Minikube` cluster.
 
-1. CDP Environment
-2. Datalake
-3. Data Service (Currently CDW, CDE & CML)
-4. `Keycloak` Server
-5. Users 
+By executing a single command it creates a **disposable** on-demand stack consists of:
 
-
-image::build/images/Components.png[Components,600,400]
+1. `EC2 Instance` with `Ubuntu OS` (If provision_ec2 is set to YES)
+2. `Minikube` `Kubernetes` Custer (If `K8S_DISTRIBUTION=minikube`)
+3. `EKS` `Kubernetes` Cluster (If `K8S_DISTRIBUTION=eks`)
+4. `DIM k8s operators` (`CFM`, `CSA`, `CSM`)
+5. `DIM` Operator Products (`NiFi`, `NiFi Registry`, `Flink`, `SSB`, `Kafka`)
 
 == Technology Stack
-**AutoClouderaDeploy** employs a robust toolchain consisting of:
+**DimK8sProvisioner** employs a robust toolchain consisting of:
 
 1. `Ansible`
 2. `Terraform`
 3. `AWS CLI`
 4. `Shell Scripting`
 
-All the above tools are integrated with each other and packaged as a `Docker` Container for use.
+All the mentioned tools integrate seamlessly and come packaged as a `Docker` container for use.
 
 == Prerequisites
 The ready to use container takes care of all the dependencies of required tools & does not require user to install or configure any of the above listed tools. 
 For using this user should have:
 
-1. `Docker` and `AWSCLI V2` installed on your Laptop.
-2. *Programatic Access*(AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY) *OR* *SSO details* of the *AWS account* with Administrator or Power User Role *OR* *Role Assignment* to EC2 deployer machine *via sts:assumeRole* method 
+. A Valid Cloudera License
+.. Request a https://github.com/cloudera/cloudera-partners/tree/main/PartnerResources#partner-developer-license-program[Free Partner Developer License]
+. *Programatic Access*(`AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`) or *SSO details* of the *AWS account* with `Administrator` or `Power User` Role or *Role Assignment* to EC2 deployer machine *via sts:assumeRole* method. 
+. `Docker` installed on your host from where you are running the docker automation.
+. Below is the minimal configuration required when using an existing remote host for the installation of `K8s operators`
+.. Ubuntu 22.04
+.. 8 vCPU
+.. 32 GB RAM
+.. 100 GB storage
+
 
 === How to install `Docker` on your local machine
 
 Follow mentioned link for link:https://docs.docker.com/engine/install/[**installing Docker**] on your machine.
 
 
-=== Generate Keys
+=== AWS Account Access
+To provision the infrastructure on `AWS`, you need to have access to an `AWS account` with the necessary permissions. The automation requires programmatic access to `AWS services`, which can be achieved through various methods. Below are the recommended ways to authenticate with your `AWS account`:
 
-==== AWS
+There are three ways you can authenticate with `AWS Account`:
 
-There are three ways you can authenticate with AWS Account:
+.. Normal Way: *Using AWS ACCESS_KEY_ID and SECRET_ACCESS_KEY*
 
-a) Normal Way: *Using AWS ACCESS_KEY_ID and SECRET_ACCESS_KEY*
-
-. Open the IAM console at https://console.aws.amazon.com/iam/.
-. On the navigation menu, click on Users
-. Click on your IAM user name
-. Open the Security credentials tab, and then click on `Create access key`.
-. To see the new access key, click on Show. Your credentials resemble the following:
-
+... Open the `IAM` console at https://console.aws.amazon.com/iam/.
+... On the navigation menu, click on Users
+... Click on your `IAM` user name
+... Open the Security credentials tab, and then click on `Create access key`.
+... To see the new access key, click on Show. Your credentials resemble the following:
++
+[.shell]
+----
  Access key ID: SAMPLEODNN7EXAMPLE
  Secret access key: examplesecret123/PSESECRETENG/myPSERfiCYEXAMPLEKEY
 
  To download the above key pair, choose Download .csv file. Store the .csv file with keys in a secure location.
-
-. Configure the AWS credentials on your Laptop.
-
+----
+... Configure the AWS credentials on your Laptop.
++
 [.shell]
 ----
 ksahu@Kuldeeps-MacBook-Air build % aws configure
@@ -80,7 +92,8 @@ Default output format [None]: <Enter>
 ksahu@Kuldeeps-MacBook-Air build % 
 ----
 
-b) *Using Single Sign On (SSO)* for AWS, If your organization supports this method:
+.. *Using Single Sign On (SSO)* for AWS, If your organization supports this method:
++
 [.shell]
 ----
 ksahu@Kuldeeps-MacBook-Air build % aws configure sso
@@ -108,146 +121,116 @@ CLI profile name [cldr_poweruser-01234567890]: default
 ksahu@Kuldeeps-MacBook-Air build % aws s3 ls
 ----
 
+.. *Using Role Assignment to EC2 instance* for example a Deployer Machine, from where you run the `Docker` container to deploy the HoL Infra *(via sts:assumeRole)*.
++
+... Sign in to the AWS Management Console
 
-c) *Using Role Assignment to EC2 instance* i.e. Deployer Machine, from where you run the `Docker` container to deploy the HoL Infra *(via sts:assumeRole)*.
+    .... Go to the AWS Management Console: https://aws.amazon.com/console/
+    .... Enter your credentials to sign in.
 
-*Steps*
+... Navigate to `IAM` Dashboard
 
-===== 1) Sign in to the AWS Management Console
+    .... In the AWS Management Console, search for **IAM** in the search bar.
+    .... Click on **IAM** to open the Identity and Access Management dashboard.
 
-    . Go to the AWS Management Console: https://aws.amazon.com/console/
-    . Enter your credentials to sign in.
+... Create a New Role
 
-===== 2) Navigate to IAM
+    .... In the left navigation pane, click on **Roles**.
+    .... Click on the **Create role** button.
 
-    1. In the AWS Management Console, search for **IAM** in the search bar.
-    2. Click on **IAM** to open the Identity and Access Management dashboard.
+... Choose Trusted Entity
 
-===== 3) Create a New Role
+    .... Select **AWS service** as the trusted entity.
+    .... Under **Use case for other AWS services**, choose **EC2**.
+    .... Click on **Next: Permissions**.
 
-    1. In the left navigation pane, click on **Roles**.
-    2. Click on the **Create role** button.
+... Attach Policies
 
-===== 4) Choose Trusted Entity
+    .... In the policy search box, type **AdministratorAccess**.
+    .... Check the box next to **AdministratorAccess** to attach the policy.
+    .... Click on **Next: Tags**.
 
-    1. Select **AWS service** as the trusted entity.
-    2. Under **Use case for other AWS services**, choose **EC2**.
-    3. Click on **Next: Permissions**.
+... Add Tags (Optional)
 
-===== 5) Attach Policies
+    .... (Optional) You can add tags to help identify the role.
+    .... Click on **Next: Review**.
 
-    1. In the policy search box, type **AdministratorAccess**.
-    2. Check the box next to **AdministratorAccess** to attach the policy.
-    3. Click on **Next: Tags**.
+... Review and Create `Role`
 
-===== 6) Add Tags (Optional)
+    .... Enter a **Role name** (for example, `CDPAWSAdminRole`).
+    .... Review the details and click on **Create role**.
 
-    1. (Optional) You can add tags to help identify the role.
-    2. Click on **Next: Review**.
+... Navigate to `EC2` Dashboard
 
-===== 7) Review and Create Role
+    .... In the AWS Management Console, search for **EC2** in the search bar.
+    .... Click on **EC2** to open the EC2 dashboard.
 
-    1. Enter a **Role name** (e.g., `CDPAWSAdminRole`).
-    2. Review the details and click on **Create role**.
+... Select Your `EC2 Instance`
 
-===== 8) Navigate to EC2
+    .... In the left navigation pane, click on **Instances**.
+    .... Select the EC2 instance to which you want to assign the role.
 
-    1. In the AWS Management Console, search for **EC2** in the search bar.
-    2. Click on **EC2** to open the EC2 dashboard.
+... Attach the `IAM` Role
 
-===== 9) Select Your EC2 Instance
+    .... With the instance selected, click on the **Actions** dropdown menu.
+    .... Navigate to **Security** > **Modify IAM Role**.
+    .... In the **IAM role** dropdown, select the role you just created (for example, `EC2AdminRole`).
+    .... Click on **Update IAM role** to apply the changes.
 
-    1. In the left navigation pane, click on **Instances**.
-    2. Select the EC2 instance to which you want to assign the role.
+... Verify Role Assignment
 
-===== 10) Attach the IAM Role
-
-    1. With the instance selected, click on the **Actions** dropdown menu.
-    2. Navigate to **Security** > **Modify IAM Role**.
-    3. In the **IAM role** dropdown, select the role you just created (e.g., `EC2AdminRole`).
-    4. Click on **Update IAM role** to apply the changes.
-
-===== 11) Verify Role Assignment
-
-    1. With the instance still selected, check the **Description** tab at the bottom.
-    2. Under **IAM role**, confirm that your role (e.g., `EC2AdminRole`) is listed.
-
-To verify role assignment, use the following command:
-
+    .... With the instance still selected, check the **Description** tab at the bottom.
+    .... Under **IAM role**, confirm that your role (for example, `EC2AdminRole`) is listed.
+    .... You can also verify the role assignment by running the following command in your terminal.
++
 [.shell]
 ----
 aws iam list-attached-role-policies --role-name EC2AdminRole
 ----
 
 ---
-////
-=== Step 2: AWS SSH Key Pair
-1. Open the Amazon EC2 console at https://console.aws.amazon.com/ec2/ and navigate to the same region, where you want to deploy the CDP-PC HoL Infra.
-
-2. In the navigation pane, under Network & Security, choose Key Pairs.
-
-3. Choose Create key pair.
-
-4. For Name, enter a descriptive name for the key pair. It can’t include leading or trailing spaces.
-
-5. For Key pair type, choose RSA.
-
-6. For Private key file format, choose the pem format.
-
-7. To add a tag to the public key, choose Add tag, and enter the key and value for the tag. Repeat for each tag.
-
-8. Choose Create key pair.
-
-The private key file is automatically downloaded by your browser. The base file name is the name that you specified as the name of your key pair, and the file name extension is determined by the file format that you chose. Save the private key file in a safe place.
-
----
-////
 
 == How To Use
 
-image::build/images/HowToUse.png[HowToUse,600,400]
+image::../images/HowToUse.png[HowToUse,600,400]
 
-=== Step 1: Get the Docker Image
-The Docker image is available at Docker Hub. Once the `Docker` is installed and ready to use, pull the **cdp-public-cloud-hol-provisioner:latest** image by executing below command.
-
+=== Get the Docker Image
+The `Docker` image is available at `Docker Hub`. Once the `Docker` is installed and ready to use, pull the **k8soperator_deployment:latest ** image by executing below command.
 
 [.shell]
 ----
-docker pull clouderapartners/k8soperators_deployment:latest
-
+docker pull clouderapartners/k8soperator_deployment:latest 
 ----
 
 ---
 
-=== Step 2: Define Configuration Values For Stack
-This `Docker` based provisioner requires values of mandatory parameters to provision the infrastructure. It reads the values of these parameters from a configuration file hosted on your local machine. This section walks you through all the steps which are required to create a configuration file. This is the most **important** part so please dont skip any
-step of this section.
+=== Define Configuration Values For Stack
+This `Docker` based provisioner requires values of mandatory parameters to provision the infrastructure. It reads the values of these parameters from a configuration file hosted on your local machine. This section walks you through all the steps which are required to create a configuration file. This is the most **important** part so please dont skip any step of this section.
 
-==== A): 
-Create a folder inside your user home directory on your local machine by name **userconfig**. This folder will store all the configuration file and output generated in further steps.
+==== Create a new folder
+Create a folder inside your user home directory on your local machine by name **k8soperators**. This folder will store the configuration file, `cloudera license` file and output generated in further steps.
 
 **Mac/Linux Users:**
 
 [.shell]
 ----
 mkdir -p ~/k8soperators
-
 ----
+
 **Windows Users:**
 
 [.shell]
 ----
 md C:\Users\<username>\k8soperators
-
 ----
 
-==== B): 
+. Download the  **configuration/configfile** and place it inside the above created directory. Make sure you don't add any file extension to it. (.txt,.doc).
 
-Download the  **configuration/configfile** and place it inside the above created directory. Make sure you don't add any file extension to it. (.txt,.doc).
+. Similarly, download the **cloudera license** file and place it inside the same directory.
 
-==== C): 
-Start editing the `configfile` with the help of editor of your choice. **Don't add any quotes(single or double) in values and no 'new line' after the last entry in the file.** Refer to below table for defining
-values of the parameters.
+==== Edit the Configuration File
+
+Navigate to `k8soperators` directory and edit the `configfile` with the help of an editor of your choice. **Don't add any quotes(single or double) in values and no 'new line' after the last entry in the file.** Refer to below table for defining values of the parameters.
 
 [%header,cols="1,1,1"]
 |===
@@ -263,256 +246,153 @@ values of the parameters.
 
 **NO** If EC2 provisioning is not required.
 
+|K8S_DISTRIBUTION
+|Kubernetes Distribution to be used for provisioning
+|No quotes, only lowercase
+
+Values can be either 'minikube' or 'eks'
+
 |ADMIN_PASSWORD
-|Admin User Password for nifi/nifiregistry ui and openldap secrets
+|Admin User Password for `NiFi/NiFi Registry` ui and `openldap` secrets
+|No quotes
+
+|CLOUDERA_USERNAME
+|Cloudera admin user received during license registration to authenticate with cloudera repos
+|No quotes
+
+|CLOUDERA_PASSWORD
+|Cloudera admin passwords received during license registration to authenticate with cloudera repos
 |No quotes
 
 |AWS_REGION
 |Region in which resources will be deployed
 |No quotes, only lowercase with numbers
 
-
-
-Only from the provided values
-|WORKSHOP_NAME
-|Name for the workshop. Will used to create resources.
-|No quotes and underscore and should be between 5-18 characters, preferred lowercase (with integers)
-
-|NUMBER_OF_WORKSHOP_USERS
-|Number of users required for the workshop
-|No quotes, only integer
-
-|WORKSHOP_USER_PREFIX
-|Prefix for creating workshop users in Keycloak
-|No quotes, only string, preferred lowercase (with integers)
-
-|WORKSHOP_USER_DEFAULT_PASSWORD
-|Default password for participants
-|No quotes
-
-|DOMAIN
-|Root Public Domain Name on Route53 for hosting Workshop keycloak
-|No quotes, only lowercase
-
-|HOSTEDZONEID
-|HostedZoneId of Root Public Domain Name on Route53 for hosting Workshop keycloak
-|No quotes, preferred uppercase
-
 |LOCAL_MACHINE_IP
-|Public IPV4 address of local machine
+|Public IPV4 address of local machine from which you are running the Docker container.
 |No quotes and don't remove /32
+
 |INSTALL_OPERATORS
 |A comma separated list of k8s operators to install.
 |`**CFM**` If only one of them is required.
 
 `**CFM,CSA**` If any two of them are required.
 
-`**CFM,CSA,CSM`** or `**ALL**`  If all three are required.
+`**CFM,CSA,CSM**` or `**ALL**`  If all three are required.
 
 Only from the provided values
 |===
----
-[NOTE]
-**Below are the optional parameters that should only be changed if any customization is needed. If you intend to proceed with the default configuration values for the data services, do not modify and/or uncomment the values. If you need to make changes, please refer to the table below for detailed instructions on providing the correct values. To override the default values for optional parameters for any of data services, uncomment the parameter Key and provide/update the values corresponding to them, if and when required.**
 
+
+==== Parameters with Conditional Requirement
+
+[NOTE]
+====
+If the `**INSTALLATION_HOST**` value is not defined in `configfile`, automation will create a new `ec2_instance`. When `K8S_DISTRIBUTION=EKS`, the `**INSTALLATION_HOST**` is a **mandatory** parameter and the host should have `Ubuntu OS` installed and access to create an `EKS` cluster and other resources in the `AWS account`. 
+====
+
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
+
+|INSTALLATION_HOST
+|The remote host where the `K8s operators` will be installed. It can be either the public IP address of an `EC2 instance` or a remote machine with `Ubuntu OS`.
+
+Keep it commented if you want to provision EC2 instance as well(Default).
+|No quotes, only IPv4 address. **MANDATORY** if `K8S_DISTRIBUTION=EKS`.
+
+|SSH_KEY_PAIR
+|If you want to utilize an already existing keypair, uncomment the corresponding entry in `configfile` and override the value with the keypair name.
+|Only base name without `.pem `extension. 
+
+**MANDATORY** if installing on an existing remote host with `Ubuntu OS`
+|=== 
+
+
+[NOTE]
+====
+If the `**SSH_KEY_PAIR**` value is not defined and `**PROVISION_EC2=YES**` in `configfile`, automation will generate a new keypair and place pem file inside **userconfig** directory.
+In case you have defined `**SSH_KEY_PAIR**` in `configfile` in earlier step, Place the same `**SSH_KEY_PAIR.pem**` file under **userconfig** directory.
+====
 
 ==== Optional Parameters
 
-[%header,cols="1,1,1"]
-|===
-|Parameter
-|Description
-|Remarks
-
-|AWS_KEY_PAIR
-|If you want to utilize an already existing keypair, uncomment the corresponding entry in `configfile` and override the value with the keypair name. If AWS_KEY_PAIR is not defined, the automation will create a new keypair.
-|Only base name without .pem extension.
-|===
-
-==== Optional parameters for datalake_version
-
-[%header,cols="1,1,1"]
-|===
-|Parameter
-|Description
-|Remarks
-
-|DATALAKE_VERSION
-|By default the DATALAKE_VERSION is selected as per default version on CDP tenant.
-|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value e.g **7.2.18**
-|===
-
-==== Optional parameters for CDP Quota
-
-[%header,cols="1,1,1"]
-|===
-|Parameter
-|Description
-|Remarks
-
-|CDP_SAML_PROVIDER_LIMIT
-|Default value is **10**. 
-|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value.
-
-No quotes, only integer
-|CDP_USER_LIMIT
-|Default value is **1000**. 
-|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value.
-
-No quotes, only integer
-|CDP_GROUP_LIMIT
-|Default value is **50**.
-|To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value.
-
-No quotes, only integer
-|===
-
-==== Optional parameters for CDW
-
-[%header,cols="1,1,1"]
-|===
-|Parameter
-|Description
-|Remarks
-
-|CDW_VRTL_WAREHOUSE_SIZE
-|Possible values: **xsmall**, **small**, **medium**, **large**
-|Default value is **xsmall**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values. 
-
-No quotes, only string, only lowercase (with integers)
-|CDW_DATAVIZ_SIZE
-|Possible values: **viz-default**, **viz-low**, **viz-medium**, **viz-large**
-|Default value is **viz-default**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values. 
-
-No quotes, only string, only lowercase (with integers)
-|===
-
-==== Optional parameters for CDE
-
-[%header,cols="1,1,1"]
-|===
-|Parameter
-|Description
-|Remarks
-
-|CDE_SPARK_VERSION
-|Possible values: **SPARK2, SPARK2_4, SPARK3, SPARK3_0, SPARK3_1, SPARK3_2, SPARK3_3, SPARK3_5**
-|Default value is **SPARK3**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
-
-No quotes, Only from the provided values
-|CDE_VC_TIER
-|Possible values: **CORE, ALLP**
-|Default value is **CORE**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
-
-No quotes, Only from the provided values
-|CDE_INSTANCE_TYPE
-|Possible values: **m5.2xlarge, r5.4xlarge** etc.
-|Default value is **m5.2xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
-
-No quotes, only string, only lowercase (with integers)
-|CDE_INITIAL_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|CDE_MIN_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|CDE_MAX_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **40**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|===
-
-==== Optional parameters for CML
-
-[%header,cols="1,1,1"]
-|===
-|Parameter
-|Description
-|Remarks
-
-|CML_WS_INSTANCE_TYPE
-|Possible values: **m5.2xlarge, r5.4xlarge** etc.
-|Default value is **m5.2xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation. 
-
-No quotes, only string, only lowercase (with integers)
-|CML_MIN_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|CML_MAX_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **40**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|CML_ENABLE_GPU
-|Possible values: **TRUE, FALSE**
-|Default value is **FALSE**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the given possible values.
-
-No quotes, Only from the provided values
-|CML_GPU_INSTANCE_TYPE
-|Possible values: *g4dn.xlarge, p3.2xlarge* etc.
-|Default value is **g4dn.xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the CDE supported AWS instance types. Regarding supported instance types, kindly refer official documentation.
-
-No quotes, only string, only lowercase (with integers)
-|CML_MIN_GPU_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **10**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|CML_MAX_GPU_INSTANCES
-|Possible values: **0** to **100**.
-|Default value is **40**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with any number between the given possible range.
-
-No quotes, only integer
-|===
-
-
 [NOTE]
- The availability of GPU instances is specific to AWS region and Quotas available to an AWS account and may vary for different accounts and region used for deployement. Please provide the correct/suitable values only, after referring to the official AWS and CDP public documentations.
+====
+**Below are the optional parameters that should only be changed if any customization is needed. If you intend to proceed with the default configuration values, do not modify and/or uncomment the values. If you need to make changes, please refer to the table below for detailed instructions on providing the correct values. To override the default values for optional parameters for any of paremeters, uncomment the parameter Key and provide/update the values corresponding to them when required.**
+====
 
-[NOTE]
- Please refer to the official AWS and CDP public documentations, for checking the correct and suitable values for AWS regions and Instance Types.
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
 
-==== D):
-If the **AWS_KEY_PAIR** value is not defined in `configfile`, automation will generate a new keypair and place pem file inside **userconfig** directory.
-In case you have defined **AWS_KEY_PAIR** in `configfile` in earlier step, Place the same **AWS_KEY_PAIR.pem** file under **userconfig** directory.
+|INSTANCE_TYPE
+|Possible values: **m5.2xlarge, m4.2xlarge** etc.
+|Default value is **m5.2xlarge**. If you want to override, uncomment the corresponding entry in `configfile` and replace the override value with one of the supported AWS instance types. Regarding supported instance types, kindly refer AWS official documentation. 
 
----
+|CLUSTER_NAME:
+|This parameter will be used to name the `EKS` cluster as well as the `EC2 instance`. If you want to override the default value, uncomment the corresponding entry in `configfile` and replace the override value with your desired cluster name.
+|No quotes
+|===
 
-=== Step 3: Provision Stack
-Once the `configfile` is created as outlined in **Step 2** . The provisioning of infrastructure in interactive mode can be started by executing below command.
-
-
-[NOTE]
- Make sure that total number of IAM Groups present in your CDP tenant, in which you are trying to deploy using automation, are less than 48 (i.e. default limit is 50 Groups and automation will create 2 more).
-
-
-[NOTE]
- Though, there are pre-checks configured for S3 buckets count and VPC, EIP Quotas in the provided region. Please make sure from your side as well that enough quotas are available in the region to consume and total number of S3 buckets present in your AWS account are less than 99 (i.e. default limit is 100 buckets, 1 more bucket will be created by the automation).
-
-
+=== Provision Stack
+Once the `configfile` is created as outlined in **Step 4.2** . The provisioning of infrastructure in interactive mode can be started by executing below command.
 
 **For Mac/Linux/Windows Users:**
 
 [.shell]
 ----
 docker run -it \
--v ~/userconfig:/userconfig \
--v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
-clouderapartners/cdp-public-cloud-hol-provisioner:latest \
-provision
-
+  -v ~/k8soperators:/k8soperators \
+  -v ~/.aws:/root/.aws \
+  k8soperator_deployment:latest provision
 ----
 
 [NOTE]
 The above commands will start the `Docker` container in interactive mode and will display the process output and messages on the terminal. Make sure you don't close the terminal or your machine does not go to into sleep mode because of inactivity. 
 If you wan to run the container in background/detach mode then replace the '-it' flag in above commands with '-d'(without quotes). You can check the logs of container by below commands.
+
+To get the container ID or Name:
+[.shell]
+----
+docker ps
+----
+
+To get the logs:
+[.shell]
+----
+docker logs -f <CONTINER_ID> OR <CONTAINER_NAME>
+----
+
+=== Destroy Stack
+After succesful demo of the DIM operators, the complete stack can be destroyed using one single command as below. The **destroy** operation will take care of deleting/removing all of the below resources: 
+
+
+1. Delete the `k8s operators` and their products
+2. Delete the underlying k8s cluster (EKS or Minikube)
+3. Delete the `EC2 instance` (If provisioned)
+
+
+**For Mac/Linux/Windows Users:**
+ 
+[.shell]
+----
+docker run -it \
+  -v ~/k8soperators:/k8soperators \
+  -v ~/.aws:/root/.aws \
+  k8soperator_deployment:latest destroy
+----
+
+[NOTE]
+The above commands will start the `Docker` container in interactive mode and will display the process output
+and messages on the terminal. Make sure you don't close the terminal or
+your machine does not go to into sleep mode because of inactivity. 
+If you wan to run the container in background/detach mode then replace the '-it' flag in above commands
+with '-d'(without quotes). You can check the logs of container by below commands
 
 To get the container ID or Name:
 [.shell]
@@ -526,12 +406,3 @@ To get the logs:
 docker logs -f <CONTINER_ID> OR <CONTAINER_NAME>
 
 ----
-
-The overall time for provisioning is nearly ~1.5 to ~4 hours (Total Time = Time Reqd for DataLake Provisioning + Time Reqd for CDE and/or CDW and/or CML Provisioning). 
-
----
-
-[NOTE]
-If the execution of `Docker` container for provisioning fails (due to timeout or any kind of intermittent/API issues at CDP/AWS side), you can use the same command mentioned above to refresh the state and resume the execution.
-
----

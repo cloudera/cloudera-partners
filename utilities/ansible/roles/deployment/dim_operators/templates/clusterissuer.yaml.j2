@@ -1,0 +1,44 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: self-signed-ca-issuer
+spec:
+  ca:
+    secretName: self-signed-ca
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: self-signed-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: self-signed-ca
+spec:
+  dnsNames:
+  - cloudera.com
+  emailAddresses:
+  - cdf-eng-dfx@cloudera.com
+  isCA: true
+  issuerRef:
+    kind: ClusterIssuer
+    name: self-signed-issuer
+  secretName: self-signed-ca
+  subject:
+    countries:
+    - US
+    localities:
+    - Santa Clara
+    organizationalUnits:
+    - DataFlow
+    organizations:
+    - Cloudera
+    postalCodes:
+    - "95054"
+    provinces:
+    - CA
+    streetAddresses:
+    - 5470 Great America Pkwy

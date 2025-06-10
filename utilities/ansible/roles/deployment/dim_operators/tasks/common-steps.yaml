@@ -64,22 +64,16 @@
   delay: 30
   failed_when: false
 
-# Deploy ClusterIssuer for cert-manager
-- name: Deploy ClusterIssuer for cert-manager
-  copy:
-    dest: /tmp/clusterissuer.yaml
-    content: |
-      apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      metadata:
-        name: self-signed-ca-issuer
-      spec:
-        selfSigned: {}
+- name: copy clusterissuer Jinja2 template
+  template:
+    src: "clusterissuer.yaml.j2"
+    dest: "/tmp/clusterissuer.yaml"
+    mode: '0644'
 
 # Apply ClusterIssuer
 - name: Apply ClusterIssuer
   become_user: "{{ ansible_user }}"
-  shell: kubectl apply -f /tmp/clusterissuer.yaml
+  shell: kubectl apply -f /tmp/clusterissuer.yaml -n cert-manager
   changed_when: false
   failed_when: false
 

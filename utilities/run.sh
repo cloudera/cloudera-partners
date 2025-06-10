@@ -53,14 +53,25 @@ Exiting......"
       REQUIRED_KEYS=(
          "LOCAL_MACHINE_IP"
          "K8S_DISTRIBUTION"
-         "LDAPADMIN_PASSWORD"
-         "NIFIADMIN_PASSWORD"
+         "ADMIN_PASSWORD"
          "CLOUDERA_USERNAME"
          "CLOUDERA_PASSWORD"
          "INSTALL_OPERATORS"
          "AWS_REGION"
       )
-
+      if [[ "$k8s_distribution" == "eks" ]]; then
+         REQUIRED_KEYS+=(
+            "INSTALLATION_HOST"
+         )
+         if [[ "$provision_ec2" == "yes" ]]; then
+             echo "=================================================================================="
+            echo "FATAL: the value of provision_ec2 cannot be 'yes' when k8s_distribution is set to 'eks'."
+            echo "Please update the 'configfile' and set the value of provision_ec2 to 'no'."
+            echo "Exiting......"
+            echo "=================================================================================="
+            exit 1
+         fi
+      fi
       # Check if user-provided config file exists
       if [ ! -f "$USER_CONFIG_FILE" ]; then
          echo -e "\nUser config file not found :: $USER_CONFIG_FILE\n"
@@ -136,17 +147,14 @@ Exiting......"
          AWS_REGION)
             aws_region=$(echo "$value" | tr '[:upper:]' '[:lower:]')
             ;;
-         AWS_KEY_PAIR)
-            aws_key_pair=$value
+         SSH_KEY_PAIR)
+            ssh_key_pair=$value
             ;;
          K8S_DISTRIBUTION)
             k8s_distribution=$(echo "$value" | tr '[:upper:]' '[:lower:]')
             ;;
-         LDAPADMIN_PASSWORD)
-            ldapadmin_password=$value
-            ;;
-         NIFIADMIN_PASSWORD)
-            nifiadmin_password=$value
+         ADMIN_PASSWORD)
+            admin_password=$value
             ;;
          CLOUDERA_USERNAME)
             cloudera_username=$value
@@ -169,7 +177,7 @@ Exiting......"
          esac
          # Print the key-value except for sensitive fields
          case "$key" in
-            LDAPADMIN_PASSWORD|NIFIADMIN_PASSWORD|CLOUDERA_PASSWORD|CLOUDERA_USERNAME)
+            ADMIN_PASSWORD|CLOUDERA_PASSWORD|CLOUDERA_USERNAME)
                 ;;  # Do nothing
             *)
                 echo "Loaded Config: $key = $value"
@@ -191,15 +199,15 @@ Exiting......"
 # Function for checking .pem file.
 key_pair_file() {
    # Checking if SSH Keypair File exists.
-   if [[ ! -f "/k8soperators/$aws_key_pair.pem" ]]; then
+   if [[ ! -f "/k8soperators/$ssh_key_pair.pem" ]]; then
       echo "=================================================================================="
-      echo "FATAL: SSH Key Pair File Not Found. Please place the '$aws_key_pair.pem'
+      echo "FATAL: SSH Key Pair File Not Found. Please place the '$ssh_key_pair.pem'
 file in your config directory and try again.
 EXITING....."
       echo "=================================================================================="
       exit 9999 # die with error code 9999
    else
-      echo "Using existing aws_key_pair"
+      echo "Using existing ssh_key_pair"
    fi
 }
 
@@ -212,9 +220,11 @@ deploy_ec2() {
   terraform init
   terraform apply -auto-approve -lock=false\
       -var "local_ip=$local_ip" \
-      -var "key_name=$aws_key_pair" \
+      -var "key_name=$ssh_key_pair" \
       -var "aws_region=$aws_region" \
+      -var "instance_name=$cluster_name" \
       -var "instance_type=$instance_type"
+      
   RETURN=$?
    if [ $RETURN -eq 0 ]; then
       # Extract the EC2 public IP from Terraform output
@@ -226,7 +236,7 @@ deploy_ec2() {
       export installation_host="$EC2_PUBLIC_IP"
       export instance_name="$INSTANCE_NAME"
 
-      if [[ ! -f "/k8soperators/$aws_key_pair.pem" ]]; then
+      if [[ ! -f "/k8soperators/$ssh_key_pair.pem" ]]; then
       # Only copy if using a newly generated key
       cp -pf ec2/generated-$instance_name.pem "/k8soperators/"
       fi
@@ -249,8 +259,9 @@ destroy_ec2() {
   terraform init
   terraform destroy -auto-approve -lock=false \
       -var "local_ip=$local_ip" \
-      -var "key_name=$aws_key_pair" \
+      -var "key_name=$ssh_key_pair" \
       -var "aws_region=$aws_region" \
+      -var "instance_name=$cluster_name" \
       -var "instance_type=$instance_type"
   RETURN=$?
 
@@ -277,8 +288,8 @@ deploy_dimoperators() {
   [ -z "$instance_name" ] && instance_name=$(cat "/k8soperators/.instance_name")
   fi
 
-  if [ -f "/k8soperators/$aws_key_pair.pem" ]; then
-      ssh_private_key_file="/k8soperators/$aws_key_pair.pem"
+  if [ -f "/k8soperators/$ssh_key_pair.pem" ]; then
+      ssh_private_key_file="/k8soperators/$ssh_key_pair.pem"
   else
       ssh_private_key_file="/k8soperators/generated-$instance_name.pem"
   fi
@@ -287,13 +298,17 @@ deploy_dimoperators() {
     cp /k8soperators/cloudera_license.txt roles/deployment/dim_operators/files/cloudera_license.txt
   fi
 
+#Initializing cluster name if not set
+  if [ -z "$cluster_name" ]; then
+    cluster_name="DimOperatorsdemo"
+  fi
   # Run the Ansible playbook using the inventory.yaml
   ansible-playbook -vv -i inventory.yaml playbook.yaml \
     --extra-vars "INSTALLATION_HOST=$installation_host \
                   k8s_distribution=$k8s_distribution \
                   ssh_private_key_file=$ssh_private_key_file \
-                  ldapadmin_password=$ldapadmin_password \
-                  nifiadmin_password=$nifiadmin_password
+                  ldapadmin_password=$admin_password \
+                  nifiadmin_password=$admin_password \
                   Cloudera_username=$cloudera_username \
                   Cloudera_password=$cloudera_password \
                   install_operators=$install_operators \
@@ -313,10 +328,14 @@ destroy_eks() {
   [ -z "$instance_name" ] && instance_name=$(cat "/k8soperators/.instance_name")
   fi
 
-  if [ -f "/k8soperators/$aws_key_pair.pem" ]; then
-      ssh_private_key_file="/k8soperators/$aws_key_pair.pem"
+  if [ -f "/k8soperators/$ssh_key_pair.pem" ]; then
+      ssh_private_key_file="/k8soperators/$ssh_key_pair.pem"
   else
       ssh_private_key_file="/k8soperators/generated-$instance_name.pem"
+  fi
+  #Initializing cluster name if not set
+  if [ -z "$cluster_name" ]; then
+    cluster_name="DimOperatorsdemo"
   fi
    ansible-playbook -vv -i inventory.yaml destroy_eks_cluster.yaml \
      --extra-vars "INSTALLATION_HOST=$installation_host \
@@ -330,7 +349,7 @@ provision)
 # Run functions
 # Call validating_variables function if script is run directly
     validating_variables
-    if [[ -n "$aws_key_pair" ]]; then
+    if [[ -n "$ssh_key_pair" ]]; then
         key_pair_file
     else
         echo "No AWS Key Pair provided. A New key_pair will be generated."
