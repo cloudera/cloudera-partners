@@ -642,7 +642,7 @@ kubectl run kafka-consumer -it \
 
 == Access Application UI
 
-=== Nifi
+=== NiFi
 . Expose the NiFi UI using NodePort and access via SSH tunneling—for example, when running `Minikube` on a `remote` or `EC2 instance`.
 
 .. Change NiFi service type to NodePort
