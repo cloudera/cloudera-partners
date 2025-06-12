@@ -287,7 +287,7 @@ This summary page provides:
 
 === Quick Command to Open in Browser
 
-Use this command to open the summary file directly in your default web browser:
+Use this command, after replacing the <NAME_PREFIX> placeholder value, to open the summary file directly in your default web browser:
 
 [source,sh]
 ----
