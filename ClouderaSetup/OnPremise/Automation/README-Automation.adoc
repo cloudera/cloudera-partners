@@ -244,7 +244,6 @@ If your deployment scenario requires a different set of services — for example
 
 Additionally, if you have unique service requirements or want to customize your deployment, you can easily define your own cluster configuration. All you need is a **basic understanding of the Cloudera stack and Ansible** to modify or extend these playbooks to suit your environment.
 
-For best results, refer to the official playbook documentation and test custom configurations in a staging environment before deploying to production.
 ====
 
 
