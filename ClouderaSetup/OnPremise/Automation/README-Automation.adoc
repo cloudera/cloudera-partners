@@ -30,6 +30,7 @@ Before you begin, ensure the following are installed and configured on your syst
 * ✅ **SSH private key** available at `~/.ssh/id_rsa`.
 * ✅ You are logged into AWS CLI (run `aws sso login` if using SSO, or `aws configure` for static credentials).
 
+////
 == Automated Deployment using Wrapper Script
 
 To simplify the entire deployment or teardown process, use the provided wrapper script `run_onprem_deploy.sh`. This script automates virtualenv setup, credential management (with optional SSO), environment variable setup, and playbook execution.
@@ -99,6 +100,7 @@ chmod +x run_onprem_deploy.sh
 * `--owner_email` — your email address.
 * `--password` — common secure password meeting complexity requirements.
 
+////
 
 NOTE: The `password` or `common_password` is reused across multiple components (e.g. FreeIPA, Ranger, Cloudera Manager UI). It must meet the following complexity requirements:
 
