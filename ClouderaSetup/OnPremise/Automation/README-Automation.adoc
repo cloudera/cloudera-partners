@@ -145,7 +145,7 @@ source ~/cdp-navigator/bin/activate ;
 
 [source,sh]
 ----
-pip3 install ansible-core ansible-navigator virtualenv ;
+pip3 install ansible-core ansible-navigator ;
 ----
 
 === Configure AWS Credentials
