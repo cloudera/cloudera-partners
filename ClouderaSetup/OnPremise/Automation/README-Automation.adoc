@@ -9,10 +9,22 @@ This guide walks you through deploying the Cloudera On Premise on AWS infrastruc
 
 [NOTE]
 ====
-**DRAFT** — This is a work-in-progress deployment guide for internal review. Content may change and is not final. Please do not circulate outside the team.
+[.lead]
+*🚧 DRAFT NOTICE — Internal Use Only*
 
-**IMPORTANT** — The Community Edition PVC deployment repo is currently hosted on the **Internal Cloudera GitHub** and is **not accessible** outside the Cloudera network. You **must be connected to the Cloudera VPN** for this automation to work.
+This guide is a **work in progress** and currently under **internal review**. The content is **not finalized**, may be subject to frequent changes, and should **not be shared or circulated** outside the team.
+
+[.lead]
+*⚠️ IMPORTANT: VPN Requirement for Repository Access*
+
+The **Community Edition PVC deployment repository** is hosted on **Cloudera’s Internal GitHub** and is **inaccessible from external networks**. To use this automation:
+
+- You **must be connected to the Cloudera VPN**.
+- Ensure VPN access is active *before* cloning or executing any deployment scripts.
+
+Please validate your network access before proceeding.
 ====
+
 
 == Outcomes
 
@@ -41,8 +53,8 @@ You can deploy or teardown the PVC stack using either the automated wrapper scri
 
 [source,sh]
 ----
-curl -O https://raw.githubusercontent.com/cloudera/cloudera-partners/goespvc/ClouderaSetup/OnPremise/Automation/run_onprem_deploy.sh
-chmod +x run_onprem_deploy.sh
+curl -O https://raw.githubusercontent.com/cloudera/cloudera-partners/goespvc/ClouderaSetup/OnPremise/Automation/run_onprem_deploy.sh ;
+chmod +x run_onprem_deploy.sh ;
 ----
 
 ==== Provision
@@ -116,24 +128,24 @@ NOTE: The `password` or `common_password` is reused across multiple components (
 
 [source,sh]
 ----
-git clone https://github.infra.cloudera.com/GOES/pvc-community-edition-aws.git
-cd pvc-community-edition-aws
+git clone https://github.infra.cloudera.com/GOES/pvc-community-edition-aws.git ;
+cd pvc-community-edition-aws ;
 ----
 
 === Set Up Python Virtual Environment
 
 [source,sh]
 ----
-pip3 install virtualenv
-python3 -m venv ~/cdp-navigator
-source ~/cdp-navigator/bin/activate
+pip3 install virtualenv ;
+python3 -m venv ~/cdp-navigator ;
+source ~/cdp-navigator/bin/activate ;
 ----
 
 === Install Required Python Packages
 
 [source,sh]
 ----
-pip3 install ansible-core ansible-navigator virtualenv
+pip3 install ansible-core ansible-navigator virtualenv ;
 ----
 
 === Configure AWS Credentials
@@ -142,9 +154,9 @@ IMPORTANT: If you are using AWS SSO, export any existing static credentials firs
 
 [source,sh]
 ----
-unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_CREDENTIAL_EXPIRATION AWS_SESSION_TOKEN
-aws sso login
-eval $(aws configure export-credentials --format env)
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_CREDENTIAL_EXPIRATION AWS_SESSION_TOKEN ;
+aws sso login ;
+eval $(aws configure export-credentials --format env) ;
 ----
 
 TIP: You can also use standard Access Key and Secret if not using SSO.
@@ -173,15 +185,15 @@ If the file does not exist, generate a new one:
 
 [source,sh]
 ----
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa ;
 ----
 
 === Set Environment Variables
 
 [source,sh]
 ----
-export SSH_PRIVATE_KEY_FILE=~/.ssh/id_rsa
-export CDP_LICENSE_FILE=license.txt
+export SSH_PRIVATE_KEY_FILE=~/.ssh/id_rsa ;
+export CDP_LICENSE_FILE=license.txt ;
 ----
 
 === Prepare Configuration File
@@ -200,12 +212,43 @@ Edit `config.yml` and update the following fields:
 name_prefix:       <unique-deployment-name>
 infra_region:      <aws-region-code>
 common_password:   <secure-password>
-owner_email:             <your-email@cloudera.com>
+owner_email:       <your-email@cloudera.com>
 ----
 
 === Deploy the CDP PVC Stack
 
-To deploy the full stack (infrastructure + services + Ozone cluster), run:
+* To deploy the infra till the Cloudera Manager server and Cloudera Management Services (infrastructure + services), run:
+
+[source,sh]
+----
+ansible-navigator run infrastructure_setup.yml services_setup.yml cm_setup.yml -e @config.yml
+----
+
+* To deploy the Ozone included base cluster on top of infra provisioned in previous step (infrastructure + services + Ozone cluster), run:
+
+[source,sh]
+----
+ansible-navigator run infrastructure_setup.yml ozone-cluster.yml -e @config.yml
+----
+
+[NOTE]
+====
+[.lead]
+*⚠️ IMPORTANT: Understanding Base Cluster Playbooks*
+
+The `ozone-cluster.yml` playbook is tailored to deploy a **specific type of base cluster** with a predefined set of services — primarily suited for use cases involving Apache Ozone.
+
+If your deployment scenario requires a different set of services — for example, **Cloudera Streaming Analytics (CSA)** — you should use one of the **pre-built alternative playbooks**, such as:
+
+* `csa-cluster.yml` — for deploying CSA-based control plane services.
+
+Additionally, if you have unique service requirements or want to customize your deployment, you can easily define your own cluster configuration. All you need is a **basic understanding of the Cloudera stack and Ansible** to modify or extend these playbooks to suit your environment.
+
+For best results, refer to the official playbook documentation and test custom configurations in a staging environment before deploying to production.
+====
+
+
+* To deploy the full stack (infrastructure + services + Ozone cluster), run:
 
 [source,sh]
 ----
@@ -249,7 +292,8 @@ Use this command to open the summary file directly in your default web browser:
 
 [source,sh]
 ----
-python -m webbrowser file://${PWD}/<NAME_PREFIX>-summary.html
+NAME_PREFIX=<NAME_PREFIX> ;
+python3 -m webbrowser file://${PWD}/${NAME_PREFIX}-summary.html ;
 ----
 
 === What Next?
