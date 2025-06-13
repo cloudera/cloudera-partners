@@ -187,7 +187,7 @@ Place your CDP license file in the current directory and name it:
 ----
 license.txt
 ----
-
+image::license.png[Cloudera license file,align="center"]
 ==== SSH Private Key
 
 Ensure your SSH private key is available at the following path:
@@ -203,6 +203,8 @@ If the file does not exist, generate a new one:
 ----
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa ;
 ----
+
+image::id_rsa.png[SSH Private key,align="center"]
 
 === Set Environment Variables
 
