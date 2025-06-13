@@ -4,6 +4,8 @@ Cloudera | CDP PVC-OnPrem Deployment Guide
 :icons: font
 :source-highlighter: pygments
 :sectnums:
+:imagesdir: ./images
+:keywords: Cloudera, PVC, OnPremise, AWS, Automation
 
 This guide walks you through deploying the Cloudera On Premise on AWS infrastructure.
 
@@ -224,6 +226,8 @@ owner_email:       <your-email@cloudera.com>
 ansible-navigator run infrastructure_setup.yml services_setup.yml cm_setup.yml -e @config.yml
 ----
 
+image::cms.png[Cloudera Manager deployment,align="center"]
+
 * To deploy the Ozone included base cluster on top of infra provisioned in previous step (infrastructure + services + Ozone cluster), run:
 
 [source,sh]
@@ -246,6 +250,8 @@ Additionally, if you have unique service requirements or want to customize your 
 
 ====
 
+image::ozone_cluster.png[Ozone Base cluster deployment,align="center"]
+
 
 * To deploy the full stack (infrastructure + services + Ozone cluster), run:
 
@@ -253,6 +259,9 @@ Additionally, if you have unique service requirements or want to customize your 
 ----
 ansible-navigator run infrastructure_setup.yml services_setup.yml cm_setup.yml ozone-cluster.yml -e @config.yml
 ----
+
+image::ozone_cluster_e2e.png[Ozone Base cluster end-to-end deployment,align="center"]
+
 
 === Teardown the CDP PVC Stack
 
@@ -263,6 +272,8 @@ To clean up the environment when no longer needed:
 ansible-navigator run infrastructure_teardown.yml -e @config.yml
 ----
 
+image::teardown.png[Ozone Base cluster end-to-end destroy,align="center"]
+
 === Access the Deployment Summary and UI
 
 Once deployment is complete, you can review the deployment summary and access the available UI endpoints:
@@ -272,18 +283,14 @@ Once deployment is complete, you can review the deployment summary and access th
 You can either:
 
 * Open the generated `<NAME_PREFIX>-summary.html` file from the project directory, or
-* Visit the hosted URL (Listed in the webpage `<NAME_PREFIX>-summary.html`) :
+* Visit the hosted URL (Listed in the webpage `<NAME_PREFIX>-summary.html`) (It will look like below):
+* See <<Quick Command to Open in Browser,Quick Command to Open in Browser>> for instructions on how to quickly open the summary file in your browser.
 
 [source,sh]
 ----
 https://REVERSE_PROXY_PUBLIC_IP.pvc.cloudera-labs.com
 ----
 
-This summary page provides:
-
-* All UI endpoint URLs (Cloudera Manager, FreeIPA, pgAdmin, Knox, etc.)
-* Hostnames and their assigned Ansible groups
-* Service status snapshots
 
 === Quick Command to Open in Browser
 
@@ -294,8 +301,18 @@ Use this command, after replacing the **<NAME_PREFIX>** placeholder value, to op
 NAME_PREFIX=<NAME_PREFIX> ;
 python3 -m webbrowser file://${PWD}/${NAME_PREFIX}-summary.html ;
 ----
+image::webbrowser.png[Open summary in browser,align="center"]
+
+This summary page provides:
+
+* All UI endpoint URLs (Cloudera Manager, FreeIPA, pgAdmin, Knox, etc.)
+* Hostnames and their assigned Ansible groups
+* Service status snapshots
+
 
 === What Next?
+
+image::e2e.png[Cloudera Manager UI,align="center"]
 
 After the stack is provisioned:
 

@@ -1,7 +1,7 @@
 # Fast-Track Your Single-Node Cloudera On-Premises Install
 angupta@cloudera.com
 v1.0, April 6, 2025:
-:imagesdir: .
+:imagesdir: ./images
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
