@@ -7,7 +7,18 @@ Cloudera | CDP PVC-OnPrem Deployment Guide
 :imagesdir: ./images
 :keywords: Cloudera, PVC, OnPremise, AWS, Automation
 
-This guide walks you through deploying the Cloudera On Premise on AWS infrastructure.
+This automation specifically targets AWS IaaS as the infrastructure for Cloudera Manager and its agents, constructing a 10-node cluster. This deployment is "ring-fenced"; the cluster is isolated from the outside and is only accessible via SSH and reverse HTTPS proxies.
+
+This automation currently sets up the following components:
+
+* Self-contained DNS, Kerberos, database, and TLS services
+* ACME-managed TLS termination on the reverse proxy
+* Cloudera Manager Server and Cloudera Manager agents installed and configured
+* Kerberos and Auto-TLS configuration for Cloudera Manager and its clusters
+* Ozone-enabled base cluster
+* CSA-enabled base cluster
+
+This guide walks you through deploying Cloudera On-Premise on AWS infrastructure, built on top of the GOES Team's Automation Framework (link:https://github.infra.cloudera.com/GOES/pvc-community-edition-aws[GOES PVC Automation Repository]).
 
 [NOTE]
 ====
@@ -36,10 +47,12 @@ Please validate your network access before proceeding.
 
 == Prerequisites
 
+All of the code dependencies are wrapped up in an execution environment, i.e. a container, so you just need to set up the prerequisite credentials and bootstrap the execution engine.
 Before you begin, ensure the following are installed and configured on your system:
 
 * ✅ **AWS CLI** installed and configured (via AWS SSO or static Access Key/Secret).
 * ✅ **Docker** installed and running.
+* ✅ An **Ansible** execution environment.
 * ✅ **License file** named `license.txt` present in the cloned automation directory.
 * ✅ **SSH private key** available at `~/.ssh/id_rsa`.
 * ✅ You are logged into AWS CLI (run `aws sso login` if using SSO, or `aws configure` for static credentials).
@@ -144,6 +157,7 @@ source ~/cdp-navigator/bin/activate ;
 ----
 
 === Install Required Python Packages
+Set up ansible-navigator (assuming a Python virtual environment).
 
 [source,sh]
 ----
@@ -218,6 +232,16 @@ owner_email:       <your-email@cloudera.com>
 ----
 
 === Deploy the CDP PVC Stack
+
+This example deployment runs several stages to construct the greenfield base cluster in AWS:
+
+**Infrastructure**: AWS networking and hosts using Terraform as the IaC engine
+
+**Services**: all the supporting services, such as networking, OS, Python, databases, and the proxy
+
+**Cloudera Manager Server** and **Cloudera Manager Agents**: a "foundational" deployment, ready for clusters  
+
+**Cluster or clusters**: in this example, an Ozone-powered base cluster
 
 * To deploy the infra till the Cloudera Manager server and Cloudera Management Services (infrastructure + services), run:
 
