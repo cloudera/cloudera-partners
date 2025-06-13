@@ -233,16 +233,6 @@ owner_email:       <your-email@cloudera.com>
 
 === Deploy the CDP PVC Stack
 
-This example deployment runs several stages to construct the greenfield base cluster in AWS:
-
-**Infrastructure**: AWS networking and hosts using Terraform as the IaC engine
-
-**Services**: all the supporting services, such as networking, OS, Python, databases, and the proxy
-
-**Cloudera Manager Server** and **Cloudera Manager Agents**: a "foundational" deployment, ready for clusters  
-
-**Cluster or clusters**: in this example, an Ozone-powered base cluster
-
 * To deploy the infra till the Cloudera Manager server and Cloudera Management Services (infrastructure + services), run:
 
 [source,sh]
@@ -352,7 +342,7 @@ After the stack is provisioned:
 * You can continue further configuration in **Cloudera Manager UI** i.e. add more clusters, services, configure LDAP etc.
 * Use **Knox Gateway** to interact with cluster endpoints securely
 * Access **pgAdmin**, **FreeIPA**, and other UIs to explore more capabilities
-* Add Data Services cluster and activate Cloudera Data Services i.e. Data Warehousing, Data Engineering or Cloudera AI as needed
+* Add **Data Services cluster** and activate Cloudera Data Services i.e. **Data Warehousing, Data Engineering** or **Cloudera AI** as needed
 
 This concludes the deployment. You're now ready to explore the automated installation of Cloudera OnPremise on AWS Infrastructure.
 
