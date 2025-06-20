@@ -1,0 +1,6 @@
+neo4j
+numpy
+scipy
+pandas
+pandasql
+

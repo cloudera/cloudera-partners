@@ -1,0 +1,196 @@
+= neo4j_kaggle_brazilian_ecommerce
+v0.1, 2025-04-10: Draft
+:description: Installation instructions for neo4j_database_setup
+:toc: left
+:toclevels: 2
+:sectnums:
+:source-highlighter: rouge
+:icons: font
+:imagesdir: ./images
+:hide-uri-scheme:
+:homepage: https://github.com/kentontroy/neo4j_kaggle_brazilian_ecommerce.git
+
+image::../images/neo4j.png[width=200]
+
+
+== Setup Neo4j
+Neo4j is a graph database management system that provides a powerful platform for storing and querying graph data. In this section, we will set up Neo4j to work with the Brazilian ECommerce dataset from Kaggle.
+
+=== Clone the repository
+To get started, clone the `neo4j_kaggle_brazilian_ecommerce` repository from GitHub. This repository contains the necessary scripts and configurations to set up Neo4j with the Brazilian ECommerce dataset.
+[source,bash]
+----
+# Clone the repository 
+git clone https://github.com/kentontroy/neo4j_kaggle_brazilian_ecommerce.git -b feat/filter-prods
+----
+
+=== Use Neo4j web console free tier account.(Recommended and tested)
+. Creating an AuraDB Free Instance in Neo4j AuraDB
++
+To create an AuraDB Free instance in Neo4j AuraDB, follow these steps:
+
+.. Navigate to the link:https://neo4j.com[Neo4j Aura Console] in your browser.
+.. Sign in with your Neo4j account credentials. If you don't have an account, you can create one for free.
+.. After sign in, Create *New Instance*.
+.. Copy and store the instance's **Username** and **Generated password**, or download the credentials as a `.txt` file.
+.. Tick the confirmation checkbox, and select *Continue*.
+
+[NOTE]
+====
+You can only create one AuraDB Free instance per account.
+====
+
+
+> Free Instance Limitations
+
+* Limited to *200,000 nodes* and *400,000 relationships*.
+* If you don't perform any write queries for three days, your instance is *paused*.
+* You can *resume* your paused instance from the console.
+* A paused instance is *deleted after 30 days*. After deletion, you *cannot restore or recover your data*.
+* Free instances are *not automatically backed up*.
+* Snapshots are taken *on-demand* and *only the latest snapshot* is available for download.
+
+For more information about snapshots, see link:https://neo4j.com/docs/aura/auradb/backup-export-restore[Backup, export and restore].
+
+Note: `The free tier is sufficient for the purposes of this lab, but if you want to use a larger dataset or require more resources, consider upgrading to a paid plan.`
+
+=== Optionally use docker to host Neo4J
+
+[NOTE] 
+====
+`Docker` and `Docker compose` needs to be preinstalled before executing this step.
+====
+
+[source,bash]
+----
+Initial image download and how to run:
+
+cd neo4j_kaggle_brazilian_ecommerce/docker
+mkdir graph_plugins
+mkdir graph_data
+docker-compose up -d
+docker exec -it docker-demo_neo4j-1 bash
+----
+
+== Create a python virtual environment (highly recommended)
+
+. Linux OS
++
+[source,bash]
+----
+# Step 1: Install required build dependencies (for pyenv to build Python)
+if command -v apt &> /dev/null; then
+  sudo apt update
+  sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
+    libffi-dev liblzma-dev python3-openssl git
+elif command -v yum &> /dev/null; then
+  sudo yum groupinstall -y "Development Tools"
+  sudo yum install -y gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel wget curl git
+elif command -v dnf &> /dev/null; then
+  sudo dnf groupinstall -y "Development Tools"
+  sudo dnf install -y gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel wget curl git
+fi
+
+# Step 2: Install pyenv and plugins
+sudo curl https://pyenv.run | bash
+
+# Step 3: Add pyenv init to shell startup script
+cat << 'EOF' >> ~/.bashrc
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+EOF
+
+# Apply changes
+source ~/.bashrc
+
+# Step 4: Restart shell 
+exec "$SHELL"
+
+# Step 5: Install Python 3.11.9 via pyenv
+pyenv install 3.11.9
+
+# Step 6: Create virtualenv
+pyenv virtualenv 3.11.9 venv
+----
+
+. Mac OS
++
+[source,bash]
+----
+# 1. Upgrade pip
+python3 -m pip install --upgrade pip
+
+# 2. Install pyenv and pyenv-virtualenv via Homebrew
+# If you don't have Homebrew installed, run this first:
+# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew update
+brew install pyenv pyenv-virtualenv
+# 3. Configure your shell (for zsh, which is default on modern macOS)
+# This appends the pyenv setup lines to your .zshrc file
+cat << 'EOF' >> ~/.zshrc
+# pyenv setup
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+EOF
+
+# 4. Apply shell changes (important! or just close/reopen terminal)
+source ~/.zshrc
+
+# 5. Install Python 3.11.9 using pyenv
+pyenv install 3.11.9
+
+# 6. Create the virtual environment named 'venv'
+pyenv virtualenv 3.11.9 venv
+----
+
+== Prepare the environment
+[source,bash]
+----
+cd neo4j_kaggle_brazilian_ecommerce/src/python
+pyenv activate venv
+pip install --upgrade pip
+pip install -r ../../requirements.txt
+
+----
+
+. Next update the `Neo4j` settings in the `.env `file to point to your `neo4j instance`.
+
+image::../images/UpdateEnv.png[neo4j_env, width=600, align="center"]
+
+== Load data into the Neo4j graph
+[source,bash]
+----
+Create a random sample of customers (in this case, 50)
+python3 randomly_sample_customers.py --sample-size 50
+
+Filter the data sets to only load Order data specific to the customers sampled
+python3 filter_by_customer.py
+
+Load the data set nodes (i.e. vertices)
+python3 load_customer_nodes.py
+python3 load_order_nodes.py
+python3 load_order_item_nodes.py
+python3 load_product_nodes.py
+python3 load_tier_nodes.py
+
+Create the relationships (i.e. edges)
+python3 create_customer_order_edges.py
+python3 create_order_product_edges.py
+
+Finally, load the rewards calculations
+python3 load_lifetime_rewards_node.py
+----
+
+Experiment with Cypher queries
+[source,bash]
+----
+python3 query_wrapper.py
+----
+
+image::../images/neo4j_database_example.png[neo4j_database_example]

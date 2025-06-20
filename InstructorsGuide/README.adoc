@@ -1,0 +1,158 @@
+= RAG-based AI Agents with Cloudera AI
+:description: Hands On Lab Setup Instructions for AI Agents with Cloudera AI
+:toc: left
+:toclevels: 2
+:sectnums:
+:source-highlighter: rouge
+:icons: font
+:imagesdir: ./images
+:hide-uri-scheme:
+:homepage: https://github.com/cloudera/cloudera-partners
+
+== Overview
+The goal of this hands-on-lab is to explore Cloudera AI through the lens of the Agentic [Retreival Augmented Generation](https://arxiv.org/abs/2312.10997) (RAG) architecture approach. Starting from a simple Jupyter notebook and finishing with a complete chatbot application, participants will get to know some of the key Cloudera AI features and advantages. In a real-world scenario, changing business requirements and technology advancements requires agility and Cloudera AI is a great tool to enable Data Science practitioners to build use cases quickly.
+
+Because the applications of LLMs can be quite broad across industries, we will hone in on a particular use case for the purposes of this lab.
+
+> **Lab use case:** An ECommerce vendor is looking to pilot a LLM based chat to answer customer questions related to company policies and promotions. 
+
+== Requirements
+**Below are the key components required for the lab:**
+
+. Infrastructure Requirements:
+.. Cloudera on Cloud Environment (Setup has only been tested with AWS)
+.. Cloudera AI
+.. Cloudera AI Registry
+.. Cloudera AI Inference Service
+.. Deploy a Model endpoint 
+
+. Third Party Tools Setup and Integration:
+.. AWS Bedrock with Anthropic Claude 3 Sonnet
+.. Pinecone Vector Database
+.. Neo4j Graph Database
+.. Crew AI
+.. Serper API (Google Search API)
+
+== Setup Cloudera Infrastructure
+=== Setup Cloudera on Cloud Environment with Cloudera AI(CML) data service
+Follow this link:https://github.com/cloudera/cloudera-partners/tree/eb3702ea951f75ccf0866f8ee6d9d478d1306eb7/ClouderaSetup/OnCloud/AWS[Guide] to deploy a Cloudera on Cloud environment with Cloudera AI(CML) data service.
+
+=== Create Cloudera AI Registry
+Follow this link:https://docs.cloudera.com/machine-learning/cloud/setup-model-registry/topics/ml-creating-model-registry-cdp.html[official documentation] to manually crate `AI Registry` in the `environment`. 
+
+=== Deploy Cloudera AI Inference Service (CAII)
+Here's a link:https://cloudera.atlassian.net/wiki/spaces/SE/pages/10920394909/How+to+enable+Cloudera+AI+Inference+Service+CAII+on+Sandbox+and+Workshop+tenants[quick guide] to set up the `Cloudera AI Inference Service`. We'll start this instructor guide with the steps to deploy a model endpoint and then the 3rd party tools setup and integration.`
+
+* CAII link:./assets/EnableClouderaAIInferenceService(CAII)OnCDPEnvironments.pdf[PDF Setup Guide] if Link isn't accessible
+
+Note: `Soon, we'll be adding an automation framework to deploy the required infrastructure for this lab.`
+
+=== Deploy a Model Endpoint
+
+You can create an endpoint from a `model` imported from the `Model Hub` or from a model created in the CAI Workbench. The below is an example deployment of the `Llama 3.1 Instruct-8b` model imported from the `Model Hub`.
+
+. Go to the Cloudera AI Workbench and click `Model Hub` -> Look for `Llama 3.1 Instruct-8b` model and Fill the details as below ->Check the `license & agreement` box -> click `Import`.
+.. Select AI Registry: `Select deployed registry name`
+.. Select Model Size: `Llama 3.1 8B Instruct`
+.. Select Optimization: `Llama 3.1 8B Instruct A10Gx2 FP16 Throughput`
+.. Select Model: `llama-3.1-8b-instruct-A10GBF16`
++
+image::../assets/ImportModel2.png[Import Model, width=600, align="center"]
++
+image::../assets/ImportModel.png[Import Model, width=600, align="center"]
+
+. Go to the Cloudera AI Workbench and click `Model Endpoint` -> Click `Create Endpoint`.
++
+image::../assets/ModelEndpoint3.png[Deploy Model Endpoint, width=600, align="center"]
+
+
+. `Select Environment & Inference Service` -> Provide a name to the `model` -> Select `model` you want to deploy. In this case, we will select the imported `Llama 3.1 Instruct-8b` model.
++
+image::../assets/ModelEndpoint1.png[Deploy Model Endpoint, width=600, align="center"]
+
+. Provide the Resource profile details as below and Click `Create Endpoint`.
+.. Instance Type: `g5.12xlarge`
+.. GPU: `2`
+.. CPU: `10`
+.. Memory: `24 GB`
+.. Endpoint Autoscale Range: `1` - `2`
++
+image::../assets/ModelEndpoint2.png[Deploy Model Endpoint, width=600, align="center"]
++
+Note: `The above resource profile is just an example. You can choose the resource profile based on your requirements and the model you are deploying. Always keep the lower Autoscale range to **0** if you want to save costs when the model is not in use.`
+
+. Once the endpoint is created, you can see the endpoint details and the status of the model deployment. It may take a few minutes for the model to be deployed and become available.
++
+image::../assets/ModelEndpoint4.png[Deploy Model Endpoint, width=600, align="center"]
+
+== Setup Third Party Tools
+=== Setup Amazon Bedrock
+Follow this link:./ai-agents-hol-setup/1_bedrock_setup/README.adoc[bedrock_setup] guide to set up Amazon Bedrock with Anthropic Claude 3 Sonnet.
+
+=== Setup Pinecone Vector Database
+Follow this link:./ai-agents-hol-setup/2_pinecone_setup/README.adoc[pinecone_setup] guide to set up Pinecone Vector Database.
+
+=== Setup Neo4j Graph Database
+Follow this link:./ai-agents-hol-setup/3_neo4j_setup//README.adoc[neo4j_setup] guide to set up Neo4j Graph Database.
+
+
+=== Setup Crew AI
+Crew AI does not require any setup and will be installed as a Jupyter notebook package along with the other packages for each project using the `requirements.txt` file.
+
+=== Setup Serper API
+. Go to the Serper link:https://serper.dev/[website] and sign up for a free account
+. You will be granted up to 2,500 credits (as of 3/3/25). Then go to the API Key page and copy the API key provided.
+
+Note: `The quantity of credits is generally sufficient for 10 workshops, assuming around 100 users per workshop
+Enter the API Key as an environment variable in Cloudera AI.`
+
+image::../assets/Serper.png[Serper API Key, width=600, align="center"]
+
+=== Set Environment Variables in the Site Administration
+To set the environment variables required for the lab, you will need to access the `Site Administration` section in `Cloudera AI` and add the following variables. These variables will be used in the Jupyter notebooks to connect to various services like `AWS Bedrock`, `Pinecone`, `Neo4j`, and `Serper`.
+
+[.shell]
+----
+# AWS Bedrock
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_DEFAULT_REGION # Must be the region where the Bedrock models for Modules 1 and 4 are available
+AWS_BEDROCK_MODEL # This is the model you plan to use for Modules 2 and 4
+
+# Note: You can alternatively use a model deployed via the AI Inference Service, but you will need to handle the code changes required
+
+PINECONE_API_KEY # API Key to interract with Pinecone
+PINECONE_INDEX # Index where the policy document embeddings will be stored
+
+# Neo4j Setup
+NEO4J_ENDPOINT # Endpoint provided by Neo4j Aura (or other form factor)
+NEO4J_USERNAME # Neo4j Username
+NEO4J_PASSWORD # Neo4j Password
+
+# Cloudera AI Inference Service Setup
+OPENAI_BASE_URL # Enter the Model Endpoint Base URL provided, but remove the "/chat/completions" suffix.
+OPENAI_MODEL_ID # This is the *model id* you plan to use for Modules 2 and 4, e.g., "llama-3.1-8b-instruct-A10GBF16"
+
+# Serper Setup
+SERPER_API_KEY # Obtain from the Serper website
+----
+
+> Below is how you can Fetch `OPENAI_BASE_URL` and `OPENAI_MODEL_ID`.
+
+* Go to the Cloudera AI Workbench and click `Model Endpoints` -> Click on your deployed `Model Endpoint`.
+
+image::../assets/endpoint_details.png[endpoint_details, width=600, align="center"]
+
+. Click the `AI Workbenches` and click your `workbench name`.
++
+image::../assets/EnvVariables1.png[EnvVariables1.png, width=600, align="center"]
+
+. Click `Site Administration` -> Click `Runtimes`.
++
+image::../assets/EnvVariables2.png[EnvVariables2.png, width=600, align="center"]
+
+. Under Runtimes scroll down to the `Environment variables` section to add below Variables.
++
+image::../assets/EnvVariables3.png[EnvVariables3.png, width=600, align="center"]
+
+Note: `We’re done here with the setup guide. We can now proceed with hands-on lab link:../README.md[instructions].`

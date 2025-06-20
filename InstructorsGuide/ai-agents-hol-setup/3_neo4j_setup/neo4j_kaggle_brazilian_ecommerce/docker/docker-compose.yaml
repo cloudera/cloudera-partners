@@ -1,0 +1,20 @@
+services:
+  demo_neo4j:
+    image: neo4j
+    ports:
+    - "7687:7687"
+    - "7474:7474"
+    environment:
+      - NEO4J_AUTH=neo4j/cloudera
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    volumes:
+      - ./graph_data:/data
+      - ./graph_plugins:/var/lib/neo4j/plugins
+  demo_jupyter:
+    build:
+      context: .
+      dockerfile: jupyter.Dockerfile
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/home/jovyan/work

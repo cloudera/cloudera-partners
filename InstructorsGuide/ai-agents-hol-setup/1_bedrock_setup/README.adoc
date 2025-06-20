@@ -1,0 +1,83 @@
+= Amazon Bedrock Setup
+:description: Hands On Lab Setup Instructions for AI Agents with Cloudera AI
+:toc: left
+:toclevels: 2
+:sectnums:
+:source-highlighter: rouge
+:icons: font
+:imagesdir: ./images
+:hide-uri-scheme:
+:homepage: https://github.com/cloudera/cloudera-partners
+
+== Enable Model Access
+Go to Amazon Bedrock in the region your environment is deployed. See what models are available. Check out the Cross-region Inference tab to see if your org already has access to some models. If you need to, go request access to a model.
+
+image::../../img/bedrock-models.png[width=600]
+
+Note: `Copy the *Inference profile ID* for the model you want to use. We'll need this to setup environment variables in Cloudera AI Workbench later.`
+
+== Create an IAM Role with Bedrock Permissions
+. Go to AWS IAM and create a new IAM role. You can name it whatever you want. Make sure to attach the following IAM policy to it:
++
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BedrockAll",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "DescribeKey",
+            "Effect": "Allow",
+            "Action": [
+                "kms:DescribeKey"
+            ],
+            "Resource": "arn:*:kms:*:::*"
+        },
+        {
+            "Sid": "APIsWithAllResourceAccess",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListRoles",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "PassRoleToBedrock",
+            "Effect": "Allow",
+            "Action": [
+                "iam:PassRole"
+            ],
+            "Resource": "arn:aws:iam::*:role/*AmazonBedrock*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": [
+                        "bedrock.amazonaws.com"
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
+
+. From the UI, make sure to obtain an Access Key and Secret Key.
++
+image::../../img/iam-role.png[width=600]
++
+Note: `There are approaches where you can instead attach a role to your Liftie cluster. That is out of scope for this document.`
+
+> We'll keep the below information handy to set up environment variables in Cloudera AI Workbench later.
+
+	*	AWS_ACCESS_KEY_ID: someAccessKeyId
+	*	AWS_SECRET_ACCESS_KEY: sameSecretAccessKey
+	*	AWS_BEDROCK_MODEL: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+	*	AWS_DEFAULT_REGION: us-east-1(Where the model is available)

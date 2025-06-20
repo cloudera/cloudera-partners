@@ -1,0 +1,116 @@
+= Pinecone Setup
+v0.1, 2025-04-10: Draft
+:description: Installation instructions for Pinecone Setup
+:toc: left
+:toclevels: 2
+:sectnums:
+:source-highlighter: rouge
+:icons: font
+:imagesdir: ./images
+:hide-uri-scheme:
+:homepage: https://github.com/cloudera/cloudera-partners.git
+
+
+== Setting up Pinecone (Free Tier)
+
+. Sign Up: Go to https://www.pinecone.io/ and sign up for the Starter (Free) plan. You'll get the api key after successful signup.
+. Generate a new API Key in case you don't have one already.
+* Log in to the Pinecone console.
+* Navigate to "API Keys" (left sidebar).
+* Click `Create API Key`
+* Give it a name -> Click `Create key` 
+* Crucially, save your API key securely; it's shown only once.
+
+image::../../img/pinecone-api-key.png[pinecone_api_key.png, width=600, align="center"]
+
+== Set Pinecone Env Variables in Cloudera AI
+
+. Click the `AI Workbenches` and click your `workbench name`.
++
+image::../../../assets/EnvVariables1.png[EnvVariables1.png, width=600, align="center"]
+
+. Click `Site Administration` -> Click `Runtimes`.
++
+image::../../../assets/EnvVariables2.png[EnvVariables2.png, width=600, align="center"]
+
+. Under Runtimes scroll down to the `Environment variables` section to add Variables.
++
+image::../../../assets/EnvVariables3.png[EnvVariables3.png, width=600, align="center"]
+
+. Within Cloudera AI, make sure to set the following environment variables:
++
+[source, bash]
+----
+PINECONE_API_KEY # API Key you obtained
+PINECONE_INDEX # Choose a name for a Pinecone Index you want to set
+----
+
+== Launch a new project `ai-agents-lab-setup`
+Login into CDP using the URL above and the credentials assigned to you. After logging into CDP you will have access to the main console and then click on Machine Learning tile. 
+
+. Click on Workspace to proceed to executing the hands-on labs.
++
+image::../../../assets/EnvVariables1.png[EnvVariables1.png, width=600, align="center"]
+
+. Click on `Create Project` to create a new project.
++
+image::../../img/New_project.png[New_project.png, width=600, align="center"]
+
+. Enter the following details in the New Project Page
++
+[width="100%",cols="26%,74%",]
+|===
+|*Project Name* |ai-agents-lab-setup
+|*Project Visibility* |Private
+|*Initial Setup* |Select “Git”
+|*Protocol* |HTTPS
+|*Git URL of Project* |link:https://github.com/cloudera/cloudera-partners.git[https://github.com/cloudera/cloudera-partners.git]
+|*Enter Branch Name(Optional)* |feature/ai-agents-hol-cai
+|===
+
+image::../../img/CreateProject.png[CreateProject.png, width=600, align="center"]
+
+== Launch a new session for `prerequisites`
+To create a new session you can go into your project and click on `New Session`
+
+. Start a “*NEW SESSION*” and use the below configuration.
++
+[width="100%",cols="21%,79%",]
+|===
+|*Session Name* |prerequisites
+|*Runtime Editor* |Workbench
+|*Enable Spark* |No  
+|*Resource Profile* |2 vCPU / 4 GiB
+|===
++
+Click on *[.underline]#START SESSION#*
++
+image::../../img/New_session_prerequisites.png[New_session_prerequisites.png.png, width=600, align="center"]
+
+. Run the `download_req.py` script.
++
+Click `0_install_prerequisites` folder -> then `download_req.py` -> Select `All content` and hit the `play` button to run the script.
++
+image::../../img/Prereqs.png[Prereqs.png, width=600, align="center"]
+
+== Launch a new session for `embedding creation` on Vector Db
+. Start a “*NEW SESSION*” and use the below configuration.
++
+[width="100%",cols="21%,79%",]
+|===
+|*Session Name* |embedding_creation
+|*Runtime Editor* |Workbench
+|*Enable Spark* |No 
+|*Resource Profile* |2 vCPU / 4 GiB  
+|===
+Click on *[.underline]#START SESSION#*
++
+image::../../img/embedding_creation.png[embedding_creation.png, width=600, align="center"]
+
+. Run the `create_pinecone_embed.py` script.
++
+Click `2_query_vector_db` folder -> then `create_pinecone_embed.py` -> Select `All content` and hit the `play` button to run the script.
++
+image::../../img/Create_embeddings.png[Create_embeddings.png, width=600, align="center"]
+
+Note: `This script will create the embeddings for the policy documents and store them in the Pinecone Vector Database.`
