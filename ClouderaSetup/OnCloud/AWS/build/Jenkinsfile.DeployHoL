@@ -405,6 +405,7 @@ HOSTEDZONEID:${params.HOSTEDZONEID}
                         --resource-role-crn "$role_crn" \
                         --resource-crn "$CDP_ENV_CRN" 2>&1)
                     exit_status=$?
+		    echo "check_output"
 
                     if [ $exit_status -eq 0 ]; then
                         echo "✅ Role '$role_name' assigned successfully."
