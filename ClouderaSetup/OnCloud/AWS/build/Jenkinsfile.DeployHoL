@@ -408,11 +408,10 @@ HOSTEDZONEID:${params.HOSTEDZONEID}
 
                     if [ $exit_status -eq 0 ]; then
                         echo "✅ Role '$role_name' assigned successfully."
-                    elif [[ "$output" == *"Error Code: ALREADY_EXISTS"* ]]; then
+                    elif [[ echo "$output" | tr -d '\n' | grep -iq "ALREADY_EXISTS"; then
                         echo "ℹ️  Role '$role_name' is already assigned. Skipping..."
                     else
                         echo "❌ Error assigning role '$role_name':"
-                        echo "$output"
                     fi
                     done
                     
