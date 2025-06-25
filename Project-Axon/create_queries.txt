@@ -1,0 +1,416 @@
+-- ==========================================================
+-- Database: NPS
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS nps_data;
+USE nps_data;
+
+DROP TABLE IF EXISTS nps_responses;
+
+CREATE EXTERNAL TABLE nps_responses (
+  Comment STRING,
+  CustomerID STRING,
+  ResponseID STRING,
+  SatisfactionLevel STRING,
+  Score INT,
+  SurveyChannel STRING,
+  SurveyDate STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/nps-responses';
+
+-- ==========================================================
+-- Database: campaign_details
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS campaign_details;
+USE campaign_details;
+
+DROP TABLE IF EXISTS campaign_details;
+
+CREATE EXTERNAL TABLE campaign_details (
+  Budget DOUBLE,
+  CampaignID INT,
+  CampaignName STRING,
+  Channel STRING,
+  EndDate STRING,
+  SeasonID INT,
+  StartDate STRING,
+  Status STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/campaign-details';
+
+DROP TABLE IF EXISTS campaign_performance;
+
+CREATE EXTERNAL TABLE campaign_performance (
+  AverageScore DOUBLE,
+  CampaignID INT,
+  ClickThroughRate DOUBLE,
+  ConversionRate DOUBLE,
+  PerformanceID STRING,
+  RevenueGenerated DOUBLE,
+  SalesVolume INT,
+  TotalResponses INT
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/campaign-performance';
+
+DROP TABLE IF EXISTS sales_seasonality;
+
+CREATE EXTERNAL TABLE sales_seasonality (
+  CustomerRetentionRate DOUBLE,
+  RevenueGenerated DOUBLE,
+  SalesVolume INT,
+  SeasonID INT,
+  SeasonName STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/sales-seasonality';
+
+DROP TABLE IF EXISTS customer_campaign;
+
+CREATE EXTERNAL TABLE customer_campaign (
+  campaign_id INT,
+  customer_campaign_id INT,
+  customer_id INT,
+  enrolled_at STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/customer-campaign';
+
+-- ==========================================================
+-- Database: callcenter_data
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS callcenter_data;
+USE callcenter_data;
+
+DROP TABLE IF EXISTS callcenter_interaction;
+
+CREATE EXTERNAL TABLE callcenter_interaction (
+  AgentID INT,
+  CallType STRING,
+  CustomerID INT,
+  Duration INT,
+  InteractionDate STRING,
+  InteractionID INT,
+  InteractionTime STRING,
+  IssueResolved STRING,
+  SatisfactionRating INT
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/callcenter';
+
+-- ==========================================================
+-- Database: FRS
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS frsdatabase;
+USE frsdatabase;
+
+DROP TABLE IF EXISTS revenue_data;
+
+CREATE EXTERNAL TABLE revenue_data (
+  Amount DOUBLE,
+  BranchID INT,
+  Description STRING,
+  Record_Date STRING,
+  RevenueID BIGINT,
+  RevenueType STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/FRS-data/revenue';
+
+DROP TABLE IF EXISTS expense_data;
+
+CREATE EXTERNAL TABLE expense_data (
+  Amount DOUBLE,
+  BranchID INT,
+  Description STRING,
+  ExpenseID INT,
+  ExpenseType STRING,
+  Record_Date STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/FRS-data/expense';
+
+DROP TABLE IF EXISTS pnl_data;
+
+CREATE EXTERNAL TABLE pnl_data (
+  BranchID INT,
+  NetProfitLoss DOUBLE,
+  PnLID BIGINT,
+  ProfitMargin DOUBLE,
+  Record_Date STRING,
+  TotalExpense DOUBLE,
+  TotalRevenue DOUBLE
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/FRS-data/profitnloss';
+
+DROP TABLE IF EXISTS cashflow_data;
+
+CREATE EXTERNAL TABLE cashflow_data (
+  BranchID INT,
+  CashFlowID BIGINT,
+  CashInflow DOUBLE,
+  CashOutflow DOUBLE,
+  FinancingCashFlow DOUBLE,
+  InvestingCashFlow DOUBLE,
+  NetCashFlow DOUBLE,
+  OperatingCashFlow DOUBLE,
+  Record_Date STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/FRS-data/cashflow';
+
+-- ==========================================================
+-- Database: CBS
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS core_banking_db;
+USE core_banking_db;
+
+DROP TABLE IF EXISTS customer;
+
+CREATE EXTERNAL TABLE customer (
+  address STRING COMMENT 'Customer address.',
+  city STRING COMMENT 'City of residence.',
+  country STRING COMMENT 'Country.',
+  created_at STRING COMMENT 'Creation timestamp (string format).',
+  customer_id INT COMMENT 'Customer ID.',
+  customer_status STRING COMMENT 'Customer status.',
+  customer_type STRING COMMENT 'Customer type.',
+  dob STRING COMMENT 'Date of birth (YYYY-MM-DD as string).',
+  email STRING COMMENT 'Email address.',
+  first_name STRING COMMENT 'First name.',
+  gender STRING COMMENT 'Gender.',
+  kyc_status STRING COMMENT 'KYC verification status.',
+  last_name STRING COMMENT 'Last name.',
+  phone STRING COMMENT 'Phone number.',
+  postal_code STRING COMMENT 'Postal code.',
+  relationship_manager_id INT COMMENT 'ID of assigned relationship manager.',
+  source STRING COMMENT 'Source of onboarding.',
+  state STRING COMMENT 'State.',
+  updated_at STRING COMMENT 'Last update timestamp (string format).'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/CBS/customer';
+
+DROP TABLE IF EXISTS account;
+
+CREATE EXTERNAL TABLE account (
+    account_id INT COMMENT 'Account ID',
+    account_number INT COMMENT 'Account Number',
+    account_status STRING COMMENT 'Account Status',
+    account_type STRING COMMENT 'Account Type',
+    balance DOUBLE COMMENT 'Balance',
+    branch_id INT COMMENT 'Branch ID',
+    created_at STRING COMMENT 'Created At',
+    currency_type STRING COMMENT 'Currency Type',
+    customer_id INT COMMENT 'Customer ID',
+    interest_rate DOUBLE COMMENT 'Interest Rate',
+    last_transaction_date STRING COMMENT 'Last Transaction Date'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/CBS/account';
+
+DROP TABLE IF EXISTS transaction;
+
+CREATE EXTERNAL TABLE transaction (
+    account_number INT COMMENT 'Account Number',
+    amount DOUBLE COMMENT 'Transaction Amount',
+    branch_id INT COMMENT 'Branch ID',
+    currency_type STRING COMMENT 'Currency Type',
+    description STRING COMMENT 'Transaction Description',
+    transaction_date STRING COMMENT 'Transaction Date',
+    transaction_due_date STRING COMMENT 'Transaction Due Date',
+    transaction_id INT COMMENT 'Transaction ID',
+    transaction_mode STRING COMMENT 'Transaction Mode',
+    transaction_reference_id STRING COMMENT 'Reference ID',
+    transaction_status STRING COMMENT 'Transaction Status',
+    transaction_type STRING COMMENT 'Transaction Type'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/CBS/transaction';
+
+DROP TABLE IF EXISTS feedback;
+
+CREATE EXTERNAL TABLE feedback (
+    branch_id INT COMMENT 'Branch ID',
+    customer_id INT COMMENT 'Customer ID',
+    feedback_comment STRING COMMENT 'Feedback Comment',
+    feedback_date STRING COMMENT 'Feedback Date',
+    feedback_id INT COMMENT 'Feedback ID',
+    feedback_rating INT COMMENT 'Feedback Rating',
+    feedback_status STRING COMMENT 'Feedback Status',
+    feedback_type STRING COMMENT 'Feedback Type'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/CBS/feedback';
+
+-- ==========================================================
+-- Database: HRMS
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS hrms;
+USE hrms;
+
+DROP TABLE IF EXISTS hrms_employee;
+
+CREATE EXTERNAL TABLE hrms_employee (
+    branch_id INT COMMENT 'Branch ID',
+    created_at STRING COMMENT 'Created At (Stored as STRING for Hive compatibility)',
+    department STRING COMMENT 'Department',
+    email STRING COMMENT 'Email',
+    employee_id INT COMMENT 'Employee ID',
+    employee_status STRING COMMENT 'Status',
+    first_name STRING COMMENT 'First Name',
+    hire_date STRING COMMENT 'Hire Date (Stored as STRING for Hive compatibility)',
+    last_name STRING COMMENT 'Last Name',
+    phone STRING COMMENT 'Phone',
+    position STRING COMMENT 'Position',
+    salary DOUBLE COMMENT 'Salary',
+    updated_at STRING COMMENT 'Updated At (Stored as STRING for Hive compatibility)'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/HRMS/employee';
+
+DROP TABLE IF EXISTS hrms_attendance;
+
+CREATE EXTERNAL TABLE hrms_attendance (
+    attendance_date STRING COMMENT 'Attendance Date (Stored as STRING for Hive compatibility)',
+    attendance_id INT COMMENT 'Attendance ID',
+    attendance_status STRING COMMENT 'Status',
+    created_at STRING COMMENT 'Created At (Stored as STRING for Hive compatibility)',
+    employee_id INT COMMENT 'Employee ID'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/HRMS/attendance';
+
+DROP TABLE IF EXISTS hrms_performance;
+
+CREATE EXTERNAL TABLE hrms_performance (
+    comments STRING COMMENT 'Feedback comments',
+    created_at STRING COMMENT 'Created At (Stored as STRING for Hive compatibility)',
+    employee_id INT COMMENT 'Employee ID',
+    performance_id INT COMMENT 'Performance ID',
+    performance_rating INT COMMENT 'Performance Rating',
+    review_date STRING COMMENT 'Review Period (Stored as STRING for Hive compatibility)'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/HRMS/performance';
+
+DROP TABLE IF EXISTS hrms_time_tracking;
+
+CREATE EXTERNAL TABLE hrms_time_tracking (
+    created_at STRING COMMENT 'Created At (Stored as STRING for Hive compatibility)',
+    employee_id INT COMMENT 'Employee ID',
+    hours_worked DOUBLE COMMENT 'Hours Worked',
+    overtime_hours DOUBLE COMMENT 'Overtime Hours',
+    time_tracking_id INT COMMENT 'Time Tracking ID',
+    tracking_date STRING COMMENT 'Tracking Date (Stored as STRING for Hive compatibility)',
+    time_tracking_status STRING COMMENT 'Status'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/HRMS/timetracking';
+
+-- ==========================================================
+-- Database: branch_management_db
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS branch_management_db;
+USE branch_management_db;
+
+DROP TABLE IF EXISTS branches;
+
+CREATE EXTERNAL TABLE branches (
+    branch_id INT COMMENT 'Unique ID for the branch.',
+    branch_name STRING COMMENT 'Name of the branch.',
+    established_date STRING COMMENT 'Date the branch was established.',
+    ifsc_code STRING COMMENT 'IFSC code of the branch.',
+    location STRING COMMENT 'Branch location.',
+    manager_id STRING COMMENT 'ID of the branch manager.',
+    region STRING COMMENT 'Region to which the branch belongs.'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/BMS/branches';
+
+DROP TABLE IF EXISTS inventory;
+
+CREATE EXTERNAL TABLE inventory (
+    branch_id INT COMMENT 'Branch reference.',
+    inventory_id STRING COMMENT 'Inventory item ID (UUID).',
+    product_id STRING COMMENT 'Product ID as UUID.',
+    product_name STRING COMMENT 'Product name.',
+    status STRING COMMENT 'Status (Available/SoldOut).',
+    stock_quantity INT COMMENT 'Stock quantity.',
+    stock_value DOUBLE COMMENT 'Calculated stock value.',
+    unit_price DOUBLE COMMENT 'Unit price.'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/BMS/inventory';
+
+DROP TABLE IF EXISTS assets;
+
+CREATE EXTERNAL TABLE assets (
+    asset_id STRING COMMENT 'Asset ID (UUID).',
+    asset_type STRING COMMENT 'ATM, Vehicle, Software, etc.',
+    location STRING COMMENT 'Asset location.',
+    purchase_date STRING COMMENT 'Purchase date (STRING format).',
+    status STRING COMMENT 'Active/Inactive.'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/BMS/assets';
+
+DROP TABLE IF EXISTS daily_operations;
+
+CREATE EXTERNAL TABLE daily_operations (
+    branch_id INT COMMENT 'Unique ID of the branch.',
+    customers_served INT COMMENT 'Number of customers served.',
+    operation_date STRING COMMENT 'Date of the operation (STRING format).',
+    operation_id STRING COMMENT 'Unique ID of the operation.',
+    operational_cost DOUBLE COMMENT 'Cost incurred in operations.',
+    staff_count INT COMMENT 'Number of staff involved.',
+    transactions_processed INT COMMENT 'Number of transactions processed.'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/BMS/operations';
+
+-- ==========================================================
+-- Database: task_management_db
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS task_management_db;
+USE task_management_db;
+
+DROP TABLE IF EXISTS tasks;
+
+CREATE EXTERNAL TABLE tasks (
+    assigned_to INT COMMENT 'Employee reference.',
+    branch_id INT COMMENT 'Branch reference.',
+    created_at STRING COMMENT 'Created timestamp.',
+    due_date STRING COMMENT 'Due date (STRING format).',
+    priority STRING COMMENT 'Low / Medium / High / Critical.',
+    project_id INT COMMENT 'Project reference.',
+    status STRING COMMENT 'To Do / In Progress / Done.',
+    task_id INT COMMENT 'Task ID.',
+    task_name STRING COMMENT 'Task name.',
+    updated_at STRING COMMENT 'Updated timestamp.'
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/TMS/tasks';
+
+-- ==========================================================
+-- Database: footfalldb
+-- ==========================================================
+CREATE DATABASE IF NOT EXISTS footfalldb;
+USE footfalldb;
+
+DROP TABLE IF EXISTS footfallsummaryy;
+
+CREATE EXTERNAL TABLE footfallsummaryy (
+  SummaryID INT,
+  BranchID INT,
+  Record_Date STRING,
+  TotalFootfall INT,
+  TotalExit INT,
+  NetFootfall INT,
+  PeakHour STRING,
+  OffPeakHour STRING
+)
+STORED AS PARQUET
+LOCATION 'hdfs:///Axon-Files/FRS/summary/';

@@ -1,0 +1,21 @@
+{
+  "address": "1412 Tracy Dam\nKevinfort, IL 69757",
+  "city": "South Kevinton",
+  "country": "Saint Barthelemy",
+  "created_at": "2022-04-12",
+  "customer_id": 42905,
+  "customer_type": "Individual",
+  "dob": "1927-06-10",
+  "email": "omarcarlson@example.org",
+  "first_name": "Katie",
+  "gender": "Male",
+  "kyc_status": "Verified",
+  "last_name": "Burton",
+  "phone": "539.255.4662x6986",
+  "postal_code": "17695",
+  "relationship_manager_id": 494,
+  "source": "Campaign",
+  "state": "Rhode Island",
+  "status": "Prospect",
+  "updated_at": "2025-01-20"
+}

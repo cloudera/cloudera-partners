@@ -1,0 +1,48 @@
+-- Combine all COUNT(*) queries into one result set
+SELECT 'nps_data.nps_responses' AS table_name, COUNT(*) AS row_count FROM nps_data.nps_responses
+UNION ALL
+SELECT 'campaign_details.campaign_details', COUNT(*) FROM campaign_details.campaign_details
+UNION ALL
+SELECT 'campaign_details.campaign_performance', COUNT(*) FROM campaign_details.campaign_performance
+UNION ALL
+SELECT 'campaign_details.sales_seasonality', COUNT(*) FROM campaign_details.sales_seasonality
+UNION ALL
+SELECT 'campaign_details.customer_campaign', COUNT(*) FROM campaign_details.customer_campaign
+UNION ALL
+SELECT 'callcenter_data.callcenter_interaction', COUNT(*) FROM callcenter_data.callcenter_interaction
+UNION ALL
+SELECT 'frsdatabase.revenue_data', COUNT(*) FROM frsdatabase.revenue_data
+UNION ALL
+SELECT 'frsdatabase.expense_data', COUNT(*) FROM frsdatabase.expense_data
+UNION ALL
+SELECT 'frsdatabase.pnl_data', COUNT(*) FROM frsdatabase.pnl_data
+UNION ALL
+SELECT 'frsdatabase.cashflow_data', COUNT(*) FROM frsdatabase.cashflow_data
+UNION ALL
+SELECT 'core_banking_db.customer', COUNT(*) FROM core_banking_db.customer
+UNION ALL
+SELECT 'core_banking_db.account', COUNT(*) FROM core_banking_db.account
+UNION ALL
+SELECT 'core_banking_db.transaction', COUNT(*) FROM core_banking_db.transaction
+UNION ALL
+SELECT 'core_banking_db.feedback', COUNT(*) FROM core_banking_db.feedback
+UNION ALL
+SELECT 'hrms.hrms_employee', COUNT(*) FROM hrms.hrms_employee
+UNION ALL
+SELECT 'hrms.hrms_attendance', COUNT(*) FROM hrms.hrms_attendance
+UNION ALL
+SELECT 'hrms.hrms_performance', COUNT(*) FROM hrms.hrms_performance
+UNION ALL
+SELECT 'hrms.hrms_time_tracking', COUNT(*) FROM hrms.hrms_time_tracking
+UNION ALL
+SELECT 'branch_management_db.branches', COUNT(*) FROM branch_management_db.branches
+UNION ALL
+SELECT 'branch_management_db.inventory', COUNT(*) FROM branch_management_db.inventory
+UNION ALL
+SELECT 'branch_management_db.assets', COUNT(*) FROM branch_management_db.assets
+UNION ALL
+SELECT 'branch_management_db.daily_operations', COUNT(*) FROM branch_management_db.daily_operations
+UNION ALL
+SELECT 'task_management_db.tasks', COUNT(*) FROM task_management_db.tasks
+UNION ALL
+SELECT 'footfalldb.footfallsummaryy', COUNT(*) FROM footfalldb.footfallsummaryy;
