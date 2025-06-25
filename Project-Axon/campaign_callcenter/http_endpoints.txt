@@ -1,0 +1,7 @@
+http://18.143.165.246:8000/nps-responses
+http://18.143.165.246:8000/campaign-details
+http://18.143.165.246:8000/campaign-performance
+http://18.143.165.246:8000/sales-seasonality
+http://18.143.165.246:8000/customer-campaign
+http://18.143.165.246:8000/callcenter
+http://18.143.165.246:8000/customer-complaints
