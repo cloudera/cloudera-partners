@@ -51,6 +51,8 @@ Note: `Soon, we'll be adding an automation framework to deploy the required infr
 
 You can create an endpoint from a `model` imported from the `Model Hub` or from a model created in the CAI Workbench. The below is an example deployment of the `Llama 3.1 Instruct-8b` model imported from the `Model Hub`.
 
+Note: `Before you begin, ensure you have the **MLAdmin** role.`
+
 . Go to the Cloudera AI Workbench and click `Model Hub` -> Look for `Llama 3.1 Instruct-8b` model and Fill the details as below ->Check the `license & agreement` box -> click `Import`.
 .. Select AI Registry: `Select deployed registry name`
 .. Select Model Size: `Llama 3.1 8B Instruct`
