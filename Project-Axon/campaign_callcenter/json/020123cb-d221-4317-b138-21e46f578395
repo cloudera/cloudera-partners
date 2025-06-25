@@ -1,0 +1,21 @@
+{
+  "address": "42038 Lisa Cliffs Apt. 361\nNealmouth, FM 64898",
+  "city": "Lake Rickyfurt",
+  "country": "Guinea-Bissau",
+  "created_at": "2022-08-31",
+  "customer_id": 70367,
+  "customer_type": "Individual",
+  "dob": "1951-05-03",
+  "email": "trevinoallison@example.com",
+  "first_name": "Christina",
+  "gender": "Female",
+  "kyc_status": "Pending",
+  "last_name": "Garrett",
+  "phone": "001-351-389-9146",
+  "postal_code": "17407",
+  "relationship_manager_id": 728,
+  "source": "Referral",
+  "state": "Vermont",
+  "status": "Lead",
+  "updated_at": "2025-01-06"
+}

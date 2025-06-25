@@ -1,0 +1,21 @@
+{
+  "address": "79563 Wang Island Suite 049\nAlexandershire, KS 06083",
+  "city": "Danielfurt",
+  "country": "Cote d'Ivoire",
+  "created_at": "2022-08-10",
+  "customer_id": 26632,
+  "customer_type": "Individual",
+  "dob": "1933-08-16",
+  "email": "ctorres@example.com",
+  "first_name": "Jeffrey",
+  "gender": "Female",
+  "kyc_status": "Verified",
+  "last_name": "Brady",
+  "phone": "(285)679-7786x8079",
+  "postal_code": "20863",
+  "relationship_manager_id": 647,
+  "source": "Website",
+  "state": "Massachusetts",
+  "status": "Inactive",
+  "updated_at": "2025-01-26"
+}
