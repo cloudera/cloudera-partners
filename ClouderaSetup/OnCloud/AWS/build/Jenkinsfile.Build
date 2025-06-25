@@ -75,15 +75,15 @@ pipeline {
                     if (params.MULTI_PLATFORM_BUILD) {
                         echo "Multi-platform build enabled."
                         dir(env.DOCKERFILE_DIR) {
-                            sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} --push ."
+                            sh "docker buildx build --platform linux/amd64,linux/arm64  --no-cache --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} --push ."
                             if (params.PUSH_SECONDARY_TAG) {
-                                sh "docker buildx build --platform linux/amd64,linux/arm64 --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} --push ."
+                                sh "docker buildx build --platform linux/amd64,linux/arm64  --no-cache --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${secondaryTag} --push ."
                             }
                         }
                     } else {
                         echo "Regular build and push."
                         dir(env.DOCKERFILE_DIR) {
-                            sh "docker build --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} ."
+                            sh "docker build --no-cache --build-arg TF_QUICKSTART_VERSION=${params.TF_QS_VER} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${primaryTag} ."
                         }
                         withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                             sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
