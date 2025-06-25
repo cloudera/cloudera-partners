@@ -67,7 +67,7 @@ This project was developed and tested on the following component versions:
 
 == Project Workflow
 
-image::../images/project_flow.png[project_flow]
+image::images/project_flow.png[project_flow]
 
 == Steps to Run
 
@@ -86,10 +86,10 @@ cd Project-Axon/Project-Axon-Data
 .. Create a new bucket (for example, name it `Axon-Files`).
 ... Click on the wrench `🔧` icon on the top right corner to open settings.
 +
-image::../images/settings.png[settings]
+image::images/settings.png[settings]
 ... Click on *New bucket* and name it `Axon-Flow`.
 +
-image::../images/Bucket_creation.png[bucket_creation]
+image::images/Bucket_creation.png[bucket_creation]
 
 === 3. Import the NiFi Flow into NiFi from Registry
 
@@ -97,16 +97,16 @@ image::../images/Bucket_creation.png[bucket_creation]
 - Drag a new **Process Group** onto the canvas.
 - Give it any name (e.g., `Project-Axon`).
 +
-image::../images/process_group.png[process group]
+image::images/process_group.png[process group]
 +
 - After naming it, click **Import from Registry**.
 - Select the `Axon-Flow` bucket, choose the `Project-Axon` flow and desired version, then click **Import**.
 +
-image::../images/import_version.png[import version]
+image::images/import_version.png[import version]
 +
 - Inside the process group, right-click and select **Start**.
 +
-image::../images/start_flow.png[start flow]
+image::images/start_flow.png[start flow]
 
 NOTE: After starting the flow, run it for a maximum of 5 minutes. It will generate approximately **50–80 flow files**.  
 After that, right-click and click **Stop**, otherwise it will continue generating files indefinitely.
@@ -146,12 +146,12 @@ hdfs dfs -mkdir /Axon-Files
 - Open the **PutHDFS** processor inside the process group.
 - In the *Kerberos Credentials Service* field, click the arrow (`→`) to navigate to the controller service.
 +
-image::../images/put_hdfs.png[put hdfs]
+image::images/put_hdfs.png[put hdfs]
 +
 - Click the **gear icon** (⚙️) to open the settings configuration.
 - In the settings configuration, provide: **Kerberos Principal** and **Kerberos Keytab** file path.
 +
-image::../images/keytab.png[keytab credentials]
+image::images/keytab.png[keytab credentials]
 +
 - Save and enable the controller service.
 
@@ -182,12 +182,12 @@ Repeat similar steps for the other datasets using the queries from the file.
 
 - Go to Cloudera DataViz → *Data* tab → *Import visual artifacts*.
 +
-image::../images/import_visual.png[import visual]
+image::images/import_visual.png[import visual]
 +
 - Upload the dashboard JSON file: `project_axon_dashboard.json`.
 - Once imported, navigate to the *Visuals* tab and click on the dashboard to open and view it.
 +
-image::../images/dashboard.png[dashboard]
+image::images/dashboard.png[dashboard]
 
 == Contact
 
