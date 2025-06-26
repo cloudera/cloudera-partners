@@ -682,6 +682,8 @@ Since a self-signed certificate is used, you may need to accept the security exc
 URL: link:https://localhost:8443/nifi/[https://localhost:8443/nifi/]
 
 Default user: `nifiadmin`
+
+Password: `Same admin password as used for OpenLDAP chart and secret`
 ====
 
 . Expose the NiFi UI when running minikube on `local laptop`
@@ -740,6 +742,8 @@ Since a self-signed certificate is used, you may need to accept the security exc
 URL: link:https://localhost:18443/nifi-registry/[https://localhost:18443/nifi-registry]
 
 Default user: `nifiadmin`
+
+Password: `Same admin password as used for OpenLDAP chart and secret`
 ====
 
 . Expose the `NiFi Registry` UI when running `minikube` on `local laptop`
@@ -835,6 +839,8 @@ ssh -f -N -i <PEM_FILE_LOCATION> -L 18121:192.168.49.2:<NodePort> ubuntu@<ec2Pub
 URL: link:http://localhost:18121[http://localhost:18121]
 
 Default user: `admin`
+
+Default password: `admin`
 ====
 
 . Access `SQL Stream Builder`, or `SSB` UI when running on `local laptop`
