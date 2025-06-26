@@ -1,4 +1,4 @@
-= Cloudera Data in Motion K8soperators Hands-on Labs Provisioner
+= Cloudera K8soperators Hands-on Labs Provisioner
 v0.1, 2025-06-01: Draft
 :description: Automated Deployment instructions for Cloudera Kubernetes Operators
 :toc: left
@@ -307,7 +307,7 @@ Keep it commented if you want to provision EC2 instance as well(Default).
 |If you want to utilize an already existing keypair, uncomment the corresponding entry in `configfile` and override the value with the keypair name.
 |Only base name without `.pem `extension. 
 
-**MANDATORY** if installing on an existing remote host with `Ubuntu OS`
+**MANDATORY** if installing on an existing remote host with `Ubuntu OS` or if `K8S_DISTRIBUTION=EKS`.
 |=== 
 
 
