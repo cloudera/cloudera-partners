@@ -91,7 +91,7 @@ image::../images/Controller_settings.png[Controller_settings]
 image::../images/Add_registry_client.png[Add_registry_client]
 
 . Run the demo flow
-.. Drag `process group` to the canvas. Upload the `demo-flow.xml` file to the process group.
+.. Drag `process group` to the canvas. Upload the link:./demo-resources/demo-flow.json[demo-flow.json] file to the process group.
 +
 image::../images/Upload_demo-flow.png[Upload_demo-flow]
 .. Right click the process group and select `version` -> `Start version control`.
