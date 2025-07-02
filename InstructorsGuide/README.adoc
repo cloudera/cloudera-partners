@@ -35,13 +35,14 @@ Because the applications of LLMs can be quite broad across industries, we will h
 
 == Setup Cloudera Infrastructure
 === Manual Setup
-==== Setup Cloudera on Cloud Environment with Cloudera AI(CML) data service
+
+* Setup Cloudera on Cloud Environment with Cloudera AI(CML) data service
 Follow this link:https://github.com/cloudera/cloudera-partners/tree/eb3702ea951f75ccf0866f8ee6d9d478d1306eb7/ClouderaSetup/OnCloud/AWS[Guide] to deploy a Cloudera on Cloud environment with Cloudera AI(CML) data service.
 
-==== Create Cloudera AI Registry
+* Create Cloudera AI Registry
 Follow this link:https://docs.cloudera.com/machine-learning/cloud/setup-model-registry/topics/ml-creating-model-registry-cdp.html[official documentation] to manually crate `AI Registry` in the `environment`. 
 
-==== Deploy Cloudera AI Inference Service (CAII)
+* Deploy Cloudera AI Inference Service (CAII)
 Here's a link:https://cloudera.atlassian.net/wiki/spaces/SE/pages/10920394909/How+to+enable+Cloudera+AI+Inference+Service+CAII+on+Sandbox+and+Workshop+tenants[quick guide] to set up the `Cloudera AI Inference Service`. We'll start this instructor guide with the steps to deploy a model endpoint and then the 3rd party tools setup and integration.`
 
 * CAII link:./assets/EnableClouderaAIInferenceService(CAII)OnCDPEnvironments.pdf[PDF Setup Guide] if Link isn't accessible.
@@ -54,13 +55,13 @@ Follow this link:https://github.com/cloudera/cloudera-partners/blob/main/Clouder
 Here is the sample configuration file that can be generated as per `step 2` of the instruction Guide link:./assets/configfile.caii[configfile.caii] to deploy the CAII service with other dependencies for this lab.
 
 
-=== Deploy a Model Endpoint
+== Deploy a Model Endpoint
 
 You can create an endpoint from a `model` imported from the `Model Hub` or from a model created in the CAI Workbench. The below is an example deployment of the `Llama 3.1 Instruct-8b` model imported from the `Model Hub`.
 
 Note: `Before you begin, ensure you have the **MLAdmin** role.`
 
-. Go to the Cloudera AI Workbench and click `Model Hub` -> Look for `Llama 3.1 Instruct-8b` model and Fill the details as below ->Check the `license & agreement` box -> click `Import`.
+. Go to the Cloudera AI and click `Model Hub` -> Look for `Llama 3.1 Instruct` model and Fill the details as below ->Check the `license & agreement` box -> click `Import`.
 .. Select AI Registry: `Select deployed registry name`
 .. Select Model Size: `Llama 3.1 8B Instruct`
 .. Select Optimization: `Llama 3.1 8B Instruct A10Gx2 FP16 Throughput`
@@ -70,7 +71,7 @@ image::../assets/ImportModel2.png[Import Model, width=600, align="center"]
 +
 image::../assets/ImportModel.png[Import Model, width=600, align="center"]
 
-. Go to the Cloudera AI Workbench and click `Model Endpoint` -> Click `Create Endpoint`.
+. Go to the Cloudera AI and click `Model Endpoint` -> Click `Create Endpoint`.
 +
 image::../assets/ModelEndpoint3.png[Deploy Model Endpoint, width=600, align="center"]
 
@@ -106,14 +107,14 @@ Follow this link:./ai-agents-hol-setup/3_neo4j_setup//README.adoc[neo4j_setup] g
 
 
 === Setup Crew AI
-Crew AI does not require any setup and will be installed as a Jupyter notebook package along with the other packages for each project using the `requirements.txt` file.
+No separate setup is required for Crew AI. It will be installed automatically as part of the Jupyter notebook dependencies listed in the `requirements.txt` file for each project.
 
 === Setup Serper API
 . Go to the Serper link:https://serper.dev/[website] and sign up for a free account
 . You will be granted up to 2,500 credits (as of 3/3/25). Then go to the API Key page and copy the API key provided.
 
-Note: `The quantity of credits is generally sufficient for 10 workshops, assuming around 100 users per workshop
-Enter the API Key as an environment variable in Cloudera AI.`
+Note: `The quantity of credits is generally sufficient for 10 workshops, assuming around 100 users per workshop.
+Use the API Key as an **Environment variable** in Cloudera AI.`
 
 image::../assets/Serper.png[Serper API Key, width=600, align="center"]
 

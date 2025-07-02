@@ -10,7 +10,7 @@ runtimes:
   - editor: JupyterLab
     kernel: Python 3.10
     edition: Standard
-    version: "2024.10"
+    version: "2025.01"
 
 tasks:
   - type: run_session
