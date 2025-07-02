@@ -178,7 +178,39 @@ LOCATION '/Axon-Files/BMS/branches/';
 
 Repeat similar steps for the other datasets using the queries from the file.
 
-=== 6. Import Dashboard into DataViz
+=== 6. Connect DataViz to Hive
+
+To enable DataViz to read data from Hive, you need to create a connection:
+
+- Go to *Cloudera DataViz* and navigate to the *Data* tab.
+- Click *+ New Connection* → *Hive / Impala*.
++
+image::images/connection.png[make connection, width=500, height=300]
++
+[width="90%",cols="40%,50%",options="header"]
+|===
+|**Parameter** |**Value**
+|*Connection Name* |Hive-Axon (or any name you prefer)
+|*Connection type* |Hive
+|*Hostname* |pvcbasemaster.cldrsetup.local (or your HiveServer2 host)
+|*Port* |10000 (for Hive) or 21050 (if using Impala)
+|*Kerberos Credentials* |Use your admin username and password
+
+2+|*Advanced Tab Settings*
+
+|*Connection Mode* |Binary
+|*Authentication Mode* |Kerberos
+|*Kerberos Service Name* |Enter any name (e.g., `hive`)
+|===
++
+- Click *Test Connection* to verify.
++
+image::images/connection_verify.png[verify connection, width=500, height=300]
++
+- Once successful, click *Save*.
+- You can now use this connection to create/import datasets and build/import dashboards from Hive tables.
+
+=== 7. Import Dashboard into DataViz
 
 - Go to Cloudera DataViz → *Data* tab → *Import visual artifacts*.
 +
