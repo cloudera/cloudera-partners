@@ -205,7 +205,7 @@ image::images/connection.png[make connection, width=500, height=300]
 +
 - Click *Test Connection* to verify.
 +
-image::images/connection_verify.png[verify connection, width=500, height=300]
+image::images/connection_verify.png[verify connection, width=500, height=450]
 +
 - Once successful, click *Save*.
 - You can now use this connection to create/import datasets and build/import dashboards from Hive tables.
