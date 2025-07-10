@@ -1,10 +1,8 @@
 # Setup Guide for the AI Agents with Partners HOL
 
 ### Key Links:
-- [GitHub Repo](https://github.com/shreshtab/ai-agents-hol-cai/tree/v1.1.0)
+- [GitHub Repo](https://github.com/cloudera/cloudera-partners/tree/feature/ai-agents-hol-cai)
 - [SKO Deck](https://docs.google.com/presentation/d/1_-HRgb4PiycIPvH6YiAETImpGhvSE9bjEHCKwfZxE6Y/edit#slide=id.g32053a21050_0_0)
-
-Note: This setup guide is only for v1.1 of the Lab as linked above. In case of updates, this guide will also be updated.
 
 ### Prerequisites
 - Cloudera on Cloud Environment (Setup has only been tested with AWS)
@@ -23,9 +21,9 @@ AWS_BEDROCK_MODEL # This is the model you plan to use for Modules 2 and 4
 
 # Note: You can alternatively use a model deployed via the AI Inference Service, but you will need to handle the code changes required
 
-# Policy Documents Setup
-POLICY_BUCKET # This is your datalake S3 Bucket
-POLICY_BUCKET_PREFIX # The S3 prefix where you load the policy documents
+# Policy Documents Setup(Currently using policy documents from local file system)
+#POLICY_BUCKET # This is your datalake S3 Bucket
+#POLICY_BUCKET_PREFIX # The S3 prefix where you load the policy documents
 
 PINECONE_API_KEY # API Key to interract with Pinecone
 PINECONE_INDEX # Index where the policy document embeddings will be stored

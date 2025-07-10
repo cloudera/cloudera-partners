@@ -1,7 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 import pandas as pd
 
@@ -11,52 +12,49 @@ import pandas as pd
 
 # Review these settings and ensure they are correct
 
-SSO_URL = "<SSO_URL>"  # URL to your ML Workspace
+SSO_URL = "<SSO_URL>" # URL to your ML Workspace
 
-AMP_NAME = "Hands on Lab with RAG Agents" # The name of the AMP as seen in the AMP catalog
+AMP_NAME = "Hands on Lab with RAG Agents"  # The name of the AMP as seen in the AMP catalog
 
-WORKSPACE_URL = "https://sko-ai-agen-cml.sko-ai-a.dp5i-5vkq.cloudera.site/"
+WORKSPACE_URL = "https://sko-ai-agen-cml.sko-ai-a.dp5i-5vkq.cloudera.site/"  #mention your workspace/workbench URL
 
 ADD_DELAY = 10
 
-# Read in the credentials for the workshop participants
+# Read credentials
 creds = pd.read_csv("participants.csv")
 batch_size = 8
 row_cnt = len(creds.index)
 
-# Setting up selenium driver
+# ChromeDriver path
 chrome_driver_path = './chromedriver'
 service = Service(chrome_driver_path)
 
 for i, cred in creds.iterrows():
-    # Set username/password for current user
     usr_name = cred['username']
     usr_pass = cred['password']
 
-    # Reset the driver
+    # Launch browser
     driver = webdriver.Chrome(service=service)
+    wait = WebDriverWait(driver, 15)
 
     driver.get(SSO_URL)
-    # Allow some time for SSO screen to load
     sleep(2.5 + ADD_DELAY)
 
-    # Fill out and submit SSO form
-    user = driver.find_element(By.NAME, "username")
-    print(usr_name)
-    print(usr_pass)
+    # Enter username and password
+    wait.until(EC.presence_of_element_located((By.NAME, "username"))).send_keys(usr_name)
+    wait.until(EC.presence_of_element_located((By.NAME, "password"))).send_keys(usr_pass)
 
-    user.send_keys(usr_name)
-    pas = driver.find_element(By.NAME, "password")
-    pas.send_keys(usr_pass)
-    driver.find_element(By.XPATH, '//input[@type="submit"]').click()
-    sleep(2.5 + ADD_DELAY)
-    #print(f"Loggin in as {usr_name}! Waiting 30 seconds for MFA.")
+    # Click the Sign In button
+    wait.until(EC.element_to_be_clickable((By.ID, "kc-login"))).click()
+    print(f"{usr_name}\n{usr_pass}\nClicked Sign In")
 
+    # Optional screenshot for debugging
+    driver.save_screenshot(f"{usr_name}_login.png")
 
-    # Push MFA if needed
+    # Handle MFA if needed
     try:
-        driver.find_element(By.XPATH, '//input[@type="submit"]').click()
-        print("Sending push notification")
+        wait.until(EC.element_to_be_clickable((By.ID, "kc-login"))).click()
+        print("MFA prompt detected. Submitted push.")
         sleep(5 + ADD_DELAY)
     except:
         print("No MFA required.")
@@ -64,37 +62,42 @@ for i, cred in creds.iterrows():
     sleep(4 + ADD_DELAY)
     print("Logged in!")
 
-
-    driver.get(WORKSPACE_URL)  # Go straight to the workspace URL, bypassing a lot of UI navigation
-
+    # Navigate to CML workspace
+    driver.get(WORKSPACE_URL)
     sleep(90 + ADD_DELAY)
-    print(f"In CML Worksapce")
+    print("In CML Workspace")
 
-    # Launch the AMP from catalog
-    driver.find_element(By.LINK_TEXT, "AMPs").click()
+    # Click AMPs tab
+    wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "AMPs"))).click()
     sleep(4 + ADD_DELAY)
-    # New AMP UI. Need to find AMP card, then get parent div, then click "Deploy"
-    driver.find_element(By.XPATH, '//*[.="' + AMP_NAME + '"]/following-sibling::*[3]/div[2]/button').click()
+
+    # Click Deploy on the AMP card
+    wait.until(EC.element_to_be_clickable(
+        (By.XPATH, f'//*[.="{AMP_NAME}"]/following-sibling::*[3]/div[2]/button')
+    )).click()
     sleep(1 + ADD_DELAY)
-    driver.find_element(By.CLASS_NAME, 'ant-btn-primary').click()
+
+    # Click "Configure AMP"
+    wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'ant-btn-primary'))).click()
     print(f"Configuring \"{AMP_NAME}\" AMP...")
     sleep(7.5 + ADD_DELAY)
-    
+
     # Launch the AMP
-    driver.find_element(By.XPATH, '//button[@type="submit"]').click()
+    wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit"]'))).click()
     print(f"Started \"{AMP_NAME}\" AMP creation for user {usr_name}")
     sleep(2)
 
-    # Log out
-    driver.find_element(By.XPATH, '//button[@class="btn btn-link context-dropdown-toggle dropdown-toggle"]').click()
+    # Sign out
+    wait.until(EC.element_to_be_clickable(
+        (By.XPATH, '//button[@class="btn btn-link context-dropdown-toggle dropdown-toggle"]'))
+    ).click()
     sleep(0.5)
-    driver.find_element(By.XPATH, '//span[.="Sign Out"]').click()
+    wait.until(EC.element_to_be_clickable((By.XPATH, '//span[.="Sign Out"]'))).click()
 
     driver.close()
 
-    # After each batch of AMPs has been started, wait 5 minutes
-    # This is done so as not of overwhelm the NFS, avoid throtteling
+    # Wait between batches
     if (i + 1) % batch_size == 0:
         print(f"Completed {((i+1)/row_cnt)*100:.0f}% of projects kicked off.")
-        print("Waiting for 5 mins so NFS doesn't get throttled.")
+        print("Waiting for 5 mins to avoid NFS throttling.")
         sleep(5 * 60)

@@ -118,7 +118,7 @@ Use the API Key as an **Environment variable** in Cloudera AI.`
 
 image::../assets/Serper.png[Serper API Key, width=600, align="center"]
 
-=== Set Environment Variables in the Site Administration
+== Set Environment Variables in the Site Administration
 To set the environment variables required for the lab, you will need to access the `Site Administration` section in `Cloudera AI` and add the following variables. These variables will be used in the Jupyter notebooks to connect to various services like `AWS Bedrock`, `Pinecone`, `Neo4j`, and `Serper`.
 
 [.shell]
@@ -165,4 +165,39 @@ image::../assets/EnvVariables2.png[EnvVariables2.png, width=600, align="center"]
 +
 image::../assets/EnvVariables3.png[EnvVariables3.png, width=600, align="center"]
 
+---
+NOTE: Before you start the next step, ensure that `knox security group` from `dl-master` and the `keycloak sg` have an inbound rule to allow traffic at `port 443` from all IP addresses(0.0.0.0/0). This is required to access the `Cloudera AI` and other services.
+
+`While setting up the insfrastructure using the automation framework, this will be set to your local ip address as per configuration in the **configfile.caii** file.`
+
+image::../assets/knox_sg.png[knox_security_group, width=600, align="center"]
+
+
+== Participant AMPs Setup
+To set up the participant AMPs, follow the instructions in the `link:./ai-agents-hol-setup/4_participant_amps/README.adoc[README.adoc]` file located in the `4_participant_amps` directory. This setup will allow participants to run the hands-on lab exercises using the provided amplifiers.
+
 Note: `We’re done here with the setup guide. We can now proceed with hands-on lab link:../README.md[instructions].`
+
+== Teardown Environment
+To tear down the environment, you can either manually delete the resources created during the setup or use the automation framework to clean up the resources.
+
+. Manual Cleanup
+.. Shut down the AI Inference Endpoint - Delete the model endpoint, inference service and compute cluster
+.. Delete the Cloudera AI workbench 
+.. Delete the Model/AI regeistry created
+.. Delete the Cloudera environment
+.. If re-using a common Keycloak server, modify the network rules as needed to cutoff access.
+
+. Automated Cleanup
++
+To automate the cleanup of the resources created during the setup, you can use the automation framework provided. Run below command to clean up the resources:
+
+[source,bash]
+----
+docker run -it \
+-v ~/userconfig:/userconfig \
+-v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
+clouderapartners/cdp-public-cloud-hol-provisioner:latest \
+destroy
+----
+
