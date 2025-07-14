@@ -116,7 +116,7 @@ image::images/import_registry.png[import registry]
 ... Select the `Axon-Flow` bucket.
 ... Upload the flow file https://github.com/cloudera/cloudera-partners/blob/project-axon/Project-Axon/Project-Axon.json[`Project-Axon.json`] and click **Import**.
 +
-image::images/import_flow_registry.png[import flow registry, width=500, height=300]
+image::images/import_flow_registry.png[import flow registry, width=500, height=500]
 
 === 3. Import the NiFi Flow into NiFi from Registry
 
@@ -149,7 +149,7 @@ After importing the `Project-Axon` flow into NiFi and *before starting it*, you 
   For example:  
   `http://<your-server-ip>:8000/campaign-details`
 +
-image::images/http_url.png[invoke http url, width=600, height=300]
+image::images/http_url.png[invoke http url, width=900, height=500]
 +
 - *Repeat* this step for *each NiFi flow*.
 - Click *Apply* to save changes.
