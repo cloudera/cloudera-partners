@@ -138,21 +138,21 @@ IMPORTANT: While importing or configuring the flow, **note down the Kerberos Key
 
 === 4. Update the InvokeHTTP URLs in NiFi Flow
 
-After importing the Project-Axon flow into NiFi and before starting it, you must update the InvokeHTTP processor URLs to point to the correct host where your dummy data generator app is running.
+After importing the `Project-Axon` flow into NiFi and *before starting it*, you must update the `InvokeHTTP` processor URLs to point to the correct host where your dummy data generator app is running.
 
-- Double-click the Project-Axon process group to open it. You'll see individual NiFi flows for different databases.
-- Double-click to open each flow.
-- Locate the processor named InvokeHTTP (there is one per data source).
-- Double-click the InvokeHTTP processor.
-- Go to the Properties tab and find the HTTP URL field.
-- Replace <your-server-ip> in the URL with the IP address or hostname of the server running your dummy generator app.
-For example:
-http://<your-server-ip>:8000/campaign-details
+- Double-click the `Project-Axon` Process Group to open it. You'll see individual NiFi flows for different databases.
+- Double-click to open each sub-flow.
+- Locate the processor named *InvokeHTTP* (there is one per data source).
+- Double-click the *InvokeHTTP* processor.
+- In the *Properties* tab, find the *HTTP URL* field.
+- Replace only the *<your-server-ip>* in the URL with the *Public IP address* of the server running your dummy generator app.  
+  For example:  
+  `http://<your-server-ip>:8000/campaign-details`
 +
-image::images/http_url.png[invoke http url]
+image::images/http_url.png[invoke http url, width=600, height=300]
 +
-Repeat this for each NiFi flow.
-- Click Apply and save the changes.
+- *Repeat* this step for *each NiFi flow*.
+- Click *Apply* to save changes.
 
 === 5. Configure Apache NiFi (HDFS Access)
 
@@ -211,6 +211,8 @@ To create all the required databases and tables at once, simply:
 - Copy the entire content.
 - Paste it into the Hue Query Editor.
 - Select all and click the **Run** button.
++
+image::images/hive_queries.png[hive_queries, width=800, height=500]
 
 This will create all the necessary Hive tables and databases for the project in one go.
 
