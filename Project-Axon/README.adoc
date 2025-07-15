@@ -82,7 +82,9 @@ image::images/project_flow.png[project_flow]
 
 [source,shell]
 ----
-git clone hhttps://github.com/cloudera/cloudera-partners/tree/project-axon
+git clone https://github.com/cloudera/cloudera-partners.git
+cd cloudera-partners
+git checkout project-axon
 cd Project-Axon
 ./run_all.sh
 ----
