@@ -134,8 +134,6 @@ image::images/import_version.png[import version]
 NOTE: After starting the flow, run it for a maximum of 5 minutes. It will generate approximately **50–80 flow files**.  
 After that, right-click and click **Stop**, otherwise it will continue generating files indefinitely.
 
-IMPORTANT: While importing or configuring the flow, **note down the Kerberos Keytab path and Kerberos Principal** (you'll need these while configuring the `PutHDFS` processor in the next step).
-
 === 4. Update the InvokeHTTP URLs in NiFi Flow
 
 After importing the `Project-Axon` flow into NiFi and *before starting it*, you must update the `InvokeHTTP` processor URLs to point to the correct host where your dummy data generator app is running.
@@ -248,7 +246,21 @@ image::images/connection_verify.png[verify connection, width=500, height=450]
 - Once successful, click *Save*.
 - You can now use this connection to create/import datasets and build/import dashboards from Hive tables.
 
-=== 8. Import Dashboard into DataViz
+=== 8. Add Ranger Policy for DataViz Access
+
+Before importing the dashboard into Cloudera DataViz, you must ensure the `dataviz` user has access to the Hive databases and tables. This is done by updating an existing policy in Apache Ranger.
+
+- Log in to the *Ranger Admin UI* using admin credentials.
+- Select the service named *Hadoop SQL*.
+- Locate the policy named `9 all - database, table, column`.
+- Click on the *Edit* icon to open it.
++
+image::images/dataviz_policy.png[dataviz policy]
++
+- In the *Users* section, add `dataviz` to the list.
+- Scroll down and click *Save*.
+
+=== 9. Import Dashboard into DataViz
 
 - Go to Cloudera DataViz → *Data* tab → *Import visual artifacts*.
 +
