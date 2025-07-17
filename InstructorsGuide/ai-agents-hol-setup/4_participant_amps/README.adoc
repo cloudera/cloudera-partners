@@ -38,6 +38,22 @@ Next, perform the following steps to set everything up and run a simple test:
 .. You should see a new browser window open, automatic navigation to Cloudera docs, followed by navigation to Cloudera AI docs home page. **DO NOT** interact with the browser during the test.
 .. Once the test finishes, you should see ```ALL TEST PASSED!``` in the console. You are ready to move on to bulk AMPs creation.
 
+== Add AMP catalog to your workbench
+Before you can create AMPs for the participants, you need to upload the AMP catalog to your Cloudera AI workbench.
+
+To add the AMP catalog follow these steps:
+
+
+* Go to your Cloudera AI workbench
+* Click on the "Site Administration" tab in the left sidebar
+* CLick on the `AMPs` tab
+* Add a new source by `Catalog File URL`
+* Enter the URL of the AMP catalog file: https://raw.githubusercontent.com/Avanish268/ai-agents-hol-cai/refs/heads/release/v1_3/catalog-entry.yaml[https://raw.githubusercontent.com/Avanish268/ai-agents-hol-cai/refs/heads/release/v1_3/catalog-entry.yaml]
+* Click on the "Add Source" button to upload the catalog
+* Verify that the catalog is successfully added by checking the list of available AMPs in the workbench. You should see the AMP named `Hands on Lab with RAG Agents` in the list.
+
+image::../../img/Add_Amp.png[AMP-catalog.png]
+
 == Run Bulk AMP creation
 In this step you will run an automation script that launches an AMP for each paricipant. First, a few configuration steps:
 
