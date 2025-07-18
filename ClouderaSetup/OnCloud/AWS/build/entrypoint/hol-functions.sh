@@ -994,7 +994,8 @@ provision_cai_inference() {
   # Step 2: Provision compute cluster, model registry and ai workbench in parallel
   provision_compute_cluster &
   pid_compute=$!
-
+  sleep 60
+  
   enable_model_registry &
   pid_model=$!
 
