@@ -54,6 +54,17 @@ To add the AMP catalog follow these steps:
 
 image::../../img/Add_Amp.png[AMP-catalog.png]
 
+== Disable "Reset Password on First Login" in Keycloak
+To ensure Selenium automation works smoothly, disable the `reset_password_on_first_login` option in Keycloak for all participants. This prevents the automation script from being interrupted by password reset prompts.
+
+
+* Log in to Keycloak as an admin: https://partnerday.clouderapartners.click[https://partnerday.clouderapartners.click]
+* Navigate to the `Authentication` section in the left sidebar
+* Click on the `Required Actions` tab
+* Toggle off the `Update Password` option
+
+image::../../img/Disable_Reset_Password.png[Disable Reset Password on First Login]
+
 == Run Bulk AMP creation
 In this step you will run an automation script that launches an AMP for each paricipant. First, a few configuration steps:
 
