@@ -19,41 +19,70 @@ This use case helps simulate and analyze the operational performance of various 
 
 == Prerequisites
 
-Before running the project, ensure the following components are installed:
+=== 1. Linux Server Setup for running Dummy Data Generator App
 
-=== On the Dummy Data Generator Host:
-You can clone and run this dummy generator app on **any linux server** you have access to.  
-Just make sure the following ports are open on the server firewall/security groups:  
-**8000, 8085, 5001, 5003, 5400, 5500**
+Ensure you have access to any running **Linux server** (e.g., CentOS, RHEL, Ubuntu) for hosting the dummy data generator application.
+
+==== Required Open Ports
+Make sure the following ports are open on the server's firewall or cloud security group:
+
+- 8000
+- 8085
+- 5001
+- 5003
+- 5400
+- 5500
+
+==== Python Virtual Environment and Dependencies
+
 [source,shell]
 ----
-sudo yum install -y python3
+sudo yum install -y python3 git
 python3 -m ensurepip --upgrade
-sudo yum install -y git
-pip3 install Flask
-pip3 install Faker
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+
+# Verify Flask version
 python3 -m flask --version
-pip3 install uvicorn
-pip3 install fastapi
 ----
 
-=== Cloudera Platform Requirements:
-You should have a **Cloudera Private Cloud Base cluster** running with the following services enabled:
+=== 2. Cloudera Platform Requirements
 
-- Apache NiFi  
-- NiFi Registry  
-- HDFS  
-- Hue  
-- Cloudera DataViz  
-- Hive  
-- Impala  
-- Apache Knox
+Ensure you have a running **Cloudera Private Cloud Base Cluster** with the following components installed:
 
-[NOTE]
-====
-Make sure an entry is added in your local machine’s `/etc/hosts` file pointing the **public IP** of the `pvcbase-master` (or the node where **Knox** is installed) to its **hostname**.  
-This is required to access the Knox gateway and other web UIs from your browser.
-====
+- Apache NiFi
+- NiFi Registry
+- HDFS
+- Hive
+- Impala
+- Knox
+- Hue
+- Cloudera DataViz
+
+=== 3. Host File Configuration
+
+Update the `/etc/hosts` file to resolve Cloudera node hostnames. This is required to access the Knox gateway and other web UIs from your browser.
+
+Below is a **sample** configuration. 
+[source,txt]
+----
+::1             localhost
+
+# Public Host Entries
+3.0.146.46        ipaserver.cldrsetup.local        ipaserver
+18.139.21.49      cldr-mngr.cldrsetup.local        cldr-mngr
+
+# PvC Base Cluster Nodes (Replace these IPs with your actual node IPs)
+54.169.43.150     pvcbase-master.cldrsetup.local   pvcbase-master
+3.1.81.131        pvcbase-worker1.cldrsetup.local  pvcbase-worker1
+18.143.63.177     pvcbase-worker2.cldrsetup.local  pvcbase-worker2
+
+# PvC Data Services ECS Cluster Nodes (Replace these IPs with your actual ECS node IPs)
+54.151.164.174    pvcecs-master.cldrsetup.local    pvcecs-master 
+52.74.176.235     pvcecs-worker1.cldrsetup.local   pvcecs-worker1
+47.129.34.14      pvcecs-worker2.cldrsetup.local   pvcecs-worker2
+----
 
 This project was developed and tested on the following component versions:
 
@@ -80,6 +109,8 @@ image::images/project_flow.png[project_flow]
 
 === 1. Clone the Dummy Data Generator Repository
 
+Clone the repository containing the dummy data generators and run the script to start all services:
+
 [source,shell]
 ----
 git clone https://github.com/cloudera/cloudera-partners.git
@@ -89,14 +120,32 @@ cd Project-Axon
 ./run_all.sh
 ----
 
-- After running the script, verify that the dummy data endpoints are active using a curl command.
-- Replace <your-server-ip> with the public IP of the node where you ran the script.
-For example:
+- After running the script, verify that the dummy data endpoints are active using a `curl` command.
+- Replace `<your-server-ip>` with the public IP of the node where you ran the script.
+
+Example:
 [source,shell]
+----
 curl http://<your-server-ip>:5400/footfall/summary
 curl http://<your-server-ip>:8000/campaign-details
+----
 
-You should see a JSON response with dummy footfall data.
+Sample JSON response from the campaign API:
+[source,json]
+----
+{
+  "Budget": 351527.55,
+  "CampaignID": 17,
+  "CampaignName": "Mclean-Tran Loan Offer",
+  "Channel": "Bank Website",
+  "EndDate": "2025-07-21",
+  "SeasonID": 3,
+  "StartDate": "2025-07-14",
+  "Status": "Active"
+}
+----
+
+You should see a JSON response similar to the above.
 
 === 2. Configuration on `NiFi Registry` UI
 
@@ -133,28 +182,7 @@ image::images/process_group.png[process group]
 +
 image::images/import_version.png[import version]
 
-NOTE: After starting the flow, run it for a maximum of 5 minutes. It will generate approximately **50–80 flow files**.  
-After that, right-click and click **Stop**, otherwise it will continue generating files indefinitely.
-
-=== 4. Update the InvokeHTTP URLs in NiFi Flow
-
-After importing the `Project-Axon` flow into NiFi and *before starting it*, you must update the `InvokeHTTP` processor URLs to point to the correct host where your dummy data generator app is running.
-
-- Double-click the `Project-Axon` Process Group to open it. You'll see individual NiFi flows for different databases.
-- Double-click to open each sub-flow.
-- Locate the processor named *InvokeHTTP* (there is one per data source).
-- Double-click the *InvokeHTTP* processor.
-- In the *Properties* tab, find the *HTTP URL* field.
-- Replace only the *<your-server-ip>* in the URL with the *Public IP address* of the server running your dummy generator app.  
-  For example:  
-  `http://<your-server-ip>:8000/campaign-details`
-+
-image::images/http_url.png[invoke http url, width=900, height=500]
-+
-- *Repeat* this step for *each NiFi flow*.
-- Click *Apply* to save changes.
-
-=== 5. Configure Apache NiFi (HDFS Access)
+=== 4. Configure Apache NiFi (HDFS Access)
 
 To enable Hue and Hive to read files from HDFS, ensure NiFi has authenticated HDFS access using Kerberos.
 
@@ -182,24 +210,37 @@ kinit -kt /run/cloudera-scm-agent/process/1546343796-hdfs-NAMENODE/hdfs.keytab h
 hdfs dfs -mkdir /Axon-Files
 ----
 
-==== Step 5: Configure `PutHDFS` in NiFi
+=== 5. Update the Parameter Contexts in NiFi Flow
 
-- Open the **PutHDFS** processor inside the process group.
-- In the *Kerberos Credentials Service* field, click the arrow (`→`) to navigate to the controller service.
-+
-image::images/put_hdfs.png[put hdfs]
-+
-- Click the **gear icon** (⚙️) to open the settings configuration.
-- In the settings configuration, provide: **Kerberos Principal** and **Kerberos Keytab** file path.
-+
-image::images/keytab.png[keytab credentials]
-+
-- Save and enable the controller service.
+After importing the `Project-Axon` flow into NiFi and *before starting it*, you must update the required parameters in the *Parameter Context* named `axon-param`. These parameters include:
 
-==== Step 6: Start the `Project-Axon` NiFi Flow
-- Inside the process group, right-click and select **Start**.
+- The HTTP URL used by `InvokeHTTP` processors.
+- Kerberos credentials used by `PutHDFS` processors.
+
+.Steps:
+1. Go to the *NiFi UI* in your browser.
+
+2. Double-click on the `Project-Axon` Process Group to open it.
+
+3. In the top-right corner, click on the *three-line menu* (`≡`), and select *Parameter Contexts*.
+
+4. Find the `axon-param` Parameter Context and click the *pencil icon* (✎) to edit it.
+
+5. In the *Parameters* tab, locate the following parameters:
+   - `http url`
+   - `kerberos.principal`
+   - `kerberos.keytab`
+
+6. Update the values of each parameter:
+   - For `http url`, update only the IP address part with the *Public IP address* of the server running your dummy data generator app.
+   - For `kerberos.principal`, provide the valid Kerberos principal.
+   - For `kerberos.keytab`, provide the full path to the keytab file.
 +
-image::images/start_flow.png[start flow]
+image::images/http_url.png[HTTP URL Configuration]
++
+7. Click *Apply* to save the changes.
+
+NOTE: These parameter values will be automatically picked up by the corresponding processors and controller services in the flow. No need to update them manually in each sub-flow.
 
 === 6. Create Hive Tables via Hue
 
@@ -216,29 +257,53 @@ image::images/hive_queries.png[hive_queries, width=800, height=500]
 
 This will create all the necessary Hive tables and databases for the project in one go.
 
-=== 7. Connect DataViz to Hive
+==== 6: Start the `Project-Axon` NiFi Flow
+- Inside the process group, right-click and select **Start**.
++
+image::images/start_flow.png[start flow]
 
-To enable DataViz to read data from Hive, you need to create a connection:
+NOTE: After starting the flow, run it for a maximum of 5 minutes. It will generate approximately **50–80 flow files**.  
+After that, right-click and click **Stop**, otherwise it will continue generating files indefinitely.
+
+==== 6.1. Verify Table Creation & Data Load
+
+To verify that all tables were successfully created and contain data:
+
+- Copy the content of the file verify_tables.txt — this includes a Hive query to count rows across all expected tables.
+- Paste it into the *Hue Query Editor*.
+- Click *Run*.
+
+You should see a list of table names with their row counts.
+
+image::images/table_verify.png[tables verify]
+
+If any table shows a count of `0`, you may need to revisit the data ingestion step for that table.
+
+=== 7. Connect DataViz to Impala
+
+To enable DataViz to read data from Hive, you need to create a connection in the DataViz UI. 
+
+While Hive is supported, it is *recommended to use Impala* for creating the connection, as Impala is a high-performance, distributed SQL engine optimized for fast, interactive analytics on large-scale datasets.
 
 - Go to *Cloudera DataViz* and navigate to the *Data* tab.
-- Click *+ New Connection* → *Hive / Impala*.
+- Click *+ New Connection* → *Impala*.
 +
 image::images/connection.png[make connection, width=500, height=300]
 +
 [width="90%",cols="40%,50%",options="header"]
 |===
 |**Parameter** |**Value**
-|*Connection Name* |Hive-Axon (or any name you prefer)
-|*Connection type* |Hive
-|*Hostname* |pvcbasemaster.cldrsetup.local (or your HiveServer2 host)
-|*Port* |10000 (for Hive) or 21050 (if using Impala)
+|*Connection Name* |Impala-Axon (or any name you prefer)
+|*Connection type* |Impala
+|*Hostname* |pvcbase-worker1.cldrsetup.local (or your any Impala Daemon host)
+|*Port* |21050 (for Impala)
 |*Kerberos Credentials* |Use your admin username and password
 
 2+|*Advanced Tab Settings*
 
 |*Connection Mode* |Binary
 |*Authentication Mode* |Kerberos
-|*Kerberos Service Name* |Enter any name (e.g., `hive`)
+|*Kerberos Service Name* |Enter any name (e.g., `impala`)
 |===
 +
 - Click *Test Connection* to verify.
@@ -246,11 +311,11 @@ image::images/connection.png[make connection, width=500, height=300]
 image::images/connection_verify.png[verify connection, width=500, height=450]
 +
 - Once successful, click *Save*.
-- You can now use this connection to create/import datasets and build/import dashboards from Hive tables.
+- You can now use this connection to create/import datasets and build/import dashboards from Impala tables.
 
 === 8. Add Ranger Policy for DataViz Access
 
-Before importing the dashboard into Cloudera DataViz, you must ensure the `dataviz` user has access to the Hive databases and tables. This is done by updating an existing policy in Apache Ranger.
+Before importing the dashboard into Cloudera DataViz, you must ensure the `dataviz` user has access to the Impala databases and tables. This is done by updating an existing policy in Apache Ranger.
 
 - Log in to the *Ranger Admin UI* using admin credentials.
 - Select the service named *Hadoop SQL*.
@@ -264,14 +329,61 @@ image::images/dataviz_policy.png[dataviz policy]
 
 === 9. Import Dashboard into DataViz
 
-- Go to Cloudera DataViz → *Data* tab → *Import visual artifacts*.
+- Go to *Cloudera DataViz*.  
+  You can access the DataViz UI using the default admin credentials:  
+  `vizapps_admin / vizapps_admin`.
+
+- Navigate to the *Data* tab, then click on *Import visual artifacts*.
 +
-image::images/import_visual.png[import visual]
+image::images/import_visual.png[Import Visual]
 +
 - Upload the dashboard JSON file: https://github.com/cloudera/cloudera-partners/blob/project-axon/Project-Axon/project_axon_dashboard.json[project_axon_dashboard.json].
+- After uploading, click on *Accept and Import*, you will see an *Import Successful* message along with the list of datasets that were imported as part of the dashboard.
++
+image::images/dashboard_import_verify.png[import success, width=800, height=450]
++
 - Once imported, navigate to the *Visuals* tab and click on the dashboard to open and view it.
 +
 image::images/dashboard.png[dashboard]
+
+=== 10. Accessing DataViz as Individual Users
+
+To allow multiple users to view or interact with dashboards, follow the steps below to create individual user accounts in Cloudera DataViz:
+
+==== Step 1: Log in as Admin
+
+- Open the DataViz from the base cluster.
+- Log in using the default admin credentials:
++
+[source,text]
+----
+Username: vizapps_admin
+Password: vizapps_admin
+----
+
+==== Step 2: Create a New User
+
+- Once logged in, navigate to the settings icon and click on **Users and Groups**.
+- Click on the **New User** button.
++
+image::images/new_user.png[New user creation]
+
+==== Step 3: Fill in User Details
+
+- Enter the required details:
+  * `Username`: (e.g., `jdoe`)
+  * `Full Name`: (e.g., `John Doe`)
+  * `Password`: Set a secure password for the user
+- Assign appropriate permissions:
+  * For **read-only access**, select the **Visual Consumer** role.
+  * Other roles include **System Admin**, **Database Admin**, and **Analyst**, depending on the level of access needed.
++
+image::images/assign_roles.png[Assign roles, width=450, height=250]
+
+==== Step 4: User Logs In
+
+- The newly created user can now log in to DataViz using the credentials provided.
+- Depending on their role, they will have access to view, edit, or manage dashboards and datasets.
 
 == Contact
 
