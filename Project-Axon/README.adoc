@@ -378,7 +378,7 @@ image::images/new_user.png[New user creation]
   * For **read-only access**, select the **Visual Consumer** role.
   * Other roles include **System Admin**, **Database Admin**, and **Analyst**, depending on the level of access needed.
 +
-image::images/assign_roles.png[Assign roles, width=450, height=250]
+image::images/assign_roles.png[Assign roles, width=500, height=600]
 
 ==== Step 4: User Logs In
 
