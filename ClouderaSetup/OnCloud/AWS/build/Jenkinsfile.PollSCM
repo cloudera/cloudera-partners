@@ -48,6 +48,7 @@ pipeline {
                     // Define common parameters for deploy
                     def deployParams = [
                         string(name: 'PROVISION_KEYCLOAK', value: 'YES'),
+                        string(name: 'PROVISION_CAII', value: 'NO'),
                         string(name: 'KEYCLOAK_ADMIN_PASSWORD', value: 'admin'),
                         string(name: 'AWS_REGION', value: 'ap-southeast-1'),
                         string(name: 'CDP_DEPLOYMENT_TYPE', value: 'public'),
@@ -126,6 +127,7 @@ pipeline {
                     // Define common parameters for destroy
                     def destroyParams = [
                         string(name: 'PROVISION_KEYCLOAK', value: 'YES'),
+                        string(name: 'PROVISION_CAII', value: 'NO'),
                         string(name: 'KEYCLOAK_ADMIN_PASSWORD', value: 'admin'),
                         string(name: 'AWS_REGION', value: 'ap-southeast-1'),
                         string(name: 'CDP_DEPLOYMENT_TYPE', value: 'public'),
