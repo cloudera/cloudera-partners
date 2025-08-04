@@ -7,7 +7,7 @@ v0.1, 2025-04-10: Draft
 :sectnums:
 :source-highlighter: highlightjs
 :icons: font
-:imagesdir: ./images
+:imagesdir: ./extracted-media/media/
 :keywords: Cloudera, Automation
 :hide-uri-scheme:
 :homepage: https://github.com/kuldeepsahu1105/cdp-onprem-automation
@@ -16,11 +16,11 @@ v0.1, 2025-04-10: Draft
 
 **Published: April 2025**
 
-image:extracted-media/media/image117.png[extracted-media/media/image117,width=350,height=79]
+image:image117.png[image117,width=350,height=79]
 
 In partnership with:
 
-image:extracted-media/media/image144.png[A close up of a logo Description automatically generated,width=244,height=49]
+image:image144.png[A close up of a logo Description automatically generated,width=244,height=49]
 
 *Author: Kuldeep Sahu*, Partner Solutions Engineer, Cloudera Inc.
 
@@ -280,7 +280,7 @@ In this document, we focus on CDP Private Cloud Data Service Cluster setup with 
 
 === CDP PVC setup consists of the following three parts.
 
-image:extracted-media/media/image133.png[extracted-media/media/image133,width=509,height=225]
+image:image133.png[image133,width=509,height=225]
 
 * *FreeIPA server:-* It provides the Identity and Authentication to the cluster. It includes Kerberos as the authentication provider and LDAP as directory service provider. All the cluster nodes (both Base and ECS) act as FreeIPA agents. (FreeIPA server includes Private DNS Server, MIT Kerberos KDC, Directory Server, Chrony, Dogtag certificate system, SSSD)
 
@@ -394,7 +394,7 @@ Wildcard DNS entry must be configured; e.g. *.apps.cldrsetup.local. This helps t
 
 The external DNS server is expected to be ready prior to installing the CDP Private Cloud solution and its installation procedure is not covered in this document.
 
-image:extracted-media/media/image44.png[extracted-media/media/image44,width=445,height=211]
+image:image44.png[image44,width=445,height=211]
 
 *Kerberos + LDAP Server/AD + Certificate (Required only, in case we are not going with FreeIPA)
 
@@ -416,16 +416,25 @@ _This document covers the CDP Private Cloud setup and testing of the Data Servic
 
 [width="100%",cols="50%,50%",options="header",]
 |===
-|image:extracted-media/media/image38.png[extracted-media/media/image38,width=281,height=210] |image:extracted-media/media/image86.png[extracted-media/media/image86,width=269,height=202]
+|image:image38.png[image38,width=281,height=210] |image:image86.png[image86,width=269,height=202]
 |===
 
 ++**************************************************************************************************************++
 
 == Hardware Requirements
 
-**Hardware specs e.g. CPU, memory, disk, etc. should be analyzed and re-determined as per the setup requirement e.g. POC, demo, HA, DR etc. Current setup is for POC/Demo purpose only.
+NOTE: **Hardware specs e.g. CPU, memory, disk, etc. should be analyzed and re-determined as per the setup requirement e.g. POC, demo, HA, DR etc. Current setup is for POC/Demo purpose only.
 
-https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-requirements-supported-versions.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-requirements-supported-versions.html#]
+For detailed requirements, refer to: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-requirements-supported-versions.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-requirements-supported-versions.html#]
+
+=== [.underline]#Reverse Proxy Server (Optional: For external URLs, best practice perspective)#
+
+[cols="2,1,1,1,1,1", options="header"]
+|===
+| Role | HostName | CPU | RAM | Disk | Partitions
+
+| reverse proxy | proxy | 8 | 16GB | OS disk (100GB) | NA
+|===
 
 === [.underline]#FreeIPA/Kerberos & Private DNS Server:# (In case we are not going with FreeIPA: External Kerberos/KDC Reqd.)
 
@@ -1455,7 +1464,7 @@ Removed "/etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service".
 ----
 
 The setup will take 10-15 Minutes. If everything goes fine then you should get an output similar to the below screenshot.
-image:extracted-media/media/image114.png[ipa server setup,width=504,height=272]
+image:image114.png[ipa server setup,width=504,height=272]
 
 [arabic, start=2]
 . Verify KDC setup: kerberos ticket is working fine by generating a ticket for the admin user.
@@ -1496,7 +1505,7 @@ ipa: INFO: The ipactl command was successful
 
 This command should return the below output:
 
-image:extracted-media/media/image23.png[klist verify,width=624,height=184]
+image:image23.png[klist verify,width=624,height=184]
 
 [arabic, start=3]
 . *(Optional)* Enable WebUI for IPAServer Administration:
@@ -1515,12 +1524,12 @@ https://ipaserver.cldrsetup.local/ipa/ui/[[.underline]#https://ipaserver.cldrset
 [arabic, start=4]
 . You will see below WebUI for IPAServer Administration. Enter the same admin credentials used for CLI authentication: *_(i.e. admin/vmware123)_
 
-image:extracted-media/media/image12.png[extracted-media/media/image12,width=564,height=339]
+image:image12.png[image12,width=564,height=339]
 
 [arabic, start=5]
 . Below management console will get appear after the successful authentication:
 
-image:extracted-media/media/image163.png[extracted-media/media/image163,width=635,height=363]
+image:image163.png[image163,width=635,height=363]
 
 [arabic, start=3]
 . Set Up Password-less Login
@@ -1545,7 +1554,7 @@ Enable the passwordless login across all the nodes when Red Hat Linux is install
 [root@ipaserver ~]# chmod 600 /root/.ssh/id_rsa
 ----
 
-image:extracted-media/media/image45.png[ssh keygen pw,width=417,height=65]
+image:image45.png[ssh keygen pw,width=417,height=65]
 
 *Step 3.* Run the following command from the ansible-controller/ipaserver node to copy the public key id_rsa.pub to all the nodes of the cluster. ssh-copy-id appends the keys to the remote-hosts .ssh/authorized_keys.
 
@@ -1727,7 +1736,7 @@ nameserver 127.0.0.1
 [root@ipaserver ~]#
 ----
 
-image:extracted-media/media/image32.png[resolv conf,width=428,height=59]
+image:image32.png[resolv conf,width=428,height=59]
 
 [arabic, start=2]
 . We will update the network configuration file *_/etc/sysconfig/network_* on the IPA server to use the Name Server created in previous steps and will later copy this file to the rest of nodes to make them able to resolve FQDNs across the cluster:
@@ -1745,7 +1754,7 @@ NOZEROCONF=yes
 [root@ipaserver ~]#
 ----
 
-image:extracted-media/media/image55.png[sysconfig network,width=213,height=79]
+image:image55.png[sysconfig network,width=213,height=79]
 
 [arabic, start=3]
 . Copy */etc/resolv.conf* file to each node to make them able to resolve FQDNs across the cluster:
@@ -1811,7 +1820,7 @@ Zone name [31.172.in-addr.arpa.]:
 
 ##### Once you execute the above command, accept the default value by hitting the enter key. It will create a reverse DNS zone by name 16.172.in-addr.arpa. (with a trailing dot)
 
-image:extracted-media/media/image79.png[ipa dns zone add,width=624,height=241]
+image:image79.png[ipa dns zone add,width=624,height=241]
 
 [arabic, start=7]
 . Disable krb5 ccache config and verify:
@@ -1831,7 +1840,7 @@ image:extracted-media/media/image79.png[ipa dns zone add,width=624,height=241]
 [root@ipaserver ~]# ipactl restart
 ----
 
-image:extracted-media/media/image48.png[ipa kerb keyring,width=365,height=270]
+image:image48.png[ipa kerb keyring,width=365,height=270]
 
 [arabic, start=8]
 . Prepare the commands for adding dnsrecord and configuring reverse lookup:
@@ -1856,9 +1865,9 @@ ipa dnsrecord-add 16.172.in-addr.arpa. 226.31 --ptr-rec ipaserver.cldrsetup.loca
 ##### Following the same, The record for the machine should be created in the Reverse DNS zone.
 ----
 
-image:extracted-media/media/image184.png[ipa dnsrecord add,width=697,height=52]
+image:image184.png[ipa dnsrecord add,width=697,height=52]
 
-image:extracted-media/media/image116.png[ipa dns record ipa agent,width=697,height=57]
+image:image116.png[ipa dns record ipa agent,width=697,height=57]
 
 [source,bash]
 ----
@@ -2160,7 +2169,7 @@ The ipa-client-install command was successful
 [root@pvcbase-master ~]# 
 ----
 
-image:extracted-media/media/image87.png[ipa client install,width=616,height=459]
+image:image87.png[ipa client install,width=616,height=459]
 
 *Step 3:* Verify KDC setup: kerberos ticket generation is working fine by generating a ticket for the admin user from all individual hosts.
 
@@ -2200,7 +2209,7 @@ ipa: INFO: The ipactl command was successful
 
 This command should return the below output:
 
-image:extracted-media/media/image23.png[klist verify,width=582,height=171]
+image:image23.png[klist verify,width=582,height=171]
 
 *Step 4:* Verify the network configuration file *_/etc/resolv.conf_* on the IPA server to use the Name Server created in previous steps (after installing freeipa-client, as it overrides resolv.conf and may lead to rework) to make them able to resolve FQDNs across the cluster:
 
@@ -2220,7 +2229,7 @@ nameserver 127.0.0.1
 [root@ipaserver ~]#
 ----
 
-image:extracted-media/media/image32.png[resolv conf,width=428,height=59]
+image:image32.png[resolv conf,width=428,height=59]
 
 *Step 5:* Verify the network configuration file *_/etc/sysconfig/network_* on the IPA server to use the Name Server created in previous steps:
 
@@ -2236,7 +2245,7 @@ NOZEROCONF=yes
 [root@ipaserver ~]#
 ----
 
-image:extracted-media/media/image55.png[sysconfig network,width=213,height=79]
+image:image55.png[sysconfig network,width=213,height=79]
 
 *Step 6:* Copy */etc/resolv.conf* file to each node again, to make them able to resolve FQDNs across the cluster:
 
@@ -2391,7 +2400,7 @@ console-cdp.apps.cldrsetup.local. 86400 IN A       172.31.30.239
 [root@ipaserver ~]# chcon -R -t httpd_sys_content_t /var/www/html/
 ----
 
-image:extracted-media/media/image155.png[selinux,width=577,height=172]
+image:image155.png[selinux,width=577,height=172]
 
 [arabic, start=9]
 . Enable Syslog
@@ -2593,7 +2602,7 @@ sysctl -w net.ipv6.conf.lo.disable_ipv6=0
 [root@ipaserver ~]#
 ----
 
-image:extracted-media/media/image65.png[huge page ipv6,width=453,height=249]
+image:image65.png[huge page ipv6,width=453,height=249]
 
 [arabic, start=16]
 . Disable tuned service
@@ -3957,10 +3966,10 @@ com.cloudera.cmf.orm.hibernate.connection.url=jdbc:postgresql://cldr-mngr.cldrse
 [arabic, start=9]
 . The Cloudera Manager should show the below logs before the UI actually comes up.
 
-image:extracted-media/media/image111.png[jetty started,width=635,height=66]
+image:image111.png[jetty started,width=635,height=66]
 
 [arabic, start=10]
-. Once the Cloudera-Manager(CM) installation is completed, open the endpoint URL [.underline]#http://<cldr-mgr_ip_addr>:7180/# of the Cloudera Manager WebUI and login to the CM using default credentials. (Username: admin, Password: admin)image:extracted-media/media/image170.png[extracted-media/media/image170,width=695,height=444]
+. Once the Cloudera-Manager(CM) installation is completed, open the endpoint URL [.underline]#http://<cldr-mgr_ip_addr>:7180/# of the Cloudera Manager WebUI and login to the CM using default credentials. (Username: admin, Password: admin)image:image170.png[image170,width=695,height=444]
 
 [arabic, start=28]
 . Default username and password for Cloudera Manager is admin/admin.
@@ -3978,7 +3987,7 @@ image:extracted-media/media/image111.png[jetty started,width=635,height=66]
 [arabic, start=12]
 . The Welcome to Cloudera Manager page appears. Since you would have received the CDP license before, select *_Upload Cloudera Data Platform License_* and upload the downloaded .txt or .zip file with the license information.
 
-image:extracted-media/media/image85.png[A screenshot of a cloud computing software Description automatically generated,width=625,height=209]
+image:image85.png[A screenshot of a cloud computing software Description automatically generated,width=625,height=209]
 
 [arabic, start=13]
 . Activate your license for Cloudera Data Platform by clicking the *_Continue_* button. Click Continue.
@@ -3993,7 +4002,7 @@ image:extracted-media/media/image85.png[A screenshot of a cloud computing softwa
 [root@cldr-mngr ~]# systemctl status cloudera-scm-agent -l
 ----
 
-image:extracted-media/media/image180.png[extracted-media/media/image180,width=693,height=101]
+image:image180.png[image180,width=693,height=101]
 
 ***************************************************************************************************
 
@@ -4005,7 +4014,7 @@ Auto-TLS is managed using the certmanager utility, which is included in the Clou
 [arabic]
 . Click on the link *_here to setup Enable AutoTLS_* to set up AutoTLS through Cloudera Manager on the *_Add Private Cloud Base Cluster_* page.
 
-image:extracted-media/media/image185.png[extracted-media/media/image185,width=627,height=381]
+image:image185.png[image185,width=627,height=381]
 
 [arabic, start=2]
 . Below screen will appear. Enter the values for the parameters as shown below. (*We will be using the private key approach*, you can use password option as well, both options should considerably work)
@@ -4084,12 +4093,12 @@ ____
 
 |===
 
-image:extracted-media/media/image175.png[A screenshot of a computer Description automatically generated,width=627,height=381]
+image:image175.png[A screenshot of a computer Description automatically generated,width=627,height=381]
 
 [loweralpha]
 . *Screenshot for using the Password based authentication method.
 
-image:extracted-media/media/image122.png[extracted-media/media/image122,width=620,height=417]
+image:image122.png[image122,width=620,height=417]
 
 [loweralpha, start=2]
 . *Screenshot for using the Private Key based authentication method.
@@ -4097,7 +4106,7 @@ image:extracted-media/media/image122.png[extracted-media/media/image122,width=62
 [arabic, start=3]
 . Click *_Next_* to continue. Below screen will appear, if all the values are entered properly.
 
-image:extracted-media/media/image107.png[A screenshot of a computer Description automatically generated,width=622,height=177]
+image:image107.png[A screenshot of a computer Description automatically generated,width=622,height=177]
 
 [arabic, start=4]
 . Click on Finish.
@@ -4116,7 +4125,7 @@ image:extracted-media/media/image107.png[A screenshot of a computer Description 
 . The URL should get redirected to https at 7183 port i.e. https://10.29.148.150:7183/[[.underline]#https://<CM_SRVR_IP_ADDR>:7183/#] This means that the AutoTLS configuration is successful. You might get a warning message on the browser related to the certificate. You can ignore the warning and visit the website as this is not a signed certificate.
 . Enter the default credentials (admin/admin) and click on *_Login_*. You should see AutoTLS enabled as shown in the image below.
 
-image:extracted-media/media/image134.png[A screenshot of a computer Description automatically generated,width=635,height=341]
+image:image134.png[A screenshot of a computer Description automatically generated,width=635,height=341]
 
 [arabic, start=8]
 . Enable Kerberos:- Kerberos Integration with CDP
@@ -4139,7 +4148,7 @@ Cloudera Manager provides a wizard for integrating your organization’s Kerbero
 
 #default_ccache_name = KEYRING:persistent:%{uid}
 
-image:extracted-media/media/image48.png[ipa kerb keyring,width=398,height=155]
+image:image48.png[ipa kerb keyring,width=398,height=155]
 
 If you have made any changes, only then run the below commands to restart all the IPA services. If not, skip to the next step.
 
@@ -4149,7 +4158,7 @@ If you have made any changes, only then run the below commands to restart all th
 . Now, move to CM-UI on your browser.
 . In the Cloudera manager console click on *_here to set up a KDC_*, on the same TLS page, to enable the kerberos authentication on the cluster.
 
-image:extracted-media/media/image134.png[extracted-media/media/image134,width=630,height=414]
+image:image134.png[image134,width=630,height=414]
 
 [arabic, start=4]
 . Click Continue.
@@ -4157,14 +4166,14 @@ image:extracted-media/media/image134.png[extracted-media/media/image134,width=63
 
 We have already installed the required RedHat FreeIPA/ Kerberos dependency packages openldap-clients, krb5-workstation and krb5-libs in previous steps.
 
-image:extracted-media/media/image89.png[extracted-media/media/image89,width=624,height=342]
+image:image89.png[image89,width=624,height=342]
 
 [arabic, start=6]
 . Select *_Active Directory_* as shown below, *if you’re proceeding with AD based Kerberos integration* and check the box for *_I have completed all the above steps._* Setting up AD is beyond the scope of this document.
 
 We have already installed the required RedHat FreeIPA/ Kerberos dependency packages openldap-clients, krb5-workstation and krb5-libs in previous steps. *_(Skip this step, in our case)_
 
-image:extracted-media/media/image162.png[A screenshot of a computer Description automatically generated,width=558,height=504]
+image:image162.png[A screenshot of a computer Description automatically generated,width=558,height=504]
 
 [arabic, start=7]
 . As recommended, install the following in all Cloudera Manager hosts by running the following command. Once completed, click the checkbox *_“I have completed all the above steps”_* and click *_Continue_*.
@@ -4275,30 +4284,30 @@ ____
 
 Check the picture below on where to populate the above mentioned fields:
 
-image:extracted-media/media/image126.png[extracted-media/media/image126,width=634,height=218]
+image:image126.png[image126,width=634,height=218]
 
 [arabic, start=32]
 . In this setup, we used Kerberos authentication with *_RedHat FreeIPA_*.
 
-image:extracted-media/media/image61.png[extracted-media/media/image61,width=628,height=276]
+image:image61.png[image61,width=628,height=276]
 
 [arabic, start=9]
 . On the Next Page, check the box for *_Manage “krb5.conf”_* to enable it through Cloudera Manager. This will install the krb5.conf file in all the hosts selected for the data lake.
 
-image:extracted-media/media/image51.png[extracted-media/media/image51,width=624,height=203]
+image:image51.png[image51,width=624,height=203]
 
 [arabic, start=10]
 . Next, enter the details as per the configuration of FreeIPA you did before. i.e., provide the domain and password of the admin user configured earlier in the FreeIPA setup. Enter account credentials for the admin which you have created. This credential will be used to generate the keytabs. In our lab setup, “admin” user is created during the IPA server installation. Click Continue.
 
 Enter the REALM portion of the principal in upper-case only to conform to Kerberos convention.
 
-image:extracted-media/media/image66.png[extracted-media/media/image66,width=624,height=178]
+image:image66.png[image66,width=624,height=178]
 
 [arabic, start=11]
 . Click Finish to complete the KDC setup.
 . KDC Account manager credentials should get imported successfully as shown below.
 
-image:extracted-media/media/image201.png[A screenshot of a computer Description automatically generated,width=558,height=258]
+image:image201.png[A screenshot of a computer Description automatically generated,width=558,height=258]
 
 ##### For Red Hat IdM, make sure that all cluster hosts are joined to the IPA domain, after freeipa-client is installed.
 
@@ -4319,7 +4328,7 @@ ipa-client-common-4.6.8-5.el7.centos.16.noarch
 [arabic, start=13]
 . Once the KDC setup is completed, the Cloudera Manager wizard for adding a cluster will reflect the following:
 
-image:extracted-media/media/image3.png[extracted-media/media/image3,width=657,height=438]
+image:image3.png[image3,width=657,height=438]
 
 [arabic, start=14]
 . Verify Kerberos configuration.
@@ -4350,27 +4359,27 @@ renew until 03/12/2024 21:35:07
 [loweralpha]
 . *Go to —> WebUI -> Top Right Corner -> (+)Add -> Add Cloudera Management Service
 
-image:extracted-media/media/image35.png[extracted-media/media/image35,width=585,height=317]
+image:image35.png[image35,width=585,height=317]
 
 [loweralpha, start=2]
 . Assign Roles for different Cloudera Management Services to CLDR-MNGR Host (e.g. cldr-mngr.cldrsetup.local)
 
-image:extracted-media/media/image103.png[extracted-media/media/image103,width=582,height=389]
+image:image103.png[image103,width=582,height=389]
 
 [loweralpha, start=3]
 . Setup Report Manager Database integration by providing the *_DBHostname_*, *_DBNAME_*, *_DBUser_* and *_DBPassword_*. After entering the details, click on *_Test Connection._* After the successful connection test, click *_Continue._
 
-image:extracted-media/media/image67.png[extracted-media/media/image67,width=591,height=396]
+image:image67.png[image67,width=591,height=396]
 
 [loweralpha, start=4]
 . *_Summary page_* will come up. Click on *_Finish_*.
 
-image:extracted-media/media/image179.png[extracted-media/media/image179,width=582,height=390]
+image:image179.png[image179,width=582,height=390]
 
 [loweralpha, start=5]
 . Now, Cloudera Management Service is visible as installed and status of different components is also visible.
 
-image:extracted-media/media/image82.png[extracted-media/media/image82,width=621,height=351]
+image:image82.png[image82,width=621,height=351]
 
 ++**************************************************************************************************************++
 
@@ -4388,19 +4397,19 @@ An LDAP-compliant identity/directory service, such as OpenLDAP/FreeIPA, provides
 . Login to the Cloudera Manager (CM-UI) admin console.
 . From Cloudera Manager, navigate to Administration→Settings.
 
-image:extracted-media/media/image50.png[admin settings,width=351,height=212]
+image:image50.png[admin settings,width=351,height=212]
 
 [arabic, start=3]
 . In the filters section, click on External Authentication as shown in the screenshot below:
 
-image:extracted-media/media/image83.png[ldap ext auth,width=264,height=350]
+image:image83.png[ldap ext auth,width=264,height=350]
 
 [arabic, start=4]
 . Below page will get open, select the appropriate options as mentioned below in the screenshot:
 
-image:extracted-media/media/image174.png[extracted-media/media/image174,width=624,height=396]
+image:image174.png[image174,width=624,height=396]
 
-image:extracted-media/media/image108.png[extracted-media/media/image108,width=624,height=217]
+image:image108.png[image108,width=624,height=217]
 
 [arabic, start=5]
 . Search for “ldap” and enter values for ldap authentication, as mentioned in the below table.
@@ -4560,22 +4569,22 @@ ____
 [arabic, start=7]
 . Login again to CM-UI and in *_Administration > Users & Roles > LDAP/PAM Groups_*, add LDAP/PAM Group mapping.
 
-image:extracted-media/media/image22.png[A screenshot of a computer Description automatically generated,width=642,height=173]
+image:image22.png[A screenshot of a computer Description automatically generated,width=642,height=173]
 
 [arabic, start=8]
 . *_Add LDAP/PAM Group mapping_* value and Roles to assign. (*_LDAP/PAM Group: admin, Roles: Full Administrator_*)
 
-image:extracted-media/media/image191.png[extracted-media/media/image191,width=482,height=186]
+image:image191.png[image191,width=482,height=186]
 
 [arabic, start=9]
 . Click on *_Test LDAP Connectivity._* Provide a username and password for an LDAP user to test whether that user can be authenticated. *_(username: admin, password: <vmware123>)_
 
-image:extracted-media/media/image113.png[extracted-media/media/image113,width=490,height=160]
+image:image113.png[image113,width=490,height=160]
 
 [arabic, start=10]
 . Click on *_Test_* to verify LDAP configuration is set up and working fine, as expected.
 
-image:extracted-media/media/image190.png[extracted-media/media/image190,width=679,height=108]
+image:image190.png[image190,width=679,height=108]
 
 [arabic, start=11]
 . Login to the cldr-mngr server at backend and restart the Cloudera Manager Server.
@@ -4601,7 +4610,7 @@ image:extracted-media/media/image190.png[extracted-media/media/image190,width=67
 [arabic, start=12]
 . Login to Cloudera Manager WebUI and assign Roles for new users. *_(Only, If used a different user than admin, else skip this step)_
 
-image:extracted-media/media/image202.png[extracted-media/media/image202,width=667,height=142]
+image:image202.png[image202,width=667,height=142]
 
 ++**************************************************************************************************************++
 
@@ -4615,14 +4624,14 @@ In this step, we will setup the Base cluster which will serve as the DataLake fo
 [arabic]
 . In Cloudera Manager, on the top right corner, click *_(+) Add > Add Cluster_*. The Select Cluster Type page appears.
 
-image:extracted-media/media/image74.png[extracted-media/media/image74,width=316,height=149]
+image:image74.png[image74,width=316,height=149]
 
 [arabic, start=2]
 . On the *_Select Cluster Type_* page, select the cluster type as *_Private Cloud Base Cluster_* (first option) and enter a cluster name. Click *_Continue_*.
 
-image:extracted-media/media/image81.png[extracted-media/media/image81,width=684,height=456]
+image:image81.png[image81,width=684,height=456]
 
-image:extracted-media/media/image140.png[extracted-media/media/image140,width=692,height=463]
+image:image140.png[image140,width=692,height=463]
 
 [arabic, start=3]
 . Enter the cluster host names or IP addresses in the Hostnames field. You can Provide host pattern pvcbase-master, pvcbase-worker[1-5] or pvcbase-worker[1-5].cldrsetup.local etc separated with a new line and Click on *_Search_*.
@@ -4633,19 +4642,19 @@ pvcbase-master.cldrsetup.local
 
 pvcbase-worker[1-5].cldrsetup.local
 
-image:extracted-media/media/image105.png[extracted-media/media/image105,width=700,height=385]
+image:image105.png[image105,width=700,height=385]
 
 [arabic, start=5]
 . The Select Repository section appears. Select Cloudera Repository option as mentioned. Enter *_Custom Repository_* or Cloudera Repository to install Cloudera Manager Agent on all nodes in the cluster. We have earlier configured the private yum repository on *_cldr-mngr_* node. Please provide the path here:
 
 i.e. http://13.251.65.11/cloudera-repos/cloudera-manager/cm7.11.3/[[.underline]#http://13.251.65.11/cloudera-repos/cloudera-manager/#] and click on *_Continue_*.
 
-image:extracted-media/media/image208.png[extracted-media/media/image208,width=685,height=180]
+image:image208.png[image208,width=685,height=180]
 
 [arabic, start=6]
 . In the other software section, select *_Use Parcels (Recommended)_* and click *_Parcel Repository & Network Settings_* to provide a custom Parcels location to be installed *_(in a new tab in the same browser window)_*.
 
-image:extracted-media/media/image10.png[extracted-media/media/image10,width=433,height=153]
+image:image10.png[image10,width=433,height=153]
 
 [arabic, start=7]
 . Enter custom repository URL for CDH7 and CDS 3.3 parcels. Click on *_Save and Verify Configuration_*. Close the Parcel Repository & Network Settings wizard.
@@ -4654,18 +4663,18 @@ i.e. *http://13.251.65.11/cloudera-repos/spark3/3.3.7190.4/[[.underline]#http://
 
 http://13.251.65.11/cloudera-repos/cdh7.1.9/[[.underline]#http://13.251.65.11/cloudera-repos/cdh7.1.9/#]
 
-image:extracted-media/media/image80.png[extracted-media/media/image80,width=626,height=312]
+image:image80.png[image80,width=626,height=312]
 
 [arabic, start=8]
 . Select the parcels for installation.
 
-image:extracted-media/media/image18.png[extracted-media/media/image18,width=616,height=421]
+image:image18.png[image18,width=616,height=421]
 
 [arabic, start=9]
 . Click *_Continue_*.
 . Select the appropriate option for JDK. (manual installation for JDK11 with CDH 7.1.x and JDK17 with 7.1.9 and above): (Select *_Manually manage JDK_* here, as we have already installed a System-provided version of OpenJDK11 manually on all servers. Click on *_Continue_*.
 
-image:extracted-media/media/image173.png[A screenshot of a computer Description automatically generated,width=604,height=454]
+image:image173.png[A screenshot of a computer Description automatically generated,width=604,height=454]
 
 [arabic, start=11]
 . The *_Enter Login Credentials section_* appears. On this page, provide the required *_details_* as mentioned *_in the below table_*, for the hosts to install Cloudera packages. Click *_Continue_*.
@@ -4750,12 +4759,12 @@ ____
 
 |===
 
-image:extracted-media/media/image153.png[A screenshot of a computer Description automatically generated,width=572,height=441]
+image:image153.png[A screenshot of a computer Description automatically generated,width=572,height=441]
 
 [loweralpha]
 . If Selected the *_Authentication method_* as *_All hosts accept same password_
 
-image:extracted-media/media/image122.png[extracted-media/media/image122,width=566,height=358]
+image:image122.png[image122,width=566,height=358]
 
 [loweralpha, start=2]
 . If Selected the *_Authentication method_* as *_All hosts accept the same private key_*.
@@ -4763,7 +4772,7 @@ image:extracted-media/media/image122.png[extracted-media/media/image122,width=56
 [arabic, start=12]
 . The *_Install Agents_* section appears showing the progress of the installation. It will check for and install the *_JDK_* (If not already there) and *_cloudera-scm-agent_* software on all the Base Cluster nodes. Click *_Continue_* after the Cloudera Agent *_Installation completed successfully_* on all hosts.
 
-image:extracted-media/media/image4.png[extracted-media/media/image4,width=617,height=336]
+image:image4.png[image4,width=617,height=336]
 
 [arabic, start=13]
 . Stop at this stage. Create a directory on base cluster nodes (for handling of a bug associated with p1000)
@@ -4775,7 +4784,7 @@ image:extracted-media/media/image4.png[extracted-media/media/image4,width=617,he
 [arabic, start=14]
 . After the agents are installed, the *_Install Parcels_* section appears showing the progress of the parcels distribution, activation and installation on all hosts part of the cluster creation. Once the parcels are installed successfully for all hosts, click on *_Continue_*.
 
-image:extracted-media/media/image17.png[extracted-media/media/image17,width=611,height=407]
+image:image17.png[image17,width=611,height=407]
 
 [arabic, start=15]
 . Stop at this stage. On base cluster nodes (for handling of a bug associated with p1000). Once Parcels are activated, follow below steps:
@@ -4860,7 +4869,7 @@ image:extracted-media/media/image17.png[extracted-media/media/image17,width=611,
 +
 Both the inspection tests should run successfully. Review inspector summary. Click *_Finish_*.
 
-image:extracted-media/media/image188.png[A screenshot of a computer Description automatically generated,width=619,height=379]
+image:image188.png[A screenshot of a computer Description automatically generated,width=619,height=379]
 
 *If java path mismatch error occurs in network/host inspection:
 
@@ -4881,7 +4890,7 @@ image:extracted-media/media/image188.png[A screenshot of a computer Description 
 . After the Private Cloud Base Cluster (runtime) setup is complete, if successful, it will automatically move to add services *_(Add Cluster -Configuration)_* wizard. It will ask to *_Select Services_* i.e. (a) Data Engineering, (b) Data Warehouse/ Data Mart, © Operational Database specific or (d) Custom control plane/base cluster services i.e. HDFS, YARN, Hive, Tez, HiveOnTez, Ozone, Zookeeper, Kafka, SOLR, Ranger, Atlas, HBase, Phoenix, Impala, HUE, Spark2, Spark3, YARN Queue Manager etc. Choose from a combination or services defined or select custom services. Services required based on selection will be automatically added.
 . Select *_Custom Services_* option to install.
 
-image:extracted-media/media/image34.png[A screenshot of a computer Description automatically generated,width=603,height=503]
+image:image34.png[A screenshot of a computer Description automatically generated,width=603,height=503]
 
 [arabic, start=34]
 . It is important to select host(s) to deploy services based on the role intended for it. For detailed information, go to: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/installation/topics/cdpdc-runtime-cluster-hosts-role-assignments.html[[.underline]#Runtime Cluster Hosts and Role Assignments#]
@@ -4889,13 +4898,13 @@ image:extracted-media/media/image34.png[A screenshot of a computer Description a
 [arabic, start=20]
 . Under the *_Custom Services_*, select the below custom Cloudera DataLake/Control Plane management services to be installed on the cluster. The Selection would look similar to below, Select services and Click *_Continue_*.
 
-image:extracted-media/media/image97.png[A screenshot of a computer Description automatically generated,width=697,height=506]
+image:image97.png[A screenshot of a computer Description automatically generated,width=697,height=506]
 
-image:extracted-media/media/image77.png[extracted-media/media/image77,width=705,height=205]
+image:image77.png[image77,width=705,height=205]
 
-image:extracted-media/media/image196.png[extracted-media/media/image196,width=702,height=104]
+image:image196.png[image196,width=702,height=104]
 
-image:extracted-media/media/image104.png[extracted-media/media/image104,width=691,height=519]
+image:image104.png[image104,width=691,height=519]
 
 [arabic, start=21]
 . Select host assignment for different services in the *_Add cluster - configuration_* wizard. You need to assign hosts to different roles across all the selected services. Use the below table as a reference to assign the roles.
@@ -5188,11 +5197,11 @@ ____
 [arabic, start=22]
 . Assign roles as updated above and shown as below.
 
-image:extracted-media/media/image2.png[extracted-media/media/image2,width=539,height=337]
+image:image2.png[image2,width=539,height=337]
 
-image:extracted-media/media/image169.png[extracted-media/media/image169,width=539,height=377]
+image:image169.png[image169,width=539,height=377]
 
-image:extracted-media/media/image39.png[extracted-media/media/image39,width=555,height=392]image:extracted-media/media/image167.png[extracted-media/media/image167,width=572,height=429]
+image:image39.png[image39,width=555,height=392]image:image167.png[image167,width=572,height=429]
 
 [arabic, start=23]
 . Click *_Continue_*. When you’re doing the set-up for the first time on this CM Sever. *_Cloudera Management Services_* will be installed only once along with other control plane services.
@@ -5205,7 +5214,7 @@ image:extracted-media/media/image39.png[extracted-media/media/image39,width=555,
 * YARN Queue Manager
 * Hue
 
-image:extracted-media/media/image21.png[extracted-media/media/image21,width=624,height=392]
+image:image21.png[image21,width=624,height=392]
 
 [arabic, start=25]
 . Next, the *_Enter Required Parameters_* page appears.
@@ -5219,7 +5228,7 @@ image:extracted-media/media/image21.png[extracted-media/media/image21,width=624,
 * Ranger Tagsync: *_VMware@123_
 * Ranger KMS Keyadmin: *_VMware@123_
 
-image:extracted-media/media/image199.png[extracted-media/media/image199,width=624,height=357]
+image:image199.png[image199,width=624,height=357]
 
 [arabic, start=27]
 . Click *_Continue_*.
@@ -5227,7 +5236,7 @@ image:extracted-media/media/image199.png[extracted-media/media/image199,width=62
 
 * Atlas Admin password: *_VMware@123_
 
-image:extracted-media/media/image128.png[atlas passwd,width=624,height=58]
+image:image128.png[atlas passwd,width=624,height=58]
 
 [arabic, start=29]
 . Scroll down and verify/update the HDFS disks configuration according to the below.
@@ -5236,24 +5245,24 @@ image:extracted-media/media/image128.png[atlas passwd,width=624,height=58]
 * NameNode Data Directories: *_/hdfs/dfs/nn_
 * HDFS Checkpoint Directories: *_/hdfs/dfs/snn_
 
-image:extracted-media/media/image98.png[extracted-media/media/image98,width=605,height=155]
+image:image98.png[image98,width=605,height=155]
 
 [arabic, start=30]
 . Review the changes for all the services on the *_Review Changes_* page and verify/edit the configuration parameters as per your requirements. Click *_Continue_*.
 . A few sets of commands are running in the background. Wait for them to get executed successfully. Once done, Click *_Continue_*.
 . Configure Kerberos and Keep Review and customize the configuration changes based on your requirements. Check the box for *_Enable Kerberos for this cluster_*. *Required libraries i.e. krb5-workstation, krb5-libs and freeipa-client are already installed on all servers in prior steps.
 
-image:extracted-media/media/image70.png[A screenshot of a computer Description automatically generated,width=583,height=563]
+image:image70.png[A screenshot of a computer Description automatically generated,width=583,height=563]
 
 [arabic, start=33]
 . Click *_Continue_* after Cloudera Manager successfully runs the *_Enable Kerberos_* command.
 
-image:extracted-media/media/image75.png[extracted-media/media/image75,width=704,height=298]
+image:image75.png[image75,width=704,height=298]
 
 [arabic, start=34]
 . Installation wizard will run the first command to start cluster roles and services. Click *_Continue_*.
 
-image:extracted-media/media/image96.png[extracted-media/media/image96,width=693,height=265]
+image:image96.png[image96,width=693,height=265]
 
 [arabic, start=35]
 . If you still face any issue while making the services up or during the installation or start of any Control Plane services please refer to troubleshooting PvC Base Cluster part at the end of this document. Though, some of the major issues during installation, their cause and their resolution is listed as below:
@@ -5413,13 +5422,13 @@ Delete scm db and recreated db and restart scm server fixed the issue. This lead
 . Next, all the Cloudera services would get started and their prerequisite operations would also be run. These processes will run in a combination of serial and parallel processes. Wait for them to complete. Once completed, you will see a Green tick next to all the steps, as shown in the screenshot above.
 . Once completed above step, click *_Continue_*. You will see a summary page like below.
 
-image:extracted-media/media/image193.png[A screenshot of a computer Description automatically generated,width=504,height=367]
+image:image193.png[A screenshot of a computer Description automatically generated,width=504,height=367]
 
 [arabic, start=38]
 . Click *_Finish_* on the Summary page.
 . This will navigate to the main page where you can see all the services installed.
 
-image:extracted-media/media/image125.png[extracted-media/media/image125,width=666,height=379]
+image:image125.png[image125,width=666,height=379]
 
 [arabic, start=40]
 . All the services should be in Healthy state. If there are any instances in Bad Health, troubleshoot the same and fix it.
@@ -5525,9 +5534,9 @@ While accessing Web UIs from web browsers, for HDFS-Namenode, YARN services, Hiv
 
 *Example Screenshots for HDFS. You can follow the same for other services, which requires WebUI access.
 
-image:extracted-media/media/image54.png[extracted-media/media/image54,width=689,height=392]
+image:image54.png[image54,width=689,height=392]
 
-image:extracted-media/media/image110.png[extracted-media/media/image110,width=687,height=388]
+image:image110.png[image110,width=687,height=388]
 
 *1. For Impala, Hive, Hive on Tez edit value for
 
@@ -5810,7 +5819,7 @@ ____
 
 [root@pvcbase-master ~]# tail -f /var/log/ranger/admin/catalina.out
 
-image:extracted-media/media/image72.png[extracted-media/media/image72,width=691,height=446]
+image:image72.png[image72,width=691,height=446]
 
 ++**************************************************************************************************************++
 
@@ -5826,7 +5835,7 @@ Copy the database server certificate to *_/var/lib/hive/_* path, or use any cust
 
 *_jdbc:postgresql://cldr-mngr.cldrsetup.local:5432/hive?ssl=true&sslmode=verify-full&sslrootcert=/var/lib/hive/root.crt_
 
-image:extracted-media/media/image88.png[extracted-media/media/image88,width=666,height=72]
+image:image88.png[image88,width=666,height=72]
 
 [arabic, start=36]
 . Restart required for Hive Metastore Server and HiveServer2 after updating Hive configuration.
@@ -5863,7 +5872,7 @@ https://supportmatrix.cloudera.com/[[.underline]#Cloudera support matrix#] lists
 
 https://docs.cloudera.com/cdp-private-cloud-data-services/latest/installation/topics/cdppvc-installation-pvcbase-checklist.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-data-services/latest/installation/topics/cdppvc-installation-pvcbase-checklist.html#]
 
-image:extracted-media/media/image154.png[A screenshot of a computer Description automatically generated,width=446,height=265]
+image:image154.png[A screenshot of a computer Description automatically generated,width=446,height=265]
 
 ++**************************************************************************************************************++
 
@@ -5876,7 +5885,7 @@ Follow steps below to configure Ranger for LDAP authentication.
 . To display the authentication settings, type "*_authentication_*" in the Search box. Scroll down to see all of the *_LDAP_* settings.
 . Select LDAP for "Admin Authentication Method".
 
-image:extracted-media/media/image187.png[extracted-media/media/image187,width=555,height=331]
+image:image187.png[image187,width=555,height=331]
 
 [arabic, start=4]
 . Configure the following settings for LDAP authentication as shown below, the details depends on your configuration, based on existing LDAP/AD setup:
@@ -6014,20 +6023,20 @@ ____
 
 *(Search under Configuration for- _ranger.ldap_)
 
-image:extracted-media/media/image197.png[extracted-media/media/image197,width=623,height=367]
+image:image197.png[image197,width=623,height=367]
 
 *Additional parameters required for AD Based integration: (Search under Configuration for- _ranger.ldap.ad_)
 
-image:extracted-media/media/image58.png[extracted-media/media/image58,width=624,height=330]
+image:image58.png[image58,width=624,height=330]
 
 [arabic, start=5]
 . Edit Usersync configuration. Example values set are shown in the screenshot below:
 
-image:extracted-media/media/image139.png[extracted-media/media/image139,width=693,height=525]
+image:image139.png[image139,width=693,height=525]
 
-image:extracted-media/media/image1.png[extracted-media/media/image1,width=444,height=501]
+image:image1.png[image1,width=444,height=501]
 
-image:extracted-media/media/image57.png[extracted-media/media/image57,width=450,height=348]
+image:image57.png[image57,width=450,height=348]
 
 [arabic, start=9]
 . *UserSync LDAP Integration
@@ -6253,14 +6262,14 @@ Configuring Hue for Lightweight Directory Access Protocol (LDAP) enables you to 
 . Login to *_Cloudera Manager_*. Go to *_Cluster > Hue > Configuration_*.
 . Change value for Authentication Backend – desktop.auth.backend.LdapBeckend,desktop.auth.backend.AllowFirstUserDjangoBackend
 
-image:extracted-media/media/image76.png[extracted-media/media/image76,width=616,height=59]
+image:image76.png[image76,width=616,height=59]
 
 [arabic, start=3]
 . Edit value for LDAP configuration. Example values set are shown in the screenshot below:
 
-image:extracted-media/media/image137.png[A screenshot of a computer Description automatically generated,width=553,height=568]
+image:image137.png[A screenshot of a computer Description automatically generated,width=553,height=568]
 
-image:extracted-media/media/image158.png[A screenshot of a computer Description automatically generated,width=449,height=482]
+image:image158.png[A screenshot of a computer Description automatically generated,width=449,height=482]
 
 *Table: LDAP Integration
 
@@ -6403,17 +6412,17 @@ ____
 . Restart HUE service.
 . Click on Actions next to Hue. Click on Test LDAP Configuration.
 
-image:extracted-media/media/image183.png[A screenshot of a computer Description automatically generated,width=251,height=292]
+image:image183.png[A screenshot of a computer Description automatically generated,width=251,height=292]
 
 [arabic, start=7]
 . Click on Test LDAP Configuration.
 
-image:extracted-media/media/image9.png[A screenshot of a computer error Description automatically generated,width=344,height=163]
+image:image9.png[A screenshot of a computer error Description automatically generated,width=344,height=163]
 
 [arabic, start=8]
 . Click on Finish.
 
-image:extracted-media/media/image195.png[A screenshot of a computer Description automatically generated,width=407,height=169]
+image:image195.png[A screenshot of a computer Description automatically generated,width=407,height=169]
 
 For more details: https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/securing-hue/topics/hue-authenticate-users-with-ldap.html[[.underline]#https://docs.cloudera.com/cdp-private-cloud-base/7.1.9/securing-hue/topics/hue-authenticate-users-with-ldap.html#]
 
@@ -6427,9 +6436,9 @@ Follow steps below to configure Atlas authentication for LDAP. (*_If LDAP is not
 . Login to Cloudera Manager WebUI. Go to Cluster > Atlas > Configuration.
 . Edit LDAP configuration. Sample configuration is shown in the screenshot below:
 
-image:extracted-media/media/image119.png[A screenshot of a computer Description automatically generated,width=592,height=733]
+image:image119.png[A screenshot of a computer Description automatically generated,width=592,height=733]
 
-image:extracted-media/media/image36.png[extracted-media/media/image36,width=484,height=360]
+image:image36.png[image36,width=484,height=360]
 
 [arabic, start=10]
 . *Atlas LDAP Integration
@@ -6608,7 +6617,7 @@ ____
 
 === Configure Hive for LDAP Authentication (Optional– Skip this Step)
 
-image:extracted-media/media/image28.png[extracted-media/media/image28,width=566,height=509]
+image:image28.png[image28,width=566,height=509]
 
 [arabic, start=11]
 . *LDAP Integration-Hive
@@ -6718,12 +6727,12 @@ CDP uses “out_webhdfs” Fluentd output plugin to write records into HDFS, in 
 . Go to *_Cluster_* > *_HDFS Service_* > *_Configuration._
 . Enable *_WebHDFS._
 
-image:extracted-media/media/image68.png[A screenshot of a computer Description automatically generated,width=443,height=197]
+image:image68.png[A screenshot of a computer Description automatically generated,width=443,height=197]
 
 [arabic, start=4]
 . Edit value for HDFS Service Advanced Configuration Snippet (Safety Valve) for hdfs-site.xml as shown in the screenshot below:
 
-image:extracted-media/media/image172.png[A screenshot of a computer Description automatically generated,width=440,height=297]
+image:image172.png[A screenshot of a computer Description automatically generated,width=440,height=297]
 
 [arabic, start=5]
 . Click Save Changes.
@@ -6765,7 +6774,7 @@ Use the checklist for Embedded Container Service (ECS) for CDP Private Cloud Dat
 . Set up Kerberos on these clusters.
 . Ensure that all of the hosts in the ECS cluster have more than *_300 GiB_* of free space in the each *_/var/lib_* and *_/docker_* directories, on each host in a Private Cloud Containerized Cluster, at the time of installation. The default docker service uses *_/docker_* folder. Whether you wish to retain *_/docker_* or override *_/docker_* with any other folder, you *_must have a minimum of 300 GiB free space_*. The hosts in a Private Cloud Containerized Cluster that have GPUs are required to have nVidia Drivers and nvidia-container-runtime installed.
 
-image:extracted-media/media/image63.png[extracted-media/media/image63,width=660,height=97]
+image:image63.png[image63,width=660,height=97]
 
 [arabic, start=5]
 . *_Python 3.8<_* is required for Cloudera Manager version 7.11.3.0 and higher versions. Cloudera Manager agents will not start unless Python 3.8 is installed on the cluster nodes.
@@ -7098,16 +7107,16 @@ RHEL 7.x support on ECS has been dropped in CDP Private Cloud Data Services 1.5.
 [arabic]
 . In the *_Cloudera Manager WebUI_* console, go to the *_Data Services_* page by clicking on the *_Data Services_* link on the Pane located at the Left Hand side of the browser window. Alternatively, you can also click *(+) _Add > Add Cluster_* at the top right in Cloudera Manager, then select *_Private Cloud Containerized Cluster_* as the cluster type.
 
-image:extracted-media/media/image41.png[extracted-media/media/image41,width=432,height=265]
+image:image41.png[image41,width=432,height=265]
 
 [arabic, start=2]
 . The *_Add Private Cloud Containerized Cluster_* page appears. Click *_Continue_* on the page.
 
-image:extracted-media/media/image13.png[extracted-media/media/image13,width=564,height=373]
+image:image13.png[image13,width=564,height=373]
 
 *Note*: Alternatively, you can also click *_(+) Add > Add Cluster_* at the *_top right_* in *_Cloudera Manager_*, then select *_Private Cloud Containerized Cluster_* as the *_cluster type_*, then click *_Continue_*. +
-image:extracted-media/media/image74.png[extracted-media/media/image74,width=230,height=109] +
-image:extracted-media/media/image132.png[extracted-media/media/image132,width=611,height=397]
+image:image74.png[image74,width=230,height=109] +
+image:image132.png[image132,width=611,height=397]
 
 *Step. Getting started
 
@@ -7115,27 +7124,27 @@ image:extracted-media/media/image132.png[extracted-media/media/image132,width=61
 . On the getting started page of the installation wizard, select either *_Internet_* or *_Air Gapped_* as the Install Method. *_(We are going here with Internet Installation method only)_
 . If you select the *_Internet Install_* Method option on the *_Getting Started_* page, images are copied over the internet from the Cloudera repository. For this deployment, we will select the *_Internet_* as the install method. *_Select Repository._* (To use a custom repository link provided to you by Cloudera, click *_Custom Repository, instructions for this are mentioned in later steps_*):
 
-image:extracted-media/media/image59.png[extracted-media/media/image59,width=624,height=380]
+image:image59.png[image59,width=624,height=380]
 
 *Note:* Verify if the version shown below is the same as the version that we are willing to install i.e. *_1.5.4-h5_* for current setup.
 
-image:extracted-media/media/image194.png[extracted-media/media/image194,width=624,height=109]
+image:image194.png[image194,width=624,height=109]
 
 If not (as shown in below screenshot), then we need to add-up an additional custom URL and configure that to use our specific version.
 
-image:extracted-media/media/image40.png[extracted-media/media/image40,width=476,height=59]
+image:image40.png[image40,width=476,height=59]
 
-image:extracted-media/media/image8.png[extracted-media/media/image8,width=624,height=114]
+image:image8.png[image8,width=624,height=114]
 
 Add the additional URL by *(+)* and click on *_Save Changes._
 
-image:extracted-media/media/image192.png[extracted-media/media/image192,width=551,height=167]
+image:image192.png[image192,width=551,height=167]
 
 [arabic, start=5]
 . When you select the *_Air Gapped_* install option, extra steps are displayed. Follow these steps on the *_cldr-mngr_* node (our bits server), to download and mirror the Cloudera archive URL using a local HTTP server:
 . (For installing via a local mirror with an http server. You will need to set up a full mirror of Cloudera's repositories via a temporary HTTP server within the perimeter network of all hosts.): *(Skip this step, as we will choose Internet method in next steps to Install)
 
-image:extracted-media/media/image189.png[extracted-media/media/image189,width=461,height=250]
+image:image189.png[image189,width=461,height=250]
 
 [root@cldr-mngr ~]# mkdir -p /var/www/html/cloudera-repos/cdp-pvc-ds/ +
 [root@cldr-mngr ~]# cd /var/www/html/cloudera-repos/cdp-pvc-ds/
@@ -7172,12 +7181,12 @@ drwxr-xr-x 2 root root 32768 Mar 15 10:12 images
 [arabic, start=7]
 . Click *_Custom Repository_*. Add *http://your_local_repo/cdp-pvc-ds/1.5.4-h2[_[.underline]#http://your_local_repo/cloudera-repos/cdp-pvc-ds/1.5.4-h4#_]/* as a custom repository. Click on *_Save Changes_*. *(Skip this step, as we have chosen Internet method steps to Install)
 
-image:extracted-media/media/image27.png[extracted-media/media/image27,width=675,height=123]
+image:image27.png[image27,width=675,height=123]
 
 [arabic, start=8]
 . Click the *_Select Repository_* drop-down and select *http://your_local_repo/cloudera-repos/cdp-pvc-ds/1.5.4-h2/[_[.underline]#http://your_local_repo/cloudera-repos/cdp-pvc-ds/1.5.4-h4/#_] (Skip this step, as we will chosen Internet method steps to Install)
 
-image:extracted-media/media/image149.png[extracted-media/media/image149,width=679,height=439]
+image:image149.png[image149,width=679,height=439]
 
 [arabic, start=9]
 . Click *_Continue_*.
@@ -7187,7 +7196,7 @@ image:extracted-media/media/image149.png[extracted-media/media/image149,width=67
 [arabic, start=10]
 . On the *_Cluster Basics- Add Private Cloud Containerized Cluster_* page, enter the *_Cluster Name_* for the *_Private Cloud Data Services (ECS) cluster_* that you want to create in the *_Cluster Name_* field. From the *_Base Cluster_* drop-down list, select the *_CDP Private Cloud Base Cluster_* (which is created earlier i.e. *_PvCBaseCluster1_*), that has the storage and SDX services that you want this new Private Cloud Data Services instance to connect with. Click *_Continue_*.
 
-image:extracted-media/media/image159.png[extracted-media/media/image159,width=668,height=431]
+image:image159.png[image159,width=668,height=431]
 
 *Step. Specify Hosts
 
@@ -7203,7 +7212,7 @@ pvcecs-worker[1-10].cldrsetup.local
 
 *Note:* Click the pattern link under the Hostname box to display more information about allowed *FQDN* patterns.
 
-image:extracted-media/media/image138.png[extracted-media/media/image138,width=669,height=356]
+image:image138.png[image138,width=669,height=356]
 
 *Step. Select JDK
 
@@ -7214,7 +7223,7 @@ image:extracted-media/media/image138.png[extracted-media/media/image138,width=66
 * Install a Cloudera-provided version of OpenJDK
 * Install a system-provided version of OpenJDK
 
-image:extracted-media/media/image53.png[extracted-media/media/image53,width=676,height=383]
+image:image53.png[image53,width=676,height=383]
 
 *Step. Enter Login Credentials
 
@@ -7297,12 +7306,12 @@ ____
 
 |===
 
-image:extracted-media/media/image95.png[extracted-media/media/image95,width=606,height=338]
+image:image95.png[image95,width=606,height=338]
 
 [loweralpha]
 . *Screenshot for using the Password based authentication method.
 
-image:extracted-media/media/image122.png[extracted-media/media/image122,width=604,height=455]
+image:image122.png[image122,width=604,height=455]
 
 [loweralpha, start=2]
 . *Screenshot for using the Private Key based authentication method.
@@ -7312,9 +7321,9 @@ image:extracted-media/media/image122.png[extracted-media/media/image122,width=60
 [arabic, start=14]
 . The *_Install Agents_* page appears and displays a progress indicator showing the agent packages getting installed. Click on *_Continue_* after successful agent installation on hosts to be added in Cloudera Manager.
 
-image:extracted-media/media/image156.png[extracted-media/media/image156,width=670,height=327]
+image:image156.png[image156,width=670,height=327]
 
-image:extracted-media/media/image160.png[extracted-media/media/image160,width=665,height=392]
+image:image160.png[image160,width=665,height=392]
 
 *Step. Assign Roles
 
@@ -7372,7 +7381,7 @@ ____
 
 |===
 
-image:extracted-media/media/image30.png[extracted-media/media/image30,width=647,height=467]
+image:image30.png[image30,width=647,height=467]
 
 [arabic, start=16]
 . Click *Continue*.
@@ -7548,7 +7557,7 @@ ____
 
 Proceed with default selection to deploy all of the default Docker images to the repository, or select *_Select the Optional Images_* to choose which images to deploy. If you will be deploying Cloudera Machine Learning (CML), toggle the *_Cloudera Machine Learning_* switch on to copy the images for CML.
 
-image:extracted-media/media/image210.png[extracted-media/media/image210,width=655,height=562]
+image:image210.png[image210,width=655,height=562]
 
 [loweralpha]
 . *Screenshot for Use an embedded Docker Repository Option
@@ -7557,7 +7566,7 @@ image:extracted-media/media/image210.png[extracted-media/media/image210,width=65
 
 This option requires that cluster hosts have access to the internet and you have selected Internet as the install method.
 
-image:extracted-media/media/image146.png[extracted-media/media/image146,width=677,height=654]
+image:image146.png[image146,width=677,height=654]
 
 [loweralpha, start=2]
 . *Screenshot for Use Cloudera’s Docker Repository Option
@@ -7568,7 +7577,7 @@ This option requires that you set up a Docker Repository in your environment and
 
 *Note*: If you are installing ECS on a single node, you should select the Use a Custom Docker Repository option. Single node ECS installation is supported, but is only intended to enable CDSW to CML migration.
 
-image:extracted-media/media/image204.png[extracted-media/media/image204,width=567,height=569]
+image:image204.png[image204,width=567,height=569]
 
 [loweralpha, start=3]
 . *Screenshot for Use Cloudera’s Docker Repository Option
@@ -7706,12 +7715,12 @@ Both of these files must be readable by the "cloudera-scm" account.
 
 For information on the required entries that must be present in DNS and TLS certificates when not using wildcards, refer to 'No Wildcard DNS/TLS Setup'
 
-image:extracted-media/media/image124.png[extracted-media/media/image124,width=651,height=653]
+image:image124.png[image124,width=651,height=653]
 
 [arabic, start=48]
 . Please review the range of cluster IP and service IP as part of the ECS installation. It might conflict existing network configuration. Please adjust the range of IPs to be configured. Consult with the network team to avoid potential conflict.
 
-image:extracted-media/media/image56.png[A white background with black lines Description automatically generated with medium confidence,width=604,height=87]
+image:image56.png[A white background with black lines Description automatically generated with medium confidence,width=604,height=87]
 
 [arabic, start=19]
 . Click *_Continue_*.
@@ -7721,21 +7730,21 @@ image:extracted-media/media/image56.png[A white background with black lines Desc
 [arabic, start=20]
 . On the *_Configure Databases_* page, edit size for the *_Embedded Database Disk Space_*. Click *_Continue_*.
 
-image:extracted-media/media/image148.png[extracted-media/media/image148,width=681,height=560]
+image:image148.png[image148,width=681,height=560]
 
 *Step. Install Parcels
 
 [arabic, start=21]
 . On the *_Install Parcels_* page, the selected parcel is downloaded to the Cloudera Manager server host, distributed, unpacked, and activated on the ECS cluster hosts. Click *_Continue_*.
 
-image:extracted-media/media/image171.png[extracted-media/media/image171,width=666,height=402]
+image:image171.png[image171,width=666,height=402]
 
 *Step. Check Prerequisites
 
 [arabic, start=22]
 . If the hosts do not meet the prerequisites, the *_Check Prerequisites_* page displays the applicable issues. Correct the issues, then click *_Run Again_*. After all of the issues have been resolved, click *_Continue_*. Prerequisites checks are included in the new ECS release version 1.5.4.
 
-image:extracted-media/media/image63.png[extracted-media/media/image63,width=624,height=89]
+image:image63.png[image63,width=624,height=89]
 
 *The following prerequisites are checked:
 
@@ -7830,7 +7839,7 @@ ____
 
 |===
 
-image:extracted-media/media/image52.png[extracted-media/media/image52,width=598,height=407]
+image:image52.png[image52,width=598,height=407]
 
 *Note:* If the prerequisite check fails due to any reason or you need to skip this step, try the workaround by right-clicking on the screen, select *_Inspect_*, go to the *_Console_* tab, and run the below command:
 
@@ -7838,7 +7847,7 @@ image:extracted-media/media/image52.png[extracted-media/media/image52,width=598,
 
 This will enable the *Continue* button.
 
-image:extracted-media/media/image177.png[extracted-media/media/image177,width=569,height=422]
+image:image177.png[image177,width=569,height=422]
 
 *Step. Inspect Cluster
 
@@ -7851,7 +7860,7 @@ image:extracted-media/media/image177.png[extracted-media/media/image177,width=56
 . Safe to ignore unrelated errors in the host inspector result. For example, the hosts in a Private Cloud Containerized Cluster that have GPUs are required to have NVidia Drivers and NVidia-container-runtime installed. The following hosts do not satisfy this requirement: pvcecs-worker[1-12].cldrsetup.local +
 Since all hosts part of the ECS installation might not have NVIDIA GPU installed and NVidia driver and NVidia container-runtime is not installed on non-GPU node(s). It is safe to ignore the warning and click on the checkbox to continue with ECS installation.
 
-image:extracted-media/media/image84.png[extracted-media/media/image84,width=665,height=610]
+image:image84.png[image84,width=665,height=610]
 
 *Step. Install Data Services
 
@@ -8009,7 +8018,7 @@ uid: dcb8f600-e107-4c1b-9db7-701060fe063a
 [arabic, start=50]
 . Installing Data Services can take several hours. The copying operation for Docker repository may take 4 - 5 hours.
 
-image:extracted-media/media/image71.png[extracted-media/media/image71,width=598,height=508]
+image:image71.png[image71,width=598,height=508]
 
 [arabic, start=27]
 . If you still face any issue while making the services up or during the installation or start of any ECS services please refer to troubleshooting PvC Data Services Cluster part at the end of this document. Though, some of the major issues during installation, their cause and their resolution is listed as below:
@@ -8191,7 +8200,7 @@ Defaulted container "cdp-cde-embedded-db" out of: cdp-cde-embedded-db, k8tz (ini
 [arabic, start=28]
 . When the installation is complete, the *_Summary page_* appears. Click *_Launch CDP Private Cloud_*. You can also click *_Finish_* and then *_access the Private Cloud Data Services_* instance from *_Cloudera Manager_*. Click *_Data Services_*, then click *_Open Private Cloud Data Services_* for the applicable Data Services cluster.
 
-image:extracted-media/media/image6.png[extracted-media/media/image6,width=635,height=543]
+image:image6.png[image6,width=635,height=543]
 
 ++**************************************************************************************************************++
 
@@ -8201,7 +8210,7 @@ image:extracted-media/media/image6.png[extracted-media/media/image6,width=635,he
 
 [root@pvcecs-master ~]# kubectl patch clusterrolebinding gpu-feature-discovery -p '{"subjects":[{"kind":"ServiceAccount","name":"gpu-feature-discovery","namespace":"kube-system"}]}'
 
-image:extracted-media/media/image26.png[A screenshot of a computer Description automatically generated,width=572,height=274]
+image:image26.png[A screenshot of a computer Description automatically generated,width=572,height=274]
 
 To reserve a GPU node in Cloudera Private Cloud Data Services ECS cluster, assign a taint to the node. Set the node taint “nvidia.com/gpu: true:NoSchedule” For more details on setting up GPU node:
 
@@ -8210,13 +8219,13 @@ https://docs.cloudera.com/machine-learning/1.5.4/private-cloud-requirements/topi
 [arabic]
 . To *_set up a GPU node_* for ECS, go to *_Hosts > Configuration_*.
 
-image:extracted-media/media/image200.png[A screenshot of a computer Description automatically generated,width=655,height=284]
+image:image200.png[A screenshot of a computer Description automatically generated,width=655,height=284]
 
 [arabic, start=2]
-. Edit value for Data Services: Restrict workload types (node_taint) by clicking on Add Host Overrides.image:extracted-media/media/image60.png[A screenshot of a computer Description automatically generated,width=561,height=204]
+. Edit value for Data Services: Restrict workload types (node_taint) by clicking on Add Host Overrides.image:image60.png[A screenshot of a computer Description automatically generated,width=561,height=204]
 . Add Host Overrides for the ECS nodes as per the requirement. For example, we selected two of the four nodes as Dedicated GPU Nodes.
 
-image:extracted-media/media/image46.png[A screenshot of a computer Description automatically generated,width=580,height=188]
+image:image46.png[A screenshot of a computer Description automatically generated,width=580,height=188]
 
 [arabic, start=4]
 . Click on *_Add_* and click *_Save Changes_*.
@@ -8242,7 +8251,7 @@ You use Cloudera Manager to dedicate Embedded Container Service (ECS) cluster no
 . Follow the ECS installation procedure. When you reach the *_Specify Hosts_* page in the installation wizard, the hosts you added to *_Cloudera Manager_* appear. Select the hosts, click *_Continue_*, then proceed through the rest of the installation wizard.
 . After the installation is complete, the applicable workloads will only run on the specified dedicated nodes.
 
-image:extracted-media/media/image100.png[extracted-media/media/image100,width=493,height=297]
+image:image100.png[image100,width=493,height=297]
 
 *Dedicating ECS nodes in an existing cluster
 
@@ -8257,7 +8266,7 @@ image:extracted-media/media/image100.png[extracted-media/media/image100,width=49
 . On the *_ECS Cluster_* landing page, click *_Actions > Refresh Cluster._
 . After the Refresh is complete, click *_Actions > Rolling Restart_*.
 
-image:extracted-media/media/image100.png[extracted-media/media/image100,width=487,height=294]
+image:image100.png[image100,width=487,height=294]
 
 ++**************************************************************************************************************++
 
@@ -8268,34 +8277,34 @@ image:extracted-media/media/image100.png[extracted-media/media/image100,width=48
 [arabic]
 . From the *_Cloudera Manager_* screen, click on *_Data Services(New)_* in the left pane.
 
-image:extracted-media/media/image25.png[A screenshot of a cloud data service Description automatically generated,width=492,height=240]
+image:image25.png[A screenshot of a cloud data service Description automatically generated,width=492,height=240]
 
 [arabic, start=2]
 . On the *_CDP Private Cloud Containerized services_* page, click on the *_Open CDP Private Cloud Data Services_* button. This will open the *_CDP PvC authentication_* page.
 
-image:extracted-media/media/image42.png[open data svs,width=361,height=196]
+image:image42.png[open data svs,width=361,height=196]
 
 [arabic, start=3]
 . On the PvC DS Authentication Page, if you have *_LDAP account_* credentials, then enter its username and password and then click on *_Login_*. Else, you can click on *_Login as Local Administrator_*, and enter the default credentials. *_(admin/admin)_
 
-image:extracted-media/media/image15.png[data svcs auth,width=322,height=221]
+image:image15.png[data svcs auth,width=322,height=221]
 
 [arabic, start=4]
 . *_Login_* to *_CDP Private Cloud Data Services_* as *_local administrator_*: *_(admin/admin)_
 
-image:extracted-media/media/image69.png[A screenshot of a computer Description automatically generated,width=289,height=167]
+image:image69.png[A screenshot of a computer Description automatically generated,width=289,height=167]
 
 [arabic, start=5]
 . After authenticating successfully, you will land at the *_CDP console/Data Services_* page. From this page, you can navigate to different data services and the management services. Click on the *_Management Console_*.
 
-image:extracted-media/media/image90.png[A screenshot of a computer Description automatically generated,width=360,height=309]
+image:image90.png[A screenshot of a computer Description automatically generated,width=360,height=309]
 
 [arabic, start=6]
 . On the *_Welcome to CDP Private Cloud_* page, click *_Reset Password_* to change the *_Local Administrator Account password_*. *(OR)* On the *_Management Console_* page, navigate to *_Administration > Authentication_*, and then click *_Reset Password_* to change the *_Local Administrator Account password_*.
 
-image:extracted-media/media/image7.png[extracted-media/media/image7,width=577,height=226]
+image:image7.png[image7,width=577,height=226]
 
-image:extracted-media/media/image11.png[extracted-media/media/image11,width=358,height=185]
+image:image11.png[image11,width=358,height=185]
 
 [arabic, start=7]
 . *_Set up external authentication_* using the URL of the LDAP server and a CA certificate (If using prior existing LDAP server and not proceeding with FreeIPA setup) of your secure LDAP *_(e.g. ldap://<ipa_or_ldap_server_fqdn>:389/)_*. Learn more about https://docs.cloudera.com/management-console/latest/private-cloud-administration/topics/mc-private-cloud-security-ldap.html[[.underline]#LDAP user authentication for CDP Private Cloud.#] Enter values for ldap authentication, as mentioned in the below table.
@@ -8437,37 +8446,37 @@ ____
 
 |===
 
-image:extracted-media/media/image92.png[extracted-media/media/image92,width=676,height=533]
+image:image92.png[image92,width=676,height=533]
 
 [arabic, start=8]
 . Follow the instructions on the *_Welcome to CDP Private Cloud page_* to complete this step.
 . Click *_Test Connection_* to ensure that you are able to connect to the *_configured LDAP server_*.
 
-image:extracted-media/media/image64.png[extracted-media/media/image64,width=624,height=106]
+image:image64.png[image64,width=624,height=106]
 
 [arabic, start=10]
 . The *_User Management_* tab allows users to add or update roles on existing users. *_Groups_* tab allows users to sync user groups from the active directory to access *_CDP Data Services_*.
 
-image:extracted-media/media/image157.png[A screenshot of a computer Description automatically generated,width=685,height=196]
+image:image157.png[A screenshot of a computer Description automatically generated,width=685,height=196]
 
-image:extracted-media/media/image209.png[extracted-media/media/image209,width=688,height=335]
+image:image209.png[image209,width=688,height=335]
 
 For more details on Cloudera Private Cloud Management console please visit:
 
 https://docs.cloudera.com/management-console/1.5.4/index.html[[.underline]#https://docs.cloudera.com/management-console/1.5.4/index.html#]
 
-image:extracted-media/media/image142.png[extracted-media/media/image142,width=684,height=337]
+image:image142.png[image142,width=684,height=337]
 
 [arabic, start=11]
 . After successfully configuring and testing the setup for *_LDAP integration_*, page will auto-redirect for *_Register Environment_* Page, if not, navigate to the https://docs.cloudera.com/management-console/latest/private-cloud-environments/topics/mc-private-cloud-environments.html[[.underline]#Environments#] page, and select *_Register Environment_* where you will provide the Cloudera Manager details and credentials to register the *_PvC Base Cluster DataLake/Control Plane environment_* to DS. Click *_Choose Cluster,_* select the PvC Base cluster from the populated list and click on *_Register_*.
 
-image:extracted-media/media/image130.png[extracted-media/media/image130,width=686,height=265]
+image:image130.png[image130,width=686,height=265]
 
-image:extracted-media/media/image168.png[extracted-media/media/image168,width=648,height=319]
+image:image168.png[image168,width=648,height=319]
 
-image:extracted-media/media/image31.png[extracted-media/media/image31,width=658,height=146]
+image:image31.png[image31,width=658,height=146]
 
-image:extracted-media/media/image19.png[A screenshot of a computer Description automatically generated,width=664,height=341]
+image:image19.png[A screenshot of a computer Description automatically generated,width=664,height=341]
 
 [arabic, start=12]
 . To come to this section further, from the *_Cloudera Manager_* screen, click on *_Data Services(New)_* in the left pane and then click on *_Open Private Cloud Data Services_* to launch your *_CDP Private Cloud Data Services instance_*. Log in using the default username and password *_admin_*.
@@ -8503,12 +8512,12 @@ To get started with CML follow steps below:
 [arabic]
 . On the *_Cloudera Private Cloud Data Services console_*, click on Cloudera *_Machine Learning_*.
 
-image:extracted-media/media/image129.png[A screenshot of a computer Description automatically generated,width=407,height=329]
+image:image129.png[A screenshot of a computer Description automatically generated,width=407,height=329]
 
 [arabic, start=2]
 . First time login requires provision of a workspace. Since this will be the first time you open CML, there will be no CML workspace. You will see the screen below. Click on *_Provision Workspace_* on the same page.
 
-image:extracted-media/media/image145.png[A screenshot of a computer Description automatically generated,width=648,height=208]
+image:image145.png[A screenshot of a computer Description automatically generated,width=648,height=208]
 
 [arabic, start=3]
 . Provide input required to provision machine learning workspace. Click on provision workspace.
@@ -8533,46 +8542,46 @@ image:extracted-media/media/image145.png[A screenshot of a computer Description 
 ** *Enable Monitoring*: This helps in monitoring the resource usage for the provisioned workspace. Enable it.
 ** *CML Static Subdomain*: Enter any short name for this parameter that helps in monitoring the resource usage for the provisioned workspace.
 
-image:extracted-media/media/image43.png[A screenshot of a computer Description automatically generated,width=443,height=467]
+image:image43.png[A screenshot of a computer Description automatically generated,width=443,height=467]
 
-image:extracted-media/media/image37.png[A screenshot of a computer Description automatically generated,width=434,height=235]
+image:image37.png[A screenshot of a computer Description automatically generated,width=434,height=235]
 
 *_Note: Click on i icon to get more information on the field._
 
 [arabic, start=4]
 . When provisioning of workspace is completed the status reports as *_Ready_*. Once it is created, it appears on the CML Workspaces page as shown below.
 
-image:extracted-media/media/image115.png[A screenshot of a computer Description automatically generated,width=600,height=302]
+image:image115.png[A screenshot of a computer Description automatically generated,width=600,height=302]
 
 [arabic, start=5]
 . Click on Manage Access.
 
-image:extracted-media/media/image99.png[A screenshot of a cloud provider Description automatically generated,width=283,height=211]
+image:image99.png[A screenshot of a cloud provider Description automatically generated,width=283,height=211]
 
 [arabic, start=6]
 . In the search field search for a user or group to be able to access Machine Learning workspace.
 
-image:extracted-media/media/image207.png[A screenshot of a computer Description automatically generated,width=640,height=250]
+image:image207.png[A screenshot of a computer Description automatically generated,width=640,height=250]
 
 [arabic, start=7]
 . Update Resource role for user or group selected to manage access to workspace provisioned in Cloudera Machine Learning.
 
-image:extracted-media/media/image14.png[A screenshot of a computer Description automatically generated,width=644,height=288]
+image:image14.png[A screenshot of a computer Description automatically generated,width=644,height=288]
 
 [arabic, start=8]
 . Click on the workspace name created.
 
-image:extracted-media/media/image16.png[A screenshot of a computer Description automatically generated,width=671,height=205]
+image:image16.png[A screenshot of a computer Description automatically generated,width=671,height=205]
 
 [arabic, start=9]
 . CML workspace *_WebUI_* overview.
 
-image:extracted-media/media/image5.png[A screenshot of a computer Description automatically generated,width=642,height=329]
+image:image5.png[A screenshot of a computer Description automatically generated,width=642,height=329]
 
 [arabic, start=10]
 . Click on Projects tab, expand View Resource Usage Details to review available resources.
 
-image:extracted-media/media/image143.png[A screenshot of a computer Description automatically generated,width=642,height=266]
+image:image143.png[A screenshot of a computer Description automatically generated,width=642,height=266]
 
 [arabic, start=11]
 . For more details and how to review projects section in ML workspace: https://docs.cloudera.com/machine-learning/cloud/projects/index.html[[.underline]#https://docs.cloudera.com/machine-learning/cloud/projects/index.html#]
@@ -8594,20 +8603,20 @@ The Initial Setup Section for the New Project has five options as described belo
 * *Local Files*: Choose this if you have all the necessary files in a folder or in a zip.
 * *Git*: Choose this if all the resources are stored in a github project.
 
-image:extracted-media/media/image205.png[A screenshot of a chatbot Description automatically generated,width=493,height=485]
+image:image205.png[A screenshot of a chatbot Description automatically generated,width=493,height=485]
 
 [arabic, start=13]
 . Select *_Runtime setup_*. For initial exploration, select Basic and keep the kernel to *_Python3.9_* (enable checkbox to add GPU enabled Runtime variant, if applicable — *We are not using GPU in our current setup*).
 
-image:extracted-media/media/image182.png[project runtime setup,width=510,height=368]
+image:image182.png[project runtime setup,width=510,height=368]
 
-image:extracted-media/media/image106.png[A screenshot of a computer program Description automatically generated,width=526,height=394]
+image:image106.png[A screenshot of a computer program Description automatically generated,width=526,height=394]
 
 [arabic, start=14]
 . Click on *_Create Project_*. After some time, a new project will be created and will be available on the Projects page.
 . Click on the sessions tab and enter details for the new session. You will see a warning like below:
 
-image:extracted-media/media/image123.png[A screenshot of a computer Description automatically generated,width=566,height=402]
+image:image123.png[A screenshot of a computer Description automatically generated,width=566,height=402]
 
 [arabic, start=16]
 . Before starting any new session in the recently created Project, you must complete the hadoop authentication part as the cluster setup is kerberized.
@@ -8616,66 +8625,66 @@ So, to be able to access data from Hadoop clusters *_go to user > user settings 
 
 Open a *_new tab in the same browser_* window, by duplicating the existing tab. Go to the *_CML home page_* and click on *_User Settings_* in the left pane. Click on *_Hadoop Authentication_*.
 
-image:extracted-media/media/image147.png[hadoop authentication,width=485,height=333]
+image:image147.png[hadoop authentication,width=485,height=333]
 
 * Enter *_Principal_* e.g. link:about:blank[[.underline]#username@DOMAIN.LOCAL#] i.e. *_admin@CLDRSETUP.LOCAL_
 * Under the *_Credentials_* and password (i.e. *_vmware123_*) or keytab details of the LDAP user and click on Authenticate.
 * Once the authentication is successful, proceed to the next step. You will see the output similar to below screenshot, after the successful authentication and integration to Kerberized Hadoop Cluster.
 
-image:extracted-media/media/image109.png[A screenshot of a computer Description automatically generated,width=411,height=267]
+image:image109.png[A screenshot of a computer Description automatically generated,width=411,height=267]
 
 [arabic, start=17]
 . Now, to explore the CML IDEs, click on the newly created workspace. It will open the Projects screen of CML. Go to the *_Project page_* and click on the newly created project and then click on the *_New Session_* button on the top right. Explore CML by running the jobs with different IDEs like Jupyterlab and Workbench.
 
-image:extracted-media/media/image62.png[click on workspc,width=504,height=83]
+image:image62.png[click on workspc,width=504,height=83]
 
-image:extracted-media/media/image178.png[new created project,width=365,height=211]
+image:image178.png[new created project,width=365,height=211]
 
 [arabic, start=18]
 . Go to *_Site Administration_* to edit *_Resource profile_* and *_GPU per session/ Job_*.
 
-image:extracted-media/media/image47.png[A screenshot of a computer Description automatically generated,width=616,height=341]
+image:image47.png[A screenshot of a computer Description automatically generated,width=616,height=341]
 
 [arabic, start=19]
 . Go to the *_AMPs_* tab to get started with pre-built models.
 
-image:extracted-media/media/image101.png[A screenshot of a social media page Description automatically generated,width=628,height=208]
+image:image101.png[A screenshot of a social media page Description automatically generated,width=628,height=208]
 
 [arabic, start=20]
 . Select *_AMP_* and click on *_Configure Project_*.
 . After editing the *_Runtime field_* for the new project, click on *_Launch Project._
 
-image:extracted-media/media/image176.png[A screenshot of a computer Description automatically generated,width=611,height=428]
+image:image176.png[A screenshot of a computer Description automatically generated,width=611,height=428]
 
 [arabic, start=22]
 . *_Intelligent QA Chatbot with NiFi, Pinecone, and Llama2 – AMP_* project overview.
 
-image:extracted-media/media/image136.png[A screenshot of a computer Description automatically generated,width=612,height=343]
+image:image136.png[A screenshot of a computer Description automatically generated,width=612,height=343]
 
 [arabic, start=23]
 . Create a new session by *_Start A New Session_* with desired resources, editor, kernel, and number of GPUs.
 
-image:extracted-media/media/image94.png[A screenshot of a computer Description automatically generated,width=636,height=469]
+image:image94.png[A screenshot of a computer Description automatically generated,width=636,height=469]
 
 [arabic, start=24]
 . *_Jupyter notebook_* session in *_CML_*.
 
-image:extracted-media/media/image186.png[A screenshot of a computer Description automatically generated,width=674,height=278]
+image:image186.png[A screenshot of a computer Description automatically generated,width=674,height=278]
 
 [arabic, start=25]
 . Open *_AMP_* created project. To access *_WebUI_* click on *_Open_*.
 
-image:extracted-media/media/image181.png[A screenshot of a computer Description automatically generated,width=679,height=385]
+image:image181.png[A screenshot of a computer Description automatically generated,width=679,height=385]
 
 [arabic, start=26]
 . WebUI for *_Llama2 based chatbot_* with pre-trained data is now available. *_Change settings_* on the WebUI or use them out of the box. For example, we questioned “*_what is VMware Platform?_*”.
 
-image:extracted-media/media/image33.png[A screenshot of a chatbot Description automatically generated,width=688,height=301]
+image:image33.png[A screenshot of a chatbot Description automatically generated,width=688,height=301]
 
 [arabic, start=27]
 . *_Access HDFS data_* from the *_jupyter notebook session_* in CML.
 
-image:extracted-media/media/image131.png[A screenshot of a computer Description automatically generated,width=681,height=304]
+image:image131.png[A screenshot of a computer Description automatically generated,width=681,height=304]
 
 *Note*: Deploying and documentation of every aspect of *_CML workspace, project, and user management_* is not covered here. Please refer to the related *_Cloudera documentation_* on *_Cloudera Machine Learning How to_* *_section_* for more details:
 
@@ -8692,25 +8701,25 @@ https://docs.cloudera.com/data-warehouse/1.5.4/private-cloud-getting-started/top
 * Open *_CDP Data Services_* page.
 * Click on *_Data Warehouse_*.
 
-image:extracted-media/media/image198.png[select CDW,width=285,height=235]
+image:image198.png[select CDW,width=285,height=235]
 
 * On the *_Overview_* page, click on the *_Activate_* icon as shown below.
 
-image:extracted-media/media/image93.png[activate cdw,width=324,height=199]
+image:image93.png[activate cdw,width=324,height=199]
 
 * On the *_Activate Environment_* page, enter the *_LDAP username and password_*. Enable *_Low resource mode_* and click on *_Activate_*.
 
-image:extracted-media/media/image161.png[low res mode,width=498,height=157]
+image:image161.png[low res mode,width=498,height=157]
 
 === Create Virtual Warehouse
 
 * Once the *_environment_* is *_activated_*, a *_default Database Catalog_* gets created automatically.
 
-image:extracted-media/media/image78.png[default dbc,width=379,height=214]
+image:image78.png[default dbc,width=379,height=214]
 
 * Once the *_database catalog_* is created, click on *_+_* icon next to *_Virtual Warehouses_*.
 
-image:extracted-media/media/image102.png[crt vwh,width=426,height=126]
+image:image102.png[crt vwh,width=426,height=126]
 
 * A *_New Virtual Warehouse_* tab appears on the same page.
 * Enter the *_name_* for the **_new virtual warehouse(_**VW).
@@ -8720,11 +8729,11 @@ image:extracted-media/media/image102.png[crt vwh,width=426,height=126]
 * *_AutoSuspend_*: If you want the VW to keep running all the time, you can *_Disable_* it.
 * Keep the remaining parameters *_default_* and click on *_Create_*.
 
-image:extracted-media/media/image118.png[crt wh,width=370,height=531]
+image:image118.png[crt wh,width=370,height=531]
 
 * A new *_Virtual Warehouse_* will be created. You can use *_Hue_* to submit queries to the underlying engine of the Virtual Warehouse.
 
-image:extracted-media/media/image164.png[vw hue,width=512,height=176]
+image:image164.png[vw hue,width=512,height=176]
 
 ++**************************************************************************************************************++
 
@@ -8740,25 +8749,25 @@ The *_Cloudera Data Engineering (CDE)_* service requires proper configuration of
 
 * From the *_CDP console page_*, click on *_Data Engineering_*.
 
-image:extracted-media/media/image73.png[open cde,width=305,height=268]
+image:image73.png[open cde,width=305,height=268]
 
 * This will open the *_CDE home page_*. Since this will be the first time you will be opening CDE, you will not see any virtual clusters. Click on *_Administration_* in the left pane.
 
-image:extracted-media/media/image49.png[cde home,width=550,height=186]
+image:image49.png[cde home,width=550,height=186]
 
 * Click on *_+_* icon as shown below which will allow you to *_enable CDE service_* post which you can *_create Virtual Clusters_*.
 
-image:extracted-media/media/image135.png[enable cde,width=99,height=60]
+image:image135.png[enable cde,width=99,height=60]
 
 * On the *_Enable a Service_* page, enter the *_values_* as shown below and then click on *_Enable_*.
 
-image:extracted-media/media/image29.png[enable cde config,width=297,height=381]
+image:image29.png[enable cde config,width=297,height=381]
 
 Please note that the cpu and memory config chosen here are *_minimum values_*. You can choose to increase it.
 
 * This will take *_approximately 30 mins_* after which you will be able to see a *_CDE service_* on the *_CDE_* home page.
 
-image:extracted-media/media/image211.png[running cde svc,width=407,height=240]
+image:image211.png[running cde svc,width=407,height=240]
 
 (_default *CDE* is the name given as an example. You will see as per the value you entered in the previous step_.)
 
@@ -8768,7 +8777,7 @@ https://docs.cloudera.com/management-console/1.5.4/private-cloud-environments/to
 
 If you are unable to see the service, then the chances are that the default virtual cluster would not have been created properly. In this case, click on the *_View Services_* button and then you will be able to see the *_CDE_* service *_enabled_*.
 
-image:extracted-media/media/image20.png[cde svc,width=571,height=185]
+image:image20.png[cde svc,width=571,height=185]
 
 === Create Virtual Cluster:
 
@@ -8776,7 +8785,7 @@ When you *_enable CDE service_*, by default a new *_Virtual cluster with Spark2.
 
 * On the *_CDE Home page_*, click on the *_+_* icon next to *_Virtual clusters_* as shown below.
 
-image:extracted-media/media/image166.png[crt vc,width=624,height=46]
+image:image166.png[crt vc,width=624,height=46]
 
 * On the *_Create a Virtual Cluster_* page, enter the below *_values_* and click on *_Create_*.
 * *_Cluster Name:_* Cluster Name should adhere to the below conditions.
@@ -8786,15 +8795,15 @@ image:extracted-media/media/image166.png[crt vc,width=624,height=46]
 * *_Service_*: Select the CDE service created earlier.
 * *_Spark_* *_Version_*: Select the Spark version as per your requirement. If you need both *_Spark2.4_* and *_Spark3.7_*, you can create two virtual clusters provided you have sufficient resources.
 
-image:extracted-media/media/image165.png[crt vc choose spark,width=433,height=235]
+image:image165.png[crt vc choose spark,width=433,height=235]
 
 This will take approximately 20 minutes.
 
 * You can check the logs of the cluster creation by clicking on the *_pencil_* icon and selecting the *_Logs_* section on the cluster page as shown below.
 
-image:extracted-media/media/image141.png[vc clust details,width=483,height=197]
+image:image141.png[vc clust details,width=483,height=197]
 
-image:extracted-media/media/image91.png[vc clust logs,width=488,height=168]
+image:image91.png[vc clust logs,width=488,height=168]
 
 === [.underline]#Initializing Virtual Cluster#
 
@@ -8817,11 +8826,11 @@ Every time a *_new virtual cluster_* is created, there are a few *_manual steps_
 
 On the *_CDE homepage_*, select the *_CDE_* *_service_* in which the *_virtual_* *_cluster_* is created. Click on the *_pencil_* icon on the virtual cluster to be configured.
 
-image:extracted-media/media/image206.png[cde to vc details,width=512,height=108]
+image:image206.png[cde to vc details,width=512,height=108]
 
 * Click JOBS API URL to copy the URL to your clipboard.
 
-image:extracted-media/media/image24.png[vc jobs api,width=624,height=157]
+image:image24.png[vc jobs api,width=624,height=157]
 
 * Paste the URL into a text editor to identify the endpoint host. For example, if the URL is similar to the following:
 
