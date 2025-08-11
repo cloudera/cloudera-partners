@@ -90,7 +90,7 @@ This project was developed and tested on the following component versions:
 
 == Project Workflow
 
-image::images/project_flow.png[project_flow]
+image::../images/project_flow.png[project_flow]
 
 == Steps to Run
 
@@ -160,21 +160,21 @@ You should see a JSON response similar to the above.
 .. Create a new bucket (for example, name it `Axon-Files`).
 ... Click on the wrench `🔧` icon on the top right corner to open settings.
 +
-image::images/settings.png[settings]
+image::../images/settings.png[settings]
 ... Click on *New bucket* and name it `Axon-Flow`.
 +
-image::images/Bucket_creation.png[bucket_creation]
+image::../images/Bucket_creation.png[bucket_creation]
 
 .. Upload the Project-Axon flow to the Registry:
 ... Click on the *Import New Flow* button at the top-right corner of the Registry UI.
 +
-image::images/import_registry.png[import registry]
+image::../images/import_registry.png[import registry]
 +
 ... Enter a name for the flow (e.g., `Project-Axon`).
 ... Select the `Axon-Flow` bucket.
 ... Upload the flow file https://github.com/cloudera/cloudera-partners/blob/project-axon/Project-Axon/Project-Axon.json[`Project-Axon.json`] and click **Import**.
 +
-image::images/import_flow_registry.png[import flow registry, width=500, height=500]
+image::../images/import_flow_registry.png[import flow registry, width=500, height=500]
 
 === 5. Import the NiFi Flow into NiFi from Registry
 
@@ -182,12 +182,12 @@ image::images/import_flow_registry.png[import flow registry, width=500, height=5
 - Drag a new **Process Group** onto the canvas.
 - Give it any name (e.g., `Project-Axon`).
 +
-image::images/process_group.png[process group]
+image::../images/process_group.png[process group]
 +
 - After naming it, click **Import from Registry**.
 - Select the `Axon-Flow` bucket, choose the `Project-Axon` flow and desired version, then click **Import**.
 +
-image::images/import_version.png[import version]
+image::../images/import_version.png[import version]
 
 === 6. Configure Apache NiFi (HDFS Access)
 
@@ -243,7 +243,7 @@ After importing the `Project-Axon` flow into NiFi and *before starting it*, you 
    - For `kerberos.principal`, provide the valid Kerberos principal.
    - For `kerberos.keytab`, provide the full path to the keytab file.
 +
-image::images/http_url.png[HTTP URL Configuration]
+image::../images/http_url.png[HTTP URL Configuration]
 +
 7. Click *Apply* to save the changes.
 
@@ -252,7 +252,7 @@ NOTE: These parameter values will be automatically picked up by the correspondin
 === 8. Start the `Project-Axon` NiFi Flow
 - Inside the process group, right-click and select **Start**.
 +
-image::images/start_flow.png[start flow]
+image::../images/start_flow.png[start flow]
 
 NOTE: After starting the flow, run it for a maximum of 5 minutes. It will generate approximately **50–80 flow files**.  
 After that, right-click and click **Stop**, otherwise it will continue generating files indefinitely.
@@ -268,7 +268,7 @@ To create all the required databases and tables at once, simply:
 - Paste it into the Hue Query Editor.
 - Select all and click the **Run** button.
 +
-image::images/hive_queries.png[hive_queries, width=800, height=500]
+image::../images/hive_queries.png[hive_queries, width=800, height=500]
 
 This will create all the necessary Hive tables and databases for the project in one go.
 
@@ -282,7 +282,7 @@ To verify that all tables were successfully created and contain data:
 
 You should see a list of table names with their row counts.
 
-image::images/table_verify.png[tables verify]
+image::../images/table_verify.png[tables verify]
 
 If any table shows a count of `0`, you may need to revisit the data ingestion step for that table.
 
@@ -295,7 +295,7 @@ While Hive is supported, it is *recommended to use Impala* for creating the conn
 - Go to *Cloudera DataViz* and navigate to the *Data* tab.
 - Click *+ New Connection* → *Impala*.
 +
-image::images/connection.png[make connection, width=500, height=300]
+image::../images/connection.png[make connection, width=500, height=300]
 +
 [width="90%",cols="40%,50%",options="header"]
 |===
@@ -315,7 +315,7 @@ image::images/connection.png[make connection, width=500, height=300]
 +
 - Click *Test Connection* to verify.
 +
-image::images/connection_verify.png[verify connection, width=500, height=450]
+image::../images/connection_verify.png[verify connection, width=500, height=450]
 +
 - Once successful, click *Save*.
 - You can now use this connection to create/import datasets and build/import dashboards from Impala tables.
@@ -329,7 +329,7 @@ Before importing the dashboard into Cloudera DataViz, you must ensure the `datav
 - Locate the policy named `9 all - database, table, column`.
 - Click on the *Edit* icon to open it.
 +
-image::images/dataviz_policy.png[dataviz policy]
+image::../images/dataviz_policy.png[dataviz policy]
 +
 - In the *Users* section, add `dataviz` to the list.
 - Scroll down and click *Save*.
@@ -342,16 +342,16 @@ image::images/dataviz_policy.png[dataviz policy]
 
 - Navigate to the *Data* tab, then click on *Import visual artifacts*.
 +
-image::images/import_visual.png[Import Visual]
+image::../images/import_visual.png[Import Visual]
 +
 - Upload the dashboard JSON file: https://github.com/cloudera/cloudera-partners/blob/project-axon/Project-Axon/project_axon_dashboard.json[project_axon_dashboard.json].
 - After uploading, click on *Accept and Import*, you will see an *Import Successful* message along with the list of datasets that were imported as part of the dashboard.
 +
-image::images/dashboard_import_verify.png[import success, width=800, height=450]
+image::../images/dashboard_import_verify.png[import success, width=800, height=450]
 +
 - Once imported, navigate to the *Visuals* tab and click on the dashboard to open and view it.
 +
-image::images/dashboard.png[dashboard]
+image::../images/dashboard.png[dashboard]
 
 === 13. Accessing DataViz as Individual Users
 
@@ -373,7 +373,7 @@ Password: vizapps_admin
 - Once logged in, navigate to the settings icon and click on **Users and Groups**.
 - Click on the **New User** button.
 +
-image::images/new_user.png[New user creation]
+image::../images/new_user.png[New user creation]
 
 ==== Step 3: Fill in User Details
 
@@ -385,7 +385,7 @@ image::images/new_user.png[New user creation]
   * For **read-only access**, select the **Visual Consumer** role.
   * Other roles include **System Admin**, **Database Admin**, and **Analyst**, depending on the level of access needed.
 +
-image::images/assign_roles.png[Assign roles, width=500, height=600]
+image::../images/assign_roles.png[Assign roles, width=500, height=600]
 
 ==== Step 4: User Logs In
 
