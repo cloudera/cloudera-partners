@@ -107,6 +107,21 @@
                     if (!params.AWS_REGION?.trim()) {
                         printError("AWS_REGION is mandatory! Please provide a value.")
                     }
+					// Always block 0.0.0.0/32
+					if (params.LOCAL_MACHINE_IP?.trim() == "0.0.0.0/32") {
+    					printError("LOCAL_MACHINE_IP cannot be '0.0.0.0/32'. Please provide a valid IP.")
+					}
+
+					// Additional restriction when PROVISION_CAII is YES
+					if (params.PROVISION_CAII?.trim().equalsIgnoreCase("YES")) {
+    					def ip = params.LOCAL_MACHINE_IP?.trim()
+    					if (!ip) {
+        					printError("When PROVISION_CAII is YES, LOCAL_MACHINE_IP cannot be empty. Please provide a valid IP.")
+    					} else if (ip == "0.0.0.0/0") {
+        					printError("When PROVISION_CAII is YES, LOCAL_MACHINE_IP cannot be '0.0.0.0/0'. Please provide a valid IP.")
+    					}
+					}
+
                     if (!params.CDP_DEPLOYMENT_TYPE?.trim()) {
                         printError("CDP_DEPLOYMENT_TYPE is mandatory! Please select a deployment type.")
                     }
