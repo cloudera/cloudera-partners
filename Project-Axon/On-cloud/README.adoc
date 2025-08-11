@@ -53,14 +53,14 @@ This project was developed and tested on the following component versions:
 == Technology Stack
 
 - **Data Generator**: Python (Flask + Faker)
-- **Data Ingestion**: Apache NiFi
-- **Storage**: HDFS (Parquet format)
-- **Data Query Layer**: Hive tables created via Hue
-- **Visualization**: Cloudera DataViz
+- **Data Ingestion**: Cloudera Data Flow
+- **Storage**: S3 (Parquet format)
+- **Data Query Layer**: Cloudera Data Warehouse via Hue
+- **Visualization**: Cloudera Data Visualization
 
 == Project Workflow
 
-image::../images/project_flow.png[project_flow]
+image::../images/project_flow_cloud.png[project_flow]
 
 == Steps to Run
 
@@ -73,7 +73,7 @@ Clone the repository containing the dummy data generators and run the script to 
 git clone https://github.com/cloudera/cloudera-partners.git
 cd cloudera-partners
 git checkout project-axon
-cd Project-Axon
+cd Project-Axon/On-cloud
 ----
 
 === 2. Set Up Python Virtual Environment and Install Dependencies
@@ -84,7 +84,7 @@ sudo yum install -y python3 git
 python3 -m ensurepip --upgrade
 python3 -m venv venv
 source venv/bin/activate
-pip3 install -r requirements.txt
+pip3 install -r ../assets/requirements.txt
 
 # Verify Flask version
 python3 -m flask --version
@@ -94,7 +94,7 @@ python3 -m flask --version
 
 [source,shell]
 ----
-./run_all.sh
+bash ../assets/run_all.sh
 ----
 
 - After running the script, verify that the dummy data endpoints are active using a `curl` command.
@@ -124,7 +124,21 @@ Sample JSON response from the campaign API:
 
 You should see a JSON response similar to the above.
 
-=== 4. Import the NiFi Flow into the Cloudera Flow Management Catalog
+=== 4. Generate the CDP Workload Password for Your Profile
+
+- Login to the Cloudera Public Cloud Console using your credentials.   
+- click your login name at the lower-left corner → *Profile*.  
++
+image::../images/profile_name.png[profile name]
++
+- Click *Set Workload Password*.  
+- Enter `Changeme123!` (note capital C) or your desired password in both fields and click *Set Workload Password*.  
++
+image::../images/set_workload.png[set_workload]
++
+- A confirmation message will appear once your password is set successfully — **remember this password, as it will be used in later steps**.
+
+=== 5. Import the NiFi Flow into the Cloudera Flow Management Catalog
 
 . Navigate to the **Cloudera Flow Management** service and open the **Catalog**.
 +
@@ -137,46 +151,46 @@ image::../images/import_catalog.png[import catalog]
 . Enter a descriptive name for your flow (for example, `Project-Axon`) and choose the desired collection.
 . Upload the `Project-Axon` flow file as the *NiFi Flow Configuration File*, then click *Import*.
 +
-image::../images/import_wizard.png[import wizard, width=400, height=450]
+image::../images/import_wizard.png[import wizard, width=400, height=500]
 +
 . Once the flow appears in the Catalog, click to open it, then select *Deploy* to create a NiFi flow deployment.
 +
-image::../images/deploy_flow.png[deploy flow, width=400, height=550]
+image::../images/deploy_flow.png[deploy flow, width=500, height=800]
 
 ==== Deployment Steps
 
 . In the deployment wizard:
 .. Select the target workspace (your Cloudera Public Cloud environment) and click *Continue*.
 +
-image::../images/deploy_target_env.png[deploy target env, width=400, height=500]
+image::../images/deploy_target_env.png[deploy target env, width=450, height=600]
 +
 .. Provide a name for your deployment, choose the target project, and click *Next*.
 .. Under *NiFi Configuration*, keep the default settings and click *Next*.
 +
-image::../images/nifi_configuration.png[NiFi Configuration, width=500, height=700]
+image::../images/nifi_configuration.png[NiFi Configuration, width=700, height=900]
 +
 .. In the *Parameters* section:
    * Enter your **CDP Workload Username** and **CDP Workload User Password** for your tenant.
    * In the `http url` parameter, update only the IP address portion with the *Public IP address* of the server running your dummy data generator app.
    * Click *Next*.
 +
-image::../images/update_parameters.png[Update Parameters, width=500, height=700]
+image::../images/update_parameters.png[Update Parameters, width=600, height=900]
 +
 .. Under *Sizing and Scaling*, keep the default settings and click *Next*.
 .. Leave *Key Performance Indicators (KPIs)* empty unless you wish to define them.
 .. Review the configuration and click *Deploy*.
 +
-image::../images/review_wizard.png[review wizard, width=500, height=700]
+image::../images/review_wizard.png[review wizard, width=600, height=700]
 +
 . To open and view the deployed flow, go to *Actions* and select *View in NiFi*.
 +
-image::../images/view_in_nifi.png[view in nifi, width=400, height=500]
+image::../images/view_in_nifi.png[view in nifi, width=500, height=900]
 +
 . After starting the flow, run it for no more than **5 minutes** to generate about **50–80 flow files**, then right-click the process group and select *Stop* to prevent it from running indefinitely.
 +
-image::../images/stop_flow.png[stop flow, width=500, height=700]
+image::../images/stop_flow.png[stop flow]
 
-=== 5. Create Hive Tables via Hue
+=== 6. Create Hive Tables via Hue
 
 Go to **Cloudera Data Warehouse** and under Virtual warehouses, click on `Hue` for hive virtual warehouse for your environment.
 
@@ -191,7 +205,7 @@ image::../images/hive_queries.png[hive_queries, width=800, height=500]
 
 This will create all the necessary Hive tables and databases for the project in one go.
 
-==== 5.1. Verify Table Creation & Data Load
+==== 6.1. Verify Table Creation & Data Load
 
 To verify that all tables were successfully created and contain data:
 
@@ -205,7 +219,7 @@ image::../images/table_verify.png[tables verify]
 
 If any table shows a count of `0`, you may need to revisit the data ingestion step for that table.
 
-=== 6. Connect Data Visualization to Impala
+=== 7. Connect Data Visualization to Impala
 
 To enable Data Visualization to read data from Impala, you need to create a connection in the Data Visualization UI. 
 
@@ -235,24 +249,10 @@ image::../images/connection.png[make connection, width=500, height=300]
 +
 - Click *Test Connection* to verify.
 +
-image::../images/connection_cdw_impala.png[verify connection, width=500, height=450]
+image::../images/connection_cdw_impala.png[verify connection, width=450, height=500]
 +
 - Once successful, click *Save*.
 - You can now use this connection to create/import datasets and build/import dashboards from Impala tables.
-
-=== 7. Add Ranger Policy for DataViz Access
-
-Before importing the dashboard into Cloudera DataViz, you must ensure the `dataviz` user has access to the Impala databases and tables. This is done by updating an existing policy in Apache Ranger.
-
-- Log in to the *Ranger Admin UI* using admin credentials.
-- Select the service named *Hadoop SQL*.
-- Locate the policy named `9 all - database, table, column`.
-- Click on the *Edit* icon to open it.
-+
-image::../images/dataviz_policy.png[dataviz policy]
-+
-- In the *Users* section, add `dataviz` to the list.
-- Scroll down and click *Save*.
 
 === 8. Import Dashboard into Cloudera Data Visualization
 
@@ -271,45 +271,3 @@ image::../images/dashboard_import_verify.png[import success, width=800, height=4
 +
 image::../images/dashboard.png[dashboard]
 
-=== 9. Accessing DataViz as Individual Users
-
-To allow multiple users to view or interact with dashboards, follow the steps below to create individual user accounts in Cloudera DataViz:
-
-==== Step 1: Log in as Admin
-
-- Open the DataViz from the base cluster.
-- Log in using the default admin credentials:
-+
-[source,text]
-----
-Username: vizapps_admin
-Password: vizapps_admin
-----
-
-==== Step 2: Create a New User
-
-- Once logged in, navigate to the settings icon and click on **Users and Groups**.
-- Click on the **New User** button.
-+
-image::../images/new_user.png[New user creation]
-
-==== Step 3: Fill in User Details
-
-- Enter the required details:
-  * `Username`: (e.g., `jdoe`)
-  * `Full Name`: (e.g., `John Doe`)
-  * `Password`: Set a secure password for the user
-- Assign appropriate permissions:
-  * For **read-only access**, select the **Visual Consumer** role.
-  * Other roles include **System Admin**, **Database Admin**, and **Analyst**, depending on the level of access needed.
-+
-image::../images/assign_roles.png[Assign roles, width=500, height=600]
-
-==== Step 4: User Logs In
-
-- The newly created user can now log in to DataViz using the credentials provided.
-- Depending on their role, they will have access to view, edit, or manage dashboards and datasets.
-
-== Contact
-
-For questions, feedback, or demo support, please reach out to the **Partner Solutions Engineering** team at Cloudera.

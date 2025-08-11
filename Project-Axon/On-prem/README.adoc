@@ -103,7 +103,7 @@ Clone the repository containing the dummy data generators and run the script to 
 git clone https://github.com/cloudera/cloudera-partners.git
 cd cloudera-partners
 git checkout project-axon
-cd Project-Axon
+cd Project-Axon/On-prem
 ----
 
 === 2. Set Up Python Virtual Environment and Install Dependencies
@@ -114,7 +114,7 @@ sudo yum install -y python3 git
 python3 -m ensurepip --upgrade
 python3 -m venv venv
 source venv/bin/activate
-pip3 install -r requirements.txt
+pip3 install -r ../assets/requirements.txt
 
 # Verify Flask version
 python3 -m flask --version
@@ -124,7 +124,7 @@ python3 -m flask --version
 
 [source,shell]
 ----
-./run_all.sh
+bash ../assets/run_all.sh
 ----
 
 - After running the script, verify that the dummy data endpoints are active using a `curl` command.
