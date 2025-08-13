@@ -681,7 +681,10 @@ setup_keycloak_ec2() {
    RETURN=$?
    if [ $RETURN -eq 0 ]; then
       KEYCLOAK_SERVER_IP=$(terraform output -raw elastic_ip)
+      echo "Adding Keycloak instance IP to userconfig/keycloak_ip"
       echo "$KEYCLOAK_SERVER_IP" >/userconfig/keycloak_ip
+      cat /userconfig/keycloak_ip
+      echo "Keycloak instance IP added to userconfig/keycloak_ip"
    else
       return 1
    fi
@@ -825,7 +828,7 @@ EOF
       echo "ENV_PRIVATE_SUBNETS: $ENV_PRIVATE_SUBNETS"
 
       ENV_PUBLIC_SUBNETS=$(terraform output -json aws_public_subnet_ids | jq -c '.[0:3]')
-      echo "\nFirst 3 public subnets for CDW (If Applicable): $ENV_PUBLIC_SUBNETS"
+      echo -e "\nFirst 3 public subnets for CDW (If Applicable): $ENV_PUBLIC_SUBNETS"
       ENV_PRIVATE_SUBNETS=$(terraform output -json aws_private_subnet_ids | jq -c '.[0:3]')
       echo "First 3 private subnets for CDW (If Applicable): $ENV_PRIVATE_SUBNETS"
 
@@ -1215,16 +1218,22 @@ cdp_idp_setup_user() {
 cdp_idp_user_teardown() {
    USER_NAMESPACE=$workshop_name
    echo -e "\n               ====================Deleting IDP Users & Group==============================================="
-   KEYCLOAK_SERVER_IP=$(cat /userconfig/keycloak_ip)
-   echo $KEYCLOAK_SERVER_IP
-   cd /userconfig/.$USER_NAMESPACE/keycloak_ansible_config
-   ansible-playbook keycloak_hol_user_teardown.yml --extra-vars \
-      "keycloak__admin_username=admin \
-      keycloak__admin_password=$keycloak__admin_password \
-      keycloak__domain=https://$KEYCLOAK_SERVER_IP \
-      hol_keycloak_realm=master \
-      hol_session_name=$workshop_name-aw-cdp-user-group"
-   sleep 10
+   
+   if [[ -f /userconfig/keycloak_ip ]]; then
+      KEYCLOAK_SERVER_IP=$(cat /userconfig/keycloak_ip)
+      echo $KEYCLOAK_SERVER_IP
+      cd /userconfig/.$USER_NAMESPACE/keycloak_ansible_config
+      ansible-playbook keycloak_hol_user_teardown.yml --extra-vars \
+         "keycloak__admin_username=admin \
+         keycloak__admin_password=$keycloak__admin_password \
+         keycloak__domain=https://$KEYCLOAK_SERVER_IP \
+         hol_keycloak_realm=master \
+         hol_session_name=$workshop_name-aw-cdp-user-group"
+      sleep 10
+   else
+      echo "Keycloak IP file not found. Assuming Keycloak is already destroyed. Skipping ansible playbook execution."
+   fi
+
    echo "               ====================Removing IDP From CDP Tenant============================================="
    cdp iam delete-saml-provider --saml-provider-name $workshop_name
 }

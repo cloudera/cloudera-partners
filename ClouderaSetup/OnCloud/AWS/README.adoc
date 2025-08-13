@@ -9,14 +9,11 @@ Author: **Avanish Tiwari**
 
 Email: **aktiwari@cloudera.com**
 
-
 ---
-
 
 == Overview
 
 Hands-on Labs play a crucial role in showcasing the capabilities of Cloudera Data Platform Public Cloud form factor to partners and customers. They offer a practical and immersive learning experience that goes beyond mere overview. Hands-on Labs facilitate participant engagement and allow them to explore and interact with different PaaS offerings of Cloudera Data Platform.
-
 
 Infrastructure components are important and play a vital role in achieving the goal of Hands-on Labs and to give a better experience to the participants.
 
@@ -28,10 +25,15 @@ Infrastructure components are important and play a vital role in achieving the g
 4. `Keycloak` Server
 5. Users 
 
-
 image::build/images/Components.png[Components,600,400]
 
+[NOTE]
+====
+For a detailed walkthrough of the automated provisioning process, check out the course on Cloudera LMS titled https://clouderapartneracademy.learnupon.com/content-details/268793819/2[CDP Public Cloud Architecture and Onboarding]. It covers step-by-step setup using **AutoClouderaDeploy**.
+====
+
 == Technology Stack
+
 **AutoClouderaDeploy** employs a robust toolchain consisting of:
 
 1. `Ansible`
@@ -46,21 +48,72 @@ image::build/images/Components.png[Components,600,400]
 All the above tools are integrated with each other and packaged as a `Docker` Container for use.
 
 == Prerequisites
-The ready to use container takes care of all the dependencies of required tools & does not require user to install or configure any of the above listed tools. 
-For using this user should have:
 
-1. `Docker` and `AWSCLI V2` installed on your Laptop.
-2. *Programatic Access*(CDP_ACCESS_KEY_ID & CDP_PRIVATE_KEY) of *CDP Tenant*
-3. *Programatic Access*(AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY) *OR* *SSO details* of the *AWS account* with Administrator or Power User Role *OR* *Role Assignment* to EC2 deployer machine *via sts:assumeRole* method 
+The ready-to-use container takes care of all the dependencies of required tools & does not require the user to install or configure any of the above listed tools. 
+To use this, you should have:
+
+1. `Docker` and `AWSCLI V2` installed on your laptop.
+2. *Programmatic Access* (`CDP_ACCESS_KEY_ID` & `CDP_PRIVATE_KEY`) of *CDP Tenant*.
+3. *Programmatic Access* (`AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`) *OR* *SSO details* of the *AWS account* with Administrator or Power User Role *OR* *Role Assignment* to EC2 deployer machine *via `sts:assumeRole` method*.
 
 === How to install `Docker` on your local machine
 
-Follow mentioned link for link:https://docs.docker.com/engine/install/[**installing Docker**] on your machine.
+Follow this link for: link:https://docs.docker.com/engine/install/[**Installing Docker**] on your machine.
 
+=== Install `awscli` (v1 or v2) [if not already installed]
+
+You only need to install `AWS CLI` if it's not already available on your system.
+
+*To check if it is installed:*
+[source,shell]
+----
+aws --version
+----
+
+*If not installed, follow one of the below links:*
+
+- **AWS CLI v2** (Recommended): link:https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html[Install AWS CLI v2]
+- **AWS CLI v1** (Legacy): link:https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html[Install AWS CLI v1]
+
+NOTE: Once installed, you can use `aws configure` command to set up credentials. (More details are covered in the <<aws-auth,AWS>> section.)
+
+[source,shell]
+----
+aws configure
+----
+
+=== Install `cdpcli` [if not already installed]
+
+You only need to install `CDP CLI` if it's not already installed.
+
+*To check if it is installed:*
+[source,shell]
+----
+cdp --version
+----
+
+*If not installed, follow the official installation instructions:*
+
+- **Install CDP CLI**: link:https://docs.cloudera.com/cdp-public-cloud/cloud/cli/topics/mc-installing-cdp-client.html[Installing the CDP CLI]
+
+Make sure Python and `pip` are available before installing `cdpcli`:
+
+[source,shell]
+----
+pip install cdpcli --upgrade
+----
+
+NOTE: Once installed, you can use `cdp configure` command to set up credentials. (More details are covered in the <<cdp-auth,CDP>> section.)
+
+[source,shell]
+----
+cdp configure
+----
 
 === Generate Keys
 
-==== CDP
+==== [[cdp-auth]]CDP
+
 * On the CDP Portal, click at the left bottom corner and click on Profile as shown below. 
 
 image::build/images/profile.png[profile, 120, 120]
@@ -90,9 +143,9 @@ ksahu@Kuldeeps-MacBook-Air build %
 ksahu@Kuldeeps-MacBook-Air build % cdp iam get-user
 ----
 
-==== AWS
+==== [[aws-auth]]AWS
 
-There are three ways you can authenticate with AWS Account:
+There are three ways you can authenticate with AWS Account (use only one of them, whichever is preferable to you):
 
 a) Normal Way: *Using AWS ACCESS_KEY_ID and SECRET_ACCESS_KEY*
 
@@ -265,7 +318,7 @@ step of this section.
 [NOTE]
 ====
 To complete this setup, you must have a registered domain on `Route53` and a corresponding `Hosted Zone` linked to it.
-If you are unsure about the steps or don’t have a registered domain or hosted zone set up on `AWS Route53`, refer to the guide link:https://github.com/cloudera/cloudera-partners/blob/keycloak-ssl-le/ClouderaSetup/OnCloud/AWS/Route53.adoc[**here**] for detailed instructions.
+If you are unsure about the steps or don’t have a registered domain or hosted zone set up on `AWS Route53`, refer to the guide link:https://github.com/cloudera/cloudera-partners/blob/main/ClouderaSetup/OnCloud/AWS/Route53.adoc[**here**] for detailed instructions.
 ====
 
 ==== A): 
@@ -297,6 +350,8 @@ values of the parameters.
 [NOTE]
  Make Sure, you are providing a unique name for the variables i.e. WORKSHOP_USER_PREFIX, WORKSHOP_NAME etc. else there are chances to break in-between of execution of automation, in case there is already a resource present on account, with the same names.
 
+. Mandatory Parameters
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -368,8 +423,8 @@ Only from the provided values
 **Below are the optional parameters that should only be changed if any customization is needed. If you intend to proceed with the default configuration values for the data services, do not modify and/or uncomment the values. If you need to make changes, please refer to the table below for detailed instructions on providing the correct values. To override the default values for optional parameters for any of data services, uncomment the parameter Key and provide/update the values corresponding to them, if and when required.**
 
 
-==== Optional Parameters
-
+. Optional Parameters
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -381,8 +436,25 @@ Only from the provided values
 |Only base name without .pem extension.
 |===
 
-==== Optional parameters for datalake_version
+.. Optional parameters for `AI Inference Service` Deployment
++
+[%header,cols="1,1,1"]
+|===
+|Parameter
+|Description
+|Remarks
 
+|PROVISION_CAII
+|This is an optional parameter and should be uncommented only if you want to deploy `AI Inference Service` with other dependencies mentioned in the `Note` section below as part of a workshop.
+|No quotes 
+
+**YES** If `AI Inference` provisioning is required.
+|===
++
+Note: `This will deploy the **Cloudera on Cloud environment**, initialize **Compute Cluster**, create new **Compute Cluster**, deploy the **AI workbench** and **AI Registry** and at last deploy the **Cloudera AI Inference Service (CAII)**.`
+
+.. Optional parameters for datalake_version
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -394,8 +466,8 @@ Only from the provided values
 |To override the default value with current quota, kindly uncomment the corresponding entry in `configfile` and replace the override value e.g **7.2.18**
 |===
 
-==== Optional parameters for CDP Quota
-
+.. Optional parameters for CDP Quota
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -419,8 +491,8 @@ No quotes, only integer
 No quotes, only integer
 |===
 
-==== Optional parameters for CDW
-
+.. Optional parameters for CDW
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -439,8 +511,8 @@ No quotes, only string, only lowercase (with integers)
 No quotes, only string, only lowercase (with integers)
 |===
 
-==== Optional parameters for CDE
-
+.. Optional parameters for CDE
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -479,8 +551,8 @@ No quotes, only integer
 No quotes, only integer
 |===
 
-==== Optional parameters for CML
-
+.. Optional parameters for CML
++
 [%header,cols="1,1,1"]
 |===
 |Parameter
@@ -524,12 +596,14 @@ No quotes, only integer
 No quotes, only integer
 |===
 
+[NOTE]
+The availability of GPU instances is specific to AWS region and Quotas available to an AWS account and may vary for different accounts and region used for deployement. Please provide the correct/suitable values only, after referring to the official AWS and CDP public documentations.
 
 [NOTE]
- The availability of GPU instances is specific to AWS region and Quotas available to an AWS account and may vary for different accounts and region used for deployement. Please provide the correct/suitable values only, after referring to the official AWS and CDP public documentations.
+Please refer to the official AWS and https://docs.cloudera.com/cdp-public-cloud/cloud/requirements-aws/topics/mc-aws-req-region.html[CDP Public Documentation], for checking the correct and suitable values for AWS regions and Instance Types.
 
 [NOTE]
- Please refer to the official AWS and CDP public documentations, for checking the correct and suitable values for AWS regions and Instance Types.
+Please make sure sufficient resource quota is available in your region for provisioning CDP resources. Refer to the official https://docs.cloudera.com/cdp-public-cloud/cloud/requirements-aws/topics/mc-aws-resources-list.html[documentation] for more details.
 
 ==== D):
 If the **AWS_KEY_PAIR** value is not defined in `configfile`, automation will generate a new keypair and place pem file inside **userconfig** directory.
@@ -550,17 +624,30 @@ Once the `configfile` is created as outlined in **Step 2** . The provisioning of
 
 
 
-**For Mac/Linux/Windows Users:**
+**For Mac/Linux Users:**
 
-[.shell]
+[source,shell]
 ----
 docker run -it \
--v ~/userconfig:/userconfig \
--v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
-clouderapartners/cdp-public-cloud-hol-provisioner:latest \
-provision
-
+  -v ~/userconfig:/userconfig \
+  -v ~/.aws/:/root/.aws \
+  -v ~/.cdp/:/root/.cdp \
+  clouderapartners/cdp-public-cloud-hol-provisioner:latest \
+  provision
 ----
+
+**For Windows Users:**
+
+[source,shell]
+----
+docker run -it ^
+  -v %USERPROFILE%\userconfig:/userconfig ^
+  -v %USERPROFILE%\.aws:/root/.aws ^
+  -v %USERPROFILE%\.cdp:/root/.cdp ^
+  clouderapartners/cdp-public-cloud-hol-provisioner:latest ^
+  provision
+----
+
 
 [NOTE]
 The above commands will start the `Docker` container in interactive mode and will display the process output and messages on the terminal. Make sure you don't close the terminal or your machine does not go to into sleep mode because of inactivity. 
@@ -720,16 +807,28 @@ After succesful delivery of your HOL/Workshop the complete stack can be destroye
 
 
 
-**For Mac/Linux/Windows Users:**
- 
-[.shell]
+**For Mac/Linux Users:**
+
+[source,shell]
 ----
 docker run -it \
--v ~/userconfig:/userconfig \
--v ~/.aws/:/root/.aws -v ~/.cdp/:/root/.cdp \
-clouderapartners/cdp-public-cloud-hol-provisioner:latest \
-destroy
+  -v ~/userconfig:/userconfig \
+  -v ~/.aws/:/root/.aws \
+  -v ~/.cdp/:/root/.cdp \
+  clouderapartners/cdp-public-cloud-hol-provisioner:latest \
+  destroy
+----
 
+**For Windows Users:**
+
+[source,shell]
+----
+docker run -it ^
+  -v %USERPROFILE%\userconfig:/userconfig ^
+  -v %USERPROFILE%\.aws:/root/.aws ^
+  -v %USERPROFILE%\.cdp:/root/.cdp ^
+  clouderapartners/cdp-public-cloud-hol-provisioner:latest ^
+  destroy
 ----
 
 [NOTE]

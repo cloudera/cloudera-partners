@@ -7,7 +7,7 @@ The repository is structured by on-premise platforms, with each platform having 
 
 == Usage Instructions
 1. Click on below link to Navigate to the folder for your chosen on-premise platform.
-* link:./VMware/[**`VMware`**] [Not available yet]
+* link:./ECS/[**`ECS`**]
 * link:./Openshift/[**`Openshift`**] [Not available yet]
 
 2. Follow the `README` file in that folder for detailed steps on configuring and running the automation.

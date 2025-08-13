@@ -68,41 +68,47 @@ https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79347[Take u
 
 The first level of the accreditation lays the foundation for your journey, providing you with a comprehensive overview of Cloudera's data management and analytics technologies. You will gain a solid understanding of the core concepts, architecture, and best practices, along with hands-on experience through practical exercises and use cases. This level is designed to give you a strong foothold in Cloudera's platform.
 
-https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79363[Take up the CTP]
+https://clouderapartneracademy.learnupon.com/content-details/91450/1[Take up the CTP]
 
 * *CTS* - Cloudera Technical Specialist
 
 Building on the foundational knowledge, the second level covers advanced topics and use cases. You will dive deeper into Cloudera's technologies, exploring advanced data processing, data warehousing, data engineering, and machine learning capabilities. This level is designed to expand your skill set and provide you with the expertise to tackle complex data challenges and drive innovation in your organizations.
 
-https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79362[Take up the CTS]
+https://clouderapartneracademy.learnupon.com/content-details/91157/1[Take up the CTS]
 
 * *CTE* - Cloudera Technical Expert
 
-This level will equip you with the domain-specific knowledge and expertise needed to deliver tailored solutions and address the unique data challenges of your industry. You will explore how Cloudera's technologies are applied in various industries, such as finance, healthcare, retail, telecommunications, and more. 
+This level will equip you with the domain-specific knowledge and expertise needed to deliver tailored solutions and address the unique data challenges of your industry. You will explore how Cloudera's technologies are applied in various industries, such as finance, healthcare, retail, telecommunications, and more.
 
-https://clouderapartneracademy.learnupon.com/catalog/learning-paths/79360[Take up the CTE]
+https://clouderapartneracademy.learnupon.com/content-details/91632/1[Take up the CTE]
 
-[cols="^,^,^"]
+* *CAITP* - CLOUDERA AI TECHNICAL PROFESSIONAL ACCREDITATION
+
+This accreditation is designed for partner pre-sales and technical experts looking to deepen their understanding of building and operationalizing AI with Cloudera. It covers AI fundamentals, customer discovery, and Cloudera’s end-to-end AI platform, along with hands-on tools like AI Studios and AMPs. By the end of this path, you’ll be equipped to design and deliver scalable, real-world AI solutions across industries.
+
+https://clouderapartneracademy.learnupon.com/content-details/89672/1[Take up the CAITP]
+
+[cols="^,^,^,^"]
 |===
-| CTP | CTS | CTE
+| CTP | CTS | CTE | CAITP
 
-| Just Enough Tech | INTRODUCING CLOUDERA on cloud ADMINISTRATION | ENABLING GENERATIVE AI FOR THE ENTERPRISE
+| WELCOME TO THE CLOUDERA TECHNICAL PROFESSIONAL | APACHE OZONE FUNDAMENTALS | ENABLING GENERATIVE AI FOR THE ENTERPRISE | AI BASICS FOR CUSTOMER ENGAGEMENTS
 
-| Cloudera Data Platform Technical Overview | CLOUDERA DATA SERVICES, A CDW, CDE and CDF DEEP-DIVE | SDX - ADVANCED CONCEPTS IN ENTERPRISE-GRADE SECURITY
+| CLOUDERA TECHNICAL OVERVIEW | INTRODUCING CDP PUBLIC CLOUD ADMINISTRATION | SDX - ADVANCED CONCEPTS IN ENTERPRISE-GRADE SECURITY | CLOUDERA AI OVERVIEW
 
-| Modern Data Architectures | INTRODUCTION TO UNIVERSAL DATA DISTRIBUTION WITH CLOUDERA DATA FLOW | BUILDING A MODERN DATA LAKEHOUSE WITH APACHE ICEBERG IN Cloudera
+| MODERN DATA ARCHITECTURES | MODERN ANALYTICS WITH CLOUDERA DATA WAREHOUSE | BUILDING A MODERN DATA LAKEHOUSE WITH APACHE ICEBERG IN CLOUDERA | BUILD AI: INTRODUCING AI STUDIOS
 
-| Cloudera Hybrid Data Services | INTRODUCTION TO CLOUDERA AI | SIZING, LICENSING AND PRICING A CLOUDERA SOLUTION
+| CLOUDERA DATA SERVICES 101 | MODERN PIPELINES WITH CLOUDERA DATA ENGINEERING | SIZING, LICENSING AND PRICING A CLOUDERA SOLUTION | BUILD AI: CUSTOM ACCELERATORS (AMPs) WITH CLOUDERA AI
 
-| Cloudera Data Services Online Guided Tour | CLOUDERA OPERATIONAL DATABASE FUNDAMENTALS | APACHE OZONE, THE MODERN BIG DATA OBJECT STORE
+| CLOUDERA DATA SERVICES ONLINE GUIDED TOUR | ADVANCED DATA IN MOTION WITH CLOUDERA DATAFLOW AND KUBERNETES OPERATORS | ADVANCED CONCEPTS IN APACHE OZONE | RUN AI: DEPLOY PRIVATE LLMs WITH CLOUDERA AI INFERENCE SERVICE
 
-| | SHARED DATA EXPERIENCE (SDX) | ADVANCED CONCEPTS IN APACHE OZONE, THE MODERN BIG DATA OBJECT STORE
+| INTRODUCING CLOUDERA OCTOPAI DATA LINEAGE | CLOUDERA AI: FROM ML OPS TO ENTERPRISE-GRADE AI APPLICATIONS | SIMPLIFY SOLUTIONING AND BUILD REFERENCE ARCHITECTURES WITH CLOUDERA BLUEPRINTS | 
 
-| | CLOUDERA PRICING & LICENSING | SIMPLIFY SOLUTIONING AND BUILD REFERENCE ARCHITECTURES WITH CLOUDERA BLUEPRINTS
+| CLOUDERA PRICING AND LICENSING ESSENTIALS FOR PARTNERS | CLOUDERA OPERATIONAL DATABASE: DEPLOYMENT AND DESIGN BASICS | CLOUDERA ON CLOUD ARCHITECTURE AND ONBOARDING | 
 
-| | | Cloudera on cloud ARCHITECTURE AND ONBOARDING
+|  | MASTERING THE FOUNDATIONS OF CLOUDERA SDX | INTRODUCING CLOUDERA OBSERVABILITY FOR TECHNICAL AUDIENCES | 
 
-| | | INTRODUCING CLOUDERA OBSERVABILITY FOR TECHNICAL AUDIENCES
+|  | OCTOPAI DATA LINEAGE 201 |  | 
 |===
 
 == Cloudera Data Platform Deployment 

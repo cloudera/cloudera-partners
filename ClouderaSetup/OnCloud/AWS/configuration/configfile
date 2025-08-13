@@ -10,8 +10,9 @@ LOCAL_MACHINE_IP:<VALUE>/32
 ENABLE_DATA_SERVICES:[Comma Separated list of data services to be enabled. NONE if not required]
 DOMAIN:<VALUE>
 HOSTEDZONEID:<VALUE>
-#==================Optional Parameters===============#
 
+#==================Optional Parameters===============#
+#PROVISION_CAII:YES
 #AWS_KEY_PAIR:demo-keypair
 
 ## Optional parameters for datalake_version

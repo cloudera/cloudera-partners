@@ -11,8 +11,9 @@ LOCAL_MACHINE_IP:172.16.31.xx/32
 ENABLE_DATA_SERVICES:[CML,CDW,CDE]
 DOMAIN:clouderapartners.com
 HOSTEDZONEID:ZCLOUDERAPSEAPACTEAM1
-#==================Optional Parameters===============#
 
+#==================Optional Parameters===============#
+#PROVISION_CAII:YES
 #AWS_KEY_PAIR:demo-keypair
 
 ## Optional parameters for datalake_version
