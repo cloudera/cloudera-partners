@@ -29,17 +29,20 @@ for i in {1..60}; do
 
   echo "   ➤ Attempt $i: Status = $default_cluster_status"
 
-  if [[ "$default_cluster_status" == "RUNNING" ]]; then
+  # Convert to lowercase for case-insensitive matching
+  status_lower=$(echo "$default_cluster_status" | tr '[:upper:]' '[:lower:]')
+
+  if [[ "$status_lower" == "running" ]]; then
     echo "✅ Default compute cluster is now RUNNING."
     break
-  elif [[ "$default_cluster_status" == "FAILED" ]]; then
-    echo "❌ Default compute cluster initialization FAILED."
+  elif [[ "$status_lower" == *"failed"* ]]; then
+    echo "❌ Default compute cluster initialization FAILED with status: $default_cluster_status."
     exit 1
   fi
-  sleep 30
+  sleep 60
 done
 
-if [[ "$default_cluster_status" != "RUNNING" ]]; then
-  echo "❌ Timeout Error: Default cluster did not reach RUNNING state after 30 minutes."
+if [[ "$status_lower" != "running" ]]; then
+  echo "❌ Timeout Error: Default cluster did not reach RUNNING state after 60 minutes."
   exit 1
 fi

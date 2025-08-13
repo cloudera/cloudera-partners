@@ -14,10 +14,13 @@ existing_cluster_status=$(cdp compute list-clusters | jq -r --arg name "$cluster
   | .status
 ')
 
-if [[ "$existing_cluster_status" == "RUNNING" ]]; then
+# Normalize status to lowercase for case-insensitive matching
+existing_status_lower=$(echo "$existing_cluster_status" | tr '[:upper:]' '[:lower:]')
+
+if [[ "$existing_status_lower" == "running" ]]; then
   echo "✅ Compute cluster '$cluster_name' is already RUNNING. Skipping creation."
 
-elif [[ "$existing_cluster_status" == "CREATING" ]]; then
+elif [[ "$existing_status_lower" == "creating" ]]; then
   echo "ℹ️ Compute cluster '$cluster_name' is already being created. Skipping creation."
 
 else
@@ -34,18 +37,23 @@ else
 
     echo "   ➤ Attempt $i: Status = $current_status"
 
-    if [[ "$current_status" == "RUNNING" ]]; then
+    # Convert to lowercase for comparison
+    current_status_lower=$(echo "$current_status" | tr '[:upper:]' '[:lower:]')
+
+    if [[ "$current_status_lower" == "running" ]]; then
       echo "✅ Compute cluster '$cluster_name' is now RUNNING."
       break
-    elif [[ "$current_status" == "FAILED" ]]; then
-      echo "❌ Compute cluster creation FAILED."
+    elif [[ "$current_status_lower" == *"failed"* ]]; then
+      echo "❌ Compute cluster creation FAILED with status: $current_status"
       exit 1
     fi
+
     sleep 30
   done
 
-  if [[ "$current_status" != "RUNNING" ]]; then
+  if [[ "$current_status_lower" != "running" ]]; then
     echo "❌ Timeout Error: Compute cluster did not reach RUNNING state."
     exit 1
   fi
 fi
+

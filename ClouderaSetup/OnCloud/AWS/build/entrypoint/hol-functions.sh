@@ -914,24 +914,56 @@ echo -e "\n               ==============================Provisioning Compute Clu
 }
 
 enable_model_registry() { 
-      echo -e "\n               =============================Deploying Model Registry ========================================="
-   USER_NAMESPACE=$workshop_name   
-   cd /userconfig/.$USER_NAMESPACE/CAII
-   environment_crn=$(cdp environments describe-environment --environment-name ${workshop_name}-cdp-env | jq -r .environment.crn)
-      # Check if ML Model Registry exists and is already installed
-   registry_status=$(cdp ml list-model-registries | jq -r --arg env_name "${workshop_name}-cdp-env" '
-     .modelRegistries[]
-     | select(.environmentName == $env_name)
-     | .status
-   ')
+  echo -e "\n               =============================Deploying Model Registry ========================================="
+  USER_NAMESPACE=$workshop_name   
+  cd /userconfig/.$USER_NAMESPACE/CAII
 
-   if [[ "$registry_status" == "installation:finished" ]]; then
-     echo "✅ ML Model Registry for environment '${workshop_name}-cdp-env' is already installed. Skipping creation."
-   else
-     echo "🚀 Proceeding with model registry deployment"
-     cdp ml create-model-registry --environment-crn $environment_crn --environment-name $workshop_name-cdp-env --use-public-load-balancer 
-   fi
+  environment_crn=$(cdp environments describe-environment --environment-name ${workshop_name}-cdp-env | jq -r .environment.crn)
 
+  # Check if ML Model Registry exists and is already installed
+  registry_status=$(cdp ml list-model-registries | jq -r --arg env_name "${workshop_name}-cdp-env" '
+    .modelRegistries[]
+    | select(.environmentName == $env_name)
+    | .status
+  ')
+
+  if [[ "$registry_status" == "installation:finished" ]]; then
+    echo "✅ ML Model Registry for environment '${workshop_name}-cdp-env' is already installed. Skipping creation."
+    return
+  else
+    echo "🚀 Proceeding with model registry deployment"
+    cdp ml create-model-registry \
+      --environment-crn "$environment_crn" \
+      --environment-name "${workshop_name}-cdp-env" \
+      --use-public-load-balancer
+  fi
+
+  echo "⏳ Waiting for ML Model Registry installation to finish..."
+  for i in {1..75}; do
+    registry_status=$(cdp ml list-model-registries | jq -r --arg env_name "${workshop_name}-cdp-env" '
+      .modelRegistries[]
+      | select(.environmentName == $env_name)
+      | .status
+    ')
+
+    echo "   ➤ Attempt $i: Status = $registry_status"
+
+    # Normalize to lowercase for matching
+    status_lower=$(echo "$registry_status" | tr '[:upper:]' '[:lower:]')
+
+    if [[ "$status_lower" == "installation:finished" ]]; then
+      echo "✅ ML Model Registry installation finished successfully."
+      return
+    elif [[ "$status_lower" == *"failed"* ]]; then
+      echo "❌ ML Model Registry installation FAILED with status: $registry_status"
+      exit 1
+    fi
+
+    sleep 60
+  done
+
+  echo "❌ Timeout Error: ML Model Registry did not reach 'installation:finished' state."
+  exit 1
 }
 
 provision_caii_service_app() {
