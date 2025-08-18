@@ -32,7 +32,7 @@ pinecone-client==2.2.4
 sentence-transformers==2.2.2
 
 ## Chroma Vector DB Requirements
-chromadb==0.4.15
+chromadb==1.0.17
 pysqlite3-binary==0.5.2.post1
 sentence-transformers==2.2.2
 
