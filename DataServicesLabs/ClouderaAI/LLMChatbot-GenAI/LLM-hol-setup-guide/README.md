@@ -181,11 +181,10 @@ Next, perform the following the steps to set everything up and run a simple test
 #### 5.2 Run Bulk AMP creation
 In this step you will run an automation script that launches an AMP for each paricipant. First, a few configuration steps:
 1. Make sure all of the participant credentials are listed properly in ```./amplifier/participants.csv```
-2. Open up ```./amplifier/amplifier.py``` and edit two global variables at the top:
-    * **SSO_URL** - set it to the URL you use to get to the SSO interface of your CDP tenant (e.g. sandbox or marketing tenant)
+2. Open up ```./amplifier/amplifier.py``` and edit three global variables at the top:
+    * **SSO_URL** - set it to the URL you use to get to the SSO interface of your CDP tenant (e.g. sandbox or marketing tenant). The file currently has a sample from a previous workspace for reference.
     * **ML_WORKSPACE** - set it to the name of your ML workspace
     * **AMP_NAME** - set it to the name of the AMP that you've given the lab after uploading the catalog to the workbench (i.e. **"Hands on Lab Workshop with LLM"**)
-    * **WORKSPACE_URL** - set it to URL of your workspace. The file currently has a sample from a previous workspace for reference
 3. Save the ```.py``` file
 4. Get yourself a coffee, the next step will take a while. For every 5 AMPs expect to wait about half an hour. For a 50 person workshop, the AMP creation will take approximately 2.5 hours. 
 5. While in the ```./amplifier``` directory, in the command line execute ```python3 amplifier.py```.
