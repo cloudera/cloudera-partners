@@ -1,0 +1,24 @@
+name: Update submodule
+
+on:
+  repository_dispatch:
+    types: [update-submodule]
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout parent repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update End2EndLabs to latest main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git submodule update --remote End2EndLabs
+          git add End2EndLabs
+          git commit -m "Auto-update End2EndLabs submodule to latest main" || echo "No changes to commit"
+          git push
