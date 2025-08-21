@@ -24,7 +24,7 @@ TIP: Please read the entire article before starting the setup.
 
 The detailed and **step-by-step setup guide** used in this tutorial is available here:
 
-**👉 link:./Cloudera_On-Premise_Deployment_Guide(ECS).pdf[Cloudera On-Premise Deployment Guide (ECS)]**
+**👉 link:./Cloudera_On-Premise_Deployment_Guide-ECS.pdf[Cloudera On-Premise Deployment Guide (ECS)]**
 
 Make sure to review the entire guide **before beginning your installation** to avoid any possible issues.
 ====
