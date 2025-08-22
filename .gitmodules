@@ -10,3 +10,6 @@
 [submodule "DataServicesLabs"]
 	path = DataServicesLabs
 	url = https://github.com/cloudera/DataServicesLabs.git
+[submodule "PSEAutomation"]
+	path = PSEAutomation
+	url = https://github.com/cloudera/PSEAutomation.git
