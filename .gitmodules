@@ -1,3 +1,6 @@
 [submodule "End2EndLabs"]
 	path = End2EndLabs
 	url = https://github.com/cloudera/End2EndLabs.git
+[submodule "ClouderaSetup"]
+	path = ClouderaSetup
+	url = https://github.com/cloudera/ClouderaSetup.git
