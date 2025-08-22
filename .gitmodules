@@ -7,3 +7,6 @@
 [submodule "PartnerResources"]
 	path = PartnerResources
 	url = https://github.com/cloudera/PartnerResources.git
+[submodule "DataServicesLabs"]
+	path = DataServicesLabs
+	url = https://github.com/cloudera/DataServicesLabs.git
