@@ -4,3 +4,6 @@
 [submodule "ClouderaSetup"]
 	path = ClouderaSetup
 	url = https://github.com/cloudera/ClouderaSetup.git
+[submodule "PartnerResources"]
+	path = PartnerResources
+	url = https://github.com/cloudera/PartnerResources.git
