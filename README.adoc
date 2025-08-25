@@ -34,6 +34,10 @@ Contains hands-on labs for each of Cloudera's Data Services, including `Cloudera
 *Description:*
 This folder contains comprehensive, end-to-end labs designed to showcase integrated workflows using multiple Cloudera Data Services. These labs provide a holistic view of data processing, from ingestion and transformation to analysis and visualization, simulating real-world scenarios.
 
+=== 5. PSEAutomation
+*Description:*
+This folder contains automation code developed by the PSE (Partner Solutions Engineering) team. It includes Kubernetes operators, Cloudera setup automation, and other reusable automation frameworks designed to simplify deployment, configuration, and management of Cloudera environments.
+
 *When to Use:*
 - If you're looking to explore how different Cloudera Data Services work together in a unified workflow.
 - Ideal for advanced hands-on sessions, workshops, or exploring real-world implementation scenarios.
@@ -41,10 +45,71 @@ This folder contains comprehensive, end-to-end labs designed to showcase integra
 == How to Navigate This Repository
 
 === Determine Your Goal:
-- Looking for Partner Resources? Head to `link:./PartnerResources[**PartnerResources**]`.
-- Setting Up Cloudera? Visit `link:./ClouderaSetup[**ClouderaSetup**]`.
-- Exploring Data Services? Start with `link:./DataServicesLabs[**DataServicesLabs**]`.
-- Need Hands-On Practice? Check out `link:./EndToEndLabs[**EndToEndLabs**]`.
+- Looking for Partner Resources? Head to link:https://github.com/cloudera/PartnerResources.git[**PartnerResources**].
+- Setting Up Cloudera? Visit link:https://github.com/cloudera/ClouderaSetup.git[**ClouderaSetup**].
+- Exploring Data Services? Start with link:https://github.com/cloudera/DataServicesLabs.git[**DataServicesLabs**].
+- Need Hands-On Practice? Check out link:https://github.com/cloudera/End2EndLabs.git[**End2EndLabs**].
+- Interested in Automation? Explore link:https://github.com/cloudera/PSEAutomation.git[**PSEAutomation**].
+
+=== Cloning This Repository with Submodules
+
+This repository uses Git *submodules* to manage multiple projects. Depending on your workflow, follow the instructions below:
+
+==== 1. Clone the entire repository with all submodules
+If you want everything (main repo + all submodules in one go):
+
+[source,bash]
+----
+git clone --recurse-submodules https://github.com/cloudera/cloudera-partners.git
+----
+
+If you already cloned without `--recurse-submodules`, you can fetch submodules with:
+
+[source,bash]
+----
+git submodule update --init --recursive
+----
+
+==== 2. Clone only a single submodule (folder)
+If you only want to work on a specific submodule without cloning the entire repo:
+
+[source,bash]
+----
+git clone https://github.com/cloudera/<submodule-repo>.git
+----
+
+Example (replace `<submodule-repo>` with the actual submodule name):
+
+[source,bash]
+----
+git clone https://github.com/cloudera/End2EndLabs.git
+----
+
+==== 3. Clone the main repo, then initialize submodules later
+If you want to start with just the main repo and then pull submodules as needed:
+
+[source,bash]
+----
+git clone https://github.com/cloudera/cloudera-partners.git
+cd cloudera-partners
+
+# Initialize submodules (but don’t fetch yet)
+git submodule init
+
+# Fetch a specific submodule
+git submodule update -- End2EndLabs
+
+# Or fetch all submodules
+git submodule update --recursive
+----
+
+==== Pro tip
+If submodules ever get out of sync, resync them with:
+
+[source,bash]
+----
+git submodule sync --recursive
+----
 
 === Read the Documentation:
 Each folder contains detailed documentation to guide you through its content.
