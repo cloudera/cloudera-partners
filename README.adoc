@@ -120,3 +120,9 @@ Each folder contains detailed documentation to guide you through its content.
 If you have questions or need assistance, feel free to contact the repository maintainers.
 
 We hope this repository helps you make the most of Cloudera's offerings. Happy learning and collaboration! 😊
+
+---
+
+**Copyright Notice**  
+All material is Copyright (c) 2020-2025 Cloudera, Inc. unless stated otherwise.
+
