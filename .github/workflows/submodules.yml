@@ -1,0 +1,29 @@
+name: Update submodule
+
+on:
+  repository_dispatch:
+    types: [update-submodule]
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout parent repo
+        uses: actions/checkout@v4
+        with:
+          ref: git-submodules
+          submodules: true
+          token: ${{ secrets.PARENT_REPO_TOKEN }}
+
+      - name: Update submodule from payload
+        run: |
+          SUBMODULE=${{ github.event.client_payload.submodule }}
+          echo "Updating submodule: $SUBMODULE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git submodule update --remote $SUBMODULE
+          git add $SUBMODULE
+          git commit -m "Auto-update $SUBMODULE submodule to latest main" || echo "No changes to commit"
+          git push
