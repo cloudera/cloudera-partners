@@ -1,6 +1,6 @@
 = Cloudera Repository for Partners
 
-:imagesdir: https://github.com/cloudera/ClouderaSetup/blob/main/images
+:imagesdir: https://github.com/cloudera/PartnerResources/blob/main/images
 
 Welcome to the Cloudera Repository for Partners! This repository is designed to provide all the resources, tools, and hands-on labs needed for Cloudera's Data Platform. Below, you'll find detailed descriptions of the folders within this repository, helping you quickly locate the resources you need based on your requirements.
 
