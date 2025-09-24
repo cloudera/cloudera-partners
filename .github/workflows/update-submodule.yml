@@ -14,11 +14,15 @@ jobs:
           submodules: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update End2EndLabs to latest main
+      - name: Update submodule from payload
         run: |
+          SUBMODULE=${{ github.event.client_payload.submodule }}
+          echo "Updating submodule: $SUBMODULE"
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git submodule update --remote End2EndLabs
-          git add End2EndLabs
-          git commit -m "Auto-update End2EndLabs submodule to latest main" || echo "No changes to commit"
+
+          git submodule update --remote $SUBMODULE
+          git add $SUBMODULE
+          git commit -m "Auto-update $SUBMODULE submodule to latest main" || echo "No changes to commit"
           git push
