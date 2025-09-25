@@ -11,7 +11,7 @@ jobs:
       - name: Checkout parent repo
         uses: actions/checkout@v4
         with:
-          ref: git-submodules
+          # ref: git-submodules
           submodules: true
           token: ${{ secrets.PARENT_REPO_TOKEN }}
 
