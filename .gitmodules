@@ -1,0 +1,15 @@
+[submodule "End2EndLabs"]
+	path = End2EndLabs
+	url = https://github.com/cloudera/End2EndLabs.git
+[submodule "DataServicesLabs"]
+	path = DataServicesLabs
+	url = https://github.com/cloudera/DataServicesLabs.git
+[submodule "ClouderaSetup"]
+	path = ClouderaSetup
+	url = https://github.com/cloudera/ClouderaSetup.git
+[submodule "PartnerResources"]
+	path = PartnerResources
+	url = https://github.com/cloudera/PartnerResources.git
+[submodule "PSEAutomation"]
+	path = PSEAutomation
+	url = https://github.com/cloudera/PSEAutomation.git
