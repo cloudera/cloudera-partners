@@ -1,0 +1,96 @@
+= Cloudera Partners Repo — Proposed Cleanup & Restructure
+:toc: macro
+:toclevels: 2
+
+toc::[]
+
+== Context
+
+The `cloudera-partners` repo currently contains 5 git submodules (`ClouderaSetup`, `DataServicesLabs`, `End2EndLabs`, `PartnerResources`, `PSEAutomation`), a top-level `README.adoc`, CI workflows, and two untracked local directories (`Testing/`, `utilities/`) that have accumulated assorted scripts and Terraform artifacts. Before pushing anything upstream, we'd like to tidy this up and add a dedicated area for cluster testing (on-prem and cloud).
+
+== Current State
+
+=== Tracked in `main`
+
+* `.github/workflows/`
+* `.gitignore`, `.gitmodules`, `LICENSE`, `README.adoc`
+* Submodules: `ClouderaSetup`, `DataServicesLabs`, `End2EndLabs`, `PartnerResources`, `PSEAutomation`
+
+=== Untracked (local only, not yet on `origin/main`)
+
+[cols="2,3,4",options="header"]
+|===
+| Path | Contents | Notes
+
+| `Testing/`
+| `benchit.sh`, `diskbench.pl`, `fiobench.pl`, `terabench.sh`, `zkbench.pl`, `randomnet_single.sh`, `run_td.sh`, `os_metrics.json`
+| Benchmarking scripts, mostly 2019-vintage
+
+| `Testing/BDP_CDS_Automation_Helper_Scripts_0.0.2.tar`
+| 153 MB tarball
+| Too large for git
+
+| `Testing/cloudera-pe-test-kit.tar`
+| 191 KB tarball
+| Binary blob
+
+| `Testing/._os_metrics.json`
+| macOS AppleDouble metadata
+| Junk
+
+| `utilities/terraform/`
+| `.terraform/` provider cache, `.terraform.lock.hcl`, `terraform.tfstate`
+| *No `.tf` source files.* State file may contain sensitive resource data.
+|===
+
+== Proposed Cleanup
+
+. *Delete OS junk* — remove `Testing/._os_metrics.json` (macOS AppleDouble artifact).
+. *Stop tracking large binaries* — relocate the 153 MB and 191 KB `.tar` files out of the repo (or gitignore). These should not live in git history.
+. *Resolve `utilities/terraform/`* — orphaned state without source. Propose deleting (`terraform.tfstate` in particular should never be committed). If the `.tf` source lives elsewhere, pull it in before we delete.
+. *Expand `.gitignore`* — add `.terraform/`, `*.tfstate*`, `*.tar`, `._*`, `*.log` (current `.gitignore` only covers `.DS_Store`, `.vscode/`, `.idea/`).
+. *Introduce a cluster-testing directory* — new top-level `ClusterTests/` (or similar) with `OnPrem/` and `Cloud/` subdirectories, mirroring the `ClouderaSetup/OnPremise` naming convention.
+. *Relocate the existing `Testing/` scripts* — fold the benchmark scripts into `ClusterTests/Benchmarks/` so we don't have two parallel "test" concepts.
+
+== Open Questions
+
+. *Replace or coexist?* Should the new cluster-testing directory *replace* `Testing/`, or live alongside it? Preference here is to fold benchmarks in and drop `Testing/`.
+. *Scope of "testing"* — which of the following should the new dir support?
++
+* [ ] Smoke / functional validation of a running cluster
+* [ ] Infrastructure provisioning tests (Terraform / Ansible)
+* [ ] Performance benchmarks (what's currently in `Testing/`)
+* [ ] All of the above
+. *`utilities/terraform/`* — OK to delete? Or does someone have the `.tf` source elsewhere that should be restored first?
+. *Untracked binaries* — OK to delete the `.tar` files and `._os_metrics.json` outright, or should they be archived somewhere (e.g. S3, internal share) first?
+. *Directory name* — `ClusterTests/`, `ClusterTesting/`, `ClusterValidation/`, or something else?
+. *Cloud scope* — which providers should the `Cloud/` subdirectory cover initially? AWS, Azure, GCP, all three?
+
+== Proposed Target Structure
+
+[source,text]
+----
+cloudera-partners/
+├── .github/workflows/
+├── .gitignore                (expanded)
+├── .gitmodules
+├── LICENSE
+├── README.adoc               (updated with ClusterTests section)
+├── ClouderaSetup/            (submodule)
+├── DataServicesLabs/         (submodule)
+├── End2EndLabs/              (submodule)
+├── PartnerResources/         (submodule)
+├── PSEAutomation/            (submodule)
+└── ClusterTests/             (NEW)
+    ├── README.md
+    ├── OnPrem/
+    ├── Cloud/
+    │   ├── AWS/
+    │   ├── Azure/
+    │   └── GCP/
+    └── Benchmarks/           (relocated from Testing/)
+----
+
+== Requested Sign-off
+
+Please reply with answers to the open questions above (a quick "`1a, 2-all, 3-delete, 4-delete, 5-ClusterTests, 6-AWS+Azure+GCP`" style response works). Once we have consensus, the cleanup will be implemented in a single PR so it's easy to review.
